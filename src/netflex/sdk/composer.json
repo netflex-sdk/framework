@@ -33,9 +33,9 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
-        "netflex/api": "^4.2",
-        "netflex/foundation": "^4.2",
-        "netflex/support": "^4.2",
+        "netflex/api": "^4.0",
+        "netflex/foundation": "^4.0",
+        "netflex/support": "^4.0",
         "nunomaduro/laravel-console-menu": "^3.0",
         "symfony/psr-http-message-bridge": "^2.0"
     },
