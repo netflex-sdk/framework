@@ -1,0 +1,34 @@
+{
+    "name": "netflex/api",
+    "description": "Netflex API library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Alrek",
+            "email": "thomas@apility.no"
+        }
+    ],
+    "require": {
+        "illuminate/support": "^8.0",
+        "netflex/http": "^4.2"
+    },
+    "require-dev": {
+        "illuminate/container": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Netflex\\API\\": ""
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Netflex\\API\\Providers\\APIServiceProvider"
+            ],
+            "aliases": {
+                "API": "Netflex\\API\\Facades\\API"
+            }
+        }
+    }
+}

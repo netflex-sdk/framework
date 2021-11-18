@@ -1,0 +1,19 @@
+{
+    "name": "netflex/breadcrumbs",
+    "description": "Utilities to create breadcrumb navigation in Netflex.",
+    "type": "library",
+    "license": "MIT",
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "illuminate/support": "^8.0",
+        "illuminate/view": "^8.0",
+        "netflex/pages": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Netflex\\Breadcrumbs\\": ""
+        }
+    }
+}

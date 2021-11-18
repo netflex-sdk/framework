@@ -1,0 +1,52 @@
+{
+    "name": "netflex/renderer",
+    "description": "High level API for working with the Netflex Foundation PDF generator",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["netflex", "pdf", "renderer"],
+    "homepage": "https://github.com/netflex-sdk/renderer",
+    "authors": [
+        {
+            "name": "Thomas Alrek",
+            "email": "thomas@apility.no",
+            "homepage": "https://github.com/thomas-alrek",
+            "role": "Author"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/netflex-sdk/renderer/issues",
+        "source": "https://github.com/netflex-sdk/renderer"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "facade/ignition": "^2.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/http": "^8.0",
+        "illuminate/support": "^8.0",
+        "illuminate/view": "^8.0",
+        "netflex/api": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Netflex\\Render\\": ""
+        },
+        "files": [
+            "helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Netflex\\Render\\Providers\\RenderServiceProvider"
+            ],
+            "aliases": {
+                "PDF": "Netflex\\Render\\PDF",
+                "HTML": "Netflex\\Render\\HTML",
+                "JPG": "Netflex\\Render\\JPG",
+                "PNG": "Netflex\\Render\\PNG"
+            }
+        }
+    }
+}

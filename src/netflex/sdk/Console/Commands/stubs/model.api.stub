@@ -1,0 +1,24 @@
+<?php
+
+namespace DummyNamespace;
+
+use Netflex\Structure\Model;
+
+class DummyClass extends Model
+{
+    /**
+     * The directory_id associated with the model.
+     *
+     * @var int
+     */
+    protected $relationId = DummyRelationId;
+
+    /**
+    * The resolvable field associated with the model.
+    *
+    * @var string
+    */
+    protected $resolvableField = 'url';
+
+    //
+}

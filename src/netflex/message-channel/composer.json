@@ -1,0 +1,27 @@
+{
+    "name": "netflex/message-channel",
+    "autoload": {
+        "psr-4": {
+            "Netflex\\MessageChannel\\": ""
+        },
+        "files": [
+            "helpers.php"
+        ]
+    },
+    "require": {
+        "illuminate/support": "^8.0",
+        "netflex/api": "^4.2",
+        "illuminate/broadcasting": "^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Netflex\\MessageChannel\\Providers\\MessageChannelServiceProvider",
+                "Netflex\\MessageChannel\\Providers\\MessageChannelBroadcasterServiceProvider"
+            ],
+            "aliases": {
+                "MessageChannel": "Netflex\\MessageChannel\\Facades\\MessageChannel"
+            }
+        }
+    }
+}

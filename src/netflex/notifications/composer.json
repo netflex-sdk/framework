@@ -1,0 +1,32 @@
+{
+    "name": "netflex/notifications",
+    "description": "Netflex Notifications Mail Driver for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "illuminate/mail": "^8.0",
+        "illuminate/support": "^8.0",
+        "mustache/mustache": "^2.13",
+        "netflex/api": "^4.2",
+        "netflex/foundation": "^4.2",
+        "netflex/renderer": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Netflex\\Notifications\\": ""
+        },
+        "files": [
+            "helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider"
+            ]
+        }
+    }
+}

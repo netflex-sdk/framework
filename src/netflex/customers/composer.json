@@ -1,0 +1,41 @@
+{
+    "name": "netflex/customers",
+    "description": "Netflex Customers library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Olav Øyen",
+            "email": "olav@apility.no"
+        },
+        {
+            "name": "Thomas Alrek",
+            "email": "thomas@apility.no"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Netflex\\Customers\\": ""
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "illuminate/auth": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "netflex/api": "^4.2",
+        "netflex/query-builder": "^4.2",
+        "netflex/support": "^4.2"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Netflex\\Customers\\Providers\\AuthServiceProvider"
+            ],
+            "aliases": {
+                "Customer": "Netflex\\Customers\\Customer"
+            }
+        }
+    }
+}

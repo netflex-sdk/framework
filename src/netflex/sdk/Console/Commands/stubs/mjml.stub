@@ -1,0 +1,58 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-image
+            width="162px"
+            src="{{ media_url(variable('mail_notifications_logo'), '162x162', 'l') }}"
+        >
+        </mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#f3f3f3">
+      <mj-column>
+        <mj-text
+            font-weight="bold"
+            align="justify"
+            font-size="24px"
+            color="#000"
+            font-family="helvetica"
+        >
+          Introduction
+        </mj-text>
+        <mj-text
+            align="justify"
+            font-size="15px"
+            color="#000"
+            font-family="helvetica"
+        >
+          Hello World
+        </mj-text>
+        <mj-button
+            align="left"
+            background-color="#8ccaca"
+            border-radius="40px"
+            font-family="helvetica"
+            font-size="12px"
+            href="{{ url('/') }}"
+        >
+          READ MORE
+        </mj-button>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text
+            font-weight="bold"
+            align="center"
+            font-size="16px"
+            color="#000"
+            font-family="helvetica"
+        >
+          Thanks,<br />
+          {{ config('app.name') }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

@@ -1,0 +1,146 @@
+{
+    "name": "netflex/framework",
+    "type": "framework",
+    "authors": [
+        {
+            "name": "Thomas Alrek",
+            "email": "thomas@apility.no"
+        },
+        {
+            "name": "Olav Øyen",
+            "email": "olav@apility.no"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "apility/laravel-ngrok": "^2.2",
+        "apility/rule-builder": "^1.1",
+        "apility/seotools": "^1.0",
+        "facade/ignition": "^2.0",
+        "facade/ignition-contracts": "^1.0",
+        "fideloper/proxy": "^4.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "haydenpierce/class-finder": "^0.4.3",
+        "illuminate/auth": "^8.0",
+        "illuminate/broadcasting": "^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/database": "^8.0",
+        "illuminate/events": "^8.0",
+        "illuminate/http": "^8.0",
+        "illuminate/mail": "^8.0",
+        "illuminate/pagination": "^8.0",
+        "illuminate/queue": "^8.0",
+        "illuminate/routing": "^8.0",
+        "illuminate/support": "^8.0",
+        "illuminate/translation": "^8.0",
+        "illuminate/view": "^8.0",
+        "larapack/dd": "^1.1",
+        "laravel/framework": "^8.0",
+        "laravel/tinker": "^2.0",
+        "laravelium/sitemap": "^8.0",
+        "mustache/mustache": "^2.13",
+        "nunomaduro/laravel-console-menu": "^3.0",
+        "php": "^7.4",
+        "symfony/psr-http-message-bridge": "^2.0"
+    },
+    "require-dev": {
+        "illuminate/cache": "^8.0",
+        "illuminate/container": "^8.0",
+        "illuminate/filesystem": "^8.0",
+        "phpunit/phpunit": "^9.0",
+        "symfony/cache": "^5.0",
+        "symplify/composer-json-manipulator": "^9.3",
+        "symplify/monorepo-builder": "^9.0",
+        "vlucas/phpdotenv": "^5.2"
+    },
+    "autoload": {
+        "files": [
+            "src/netflex/foundation/helpers.php",
+            "src/netflex/message-channel/helpers.php",
+            "src/netflex/notifications/helpers.php",
+            "src/netflex/pages/helpers.php",
+            "src/netflex/query-builder/helpers.php",
+            "src/netflex/renderer/helpers.php",
+            "src/netflex/sdk/helpers.php"
+        ],
+        "psr-4": {
+            "Netflex\\": "src/netflex/sdk/",
+            "Netflex\\API\\": "src/netflex/api/",
+            "Netflex\\Breadcrumbs\\": "src/netflex/breadcrumbs/",
+            "Netflex\\Commerce\\": "src/netflex/commerce/",
+            "Netflex\\Customers\\": "src/netflex/customers/",
+            "Netflex\\Files\\": "src/netflex/files/",
+            "Netflex\\Foundation\\": "src/netflex/foundation/",
+            "Netflex\\Http\\": "src/netflex/http/",
+            "Netflex\\MessageChannel\\": "src/netflex/message-channel/",
+            "Netflex\\Notifications\\": "src/netflex/notifications/",
+            "Netflex\\Pages\\": "src/netflex/pages/",
+            "Netflex\\Query\\": "src/netflex/query-builder/",
+            "Netflex\\Render\\": "src/netflex/renderer/",
+            "Netflex\\Scheduler\\": "src/netflex/scheduler/",
+            "Netflex\\Structure\\": "src/netflex/structures/",
+            "Netflex\\Support\\": "src/netflex/support/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider",
+                "Netflex\\Query\\Providers\\QueryBuilderServiceProvider",
+                "Netflex\\Query\\Providers\\SearchServiceProvider",
+                "Netflex\\Pages\\Providers\\MixServiceProvider",
+                "Netflex\\Pages\\Providers\\PagesServiceProvider",
+                "Netflex\\Pages\\Providers\\RouteServiceProvider",
+                "Netflex\\Pages\\Providers\\SEOToolsServiceProvider",
+                "Netflex\\MessageChannel\\Providers\\MessageChannelServiceProvider",
+                "Netflex\\MessageChannel\\Providers\\MessageChannelBroadcasterServiceProvider",
+                "Netflex\\API\\Providers\\APIServiceProvider",
+                "Netflex\\Http\\Providers\\HttpClientServiceProvider",
+                "Netflex\\Foundation\\Providers\\FoundationServiceProvider",
+                "Netflex\\Foundation\\Providers\\TranslationServiceProvider",
+                "Netflex\\Scheduler\\Providers\\SchedulerServiceProvider",
+                "Netflex\\Structure\\Providers\\StructureServiceProvider",
+                "Netflex\\Render\\Providers\\RenderServiceProvider",
+                "Netflex\\Customers\\Providers\\AuthServiceProvider"
+            ],
+            "aliases": {
+                "Search": "Netflex\\Query\\Facades\\Search",
+                "Query": "Netflex\\Query\\Facades\\QueryBuilderFacade",
+                "QueryAssoc": "Netflex\\Query\\Facades\\QueryBuilderFacade",
+                "SEOMeta": "Apility\\SEOTools\\Facades\\SEOMeta",
+                "OpenGraph": "Apility\\SEOTools\\Facades\\OpenGraph",
+                "Twitter": "Apility\\SEOTools\\Facades\\TwitterCard",
+                "SEO": "Apility\\SEOTools\\Facades\\SEOTools",
+                "MessageChannel": "Netflex\\MessageChannel\\Facades\\MessageChannel",
+                "API": "Netflex\\API\\Facades\\API",
+                "Http": "Netflex\\Http\\Facades\\Http",
+                "PDF": "Netflex\\Render\\PDF",
+                "HTML": "Netflex\\Render\\HTML",
+                "JPG": "Netflex\\Render\\JPG",
+                "PNG": "Netflex\\Render\\PNG",
+                "Customer": "Netflex\\Customers\\Customer"
+            }
+        }
+    },
+    "replace": {
+        "netflex/api": "4.1.4",
+        "netflex/breadcrumbs": "4.1.4",
+        "netflex/commerce": "4.1.4",
+        "netflex/customers": "4.1.4",
+        "netflex/files": "4.1.4",
+        "netflex/foundation": "4.1.4",
+        "netflex/http": "4.1.4",
+        "netflex/message-channel": "4.1.4",
+        "netflex/notifications": "4.1.4",
+        "netflex/pages": "4.1.4",
+        "netflex/query-builder": "4.1.4",
+        "netflex/renderer": "4.1.4",
+        "netflex/scheduler": "4.1.4",
+        "netflex/sdk": "4.1.4",
+        "netflex/structure": "4.1.4",
+        "netflex/structures": "4.1.4",
+        "netflex/support": "4.1.4"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
