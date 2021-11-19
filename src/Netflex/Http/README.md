@@ -1,4 +1,6 @@
-# Netflex Http Client
+# Netflex Http
+
+[READ ONLY] Subtree split of the Netflex Http component (see [netflex/framework](https://github.con/netflex-sdk/framework))
 
 This library provides a standalone Http client.
 

@@ -1,4 +1,6 @@
-# Netflex Commerce library
+# Netflex Commerce
+
+[READ ONLY] Subtree split of the Netflex Commerce component (see [netflex/framework](https://github.con/netflex-sdk/framework))
 
 The Netflex Commerce library is for working with the commerce endpoints in the Netflex API.
 

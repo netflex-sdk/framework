@@ -1,5 +1,7 @@
 # Netflex API
 
+[READ ONLY] Subtree split of the Netflex API component (see [netflex/framework](https://github.con/netflex-sdk/framework))
+
 A library for working with the Netflex API.
 
 <a href="https://packagist.org/packages/netflex/api"><img src="https://img.shields.io/packagist/v/netflex/api?label=stable" alt="Stable version"></a>

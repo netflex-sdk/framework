@@ -1,5 +1,7 @@
 # Netflex Renderer
 
+[READ ONLY] Subtree split of the Netflex Renderer component (see [netflex/framework](https://github.con/netflex-sdk/framework))
+
 This package provides a high-level builder interface for generating PDF's, images, and server side rendering of HTML.
 
 Full API reference is [available here](https://netflex-sdk.github.io/docs/api/Netflex/Render.html).

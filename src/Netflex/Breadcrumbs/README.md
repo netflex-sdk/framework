@@ -1,4 +1,7 @@
 # Netflex Breadcrumbs
+
+[READ ONLY] Subtree split of the Netflex Breadcrumbs component (see [netflex/framework](https://github.con/netflex-sdk/framework))
+
 Utilitiy class for creating breadcrumb navigations in Netflex Pages.
 
 <a href="https://packagist.org/packages/netflex/breadcrumbs"><img src="https://img.shields.io/packagist/v/netflex/breadcrumbs?label=stable" alt="Stable version"></a>

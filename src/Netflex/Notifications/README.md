@@ -1,5 +1,6 @@
-# Netflex Notifications Mail Driver for Laravel MailManager
+# Netflex Notifications
 
+[READ ONLY] Subtree split of the Netflex Notification component (see [netflex/framework](https://github.con/netflex-sdk/framework))
 ## Installation
 
 ```bash

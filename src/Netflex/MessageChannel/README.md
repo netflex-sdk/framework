@@ -1,5 +1,7 @@
 # Netflex MessageChannel
 
+[READ ONLY] Subtree split of the Netflex MessageChannel component (see [netflex/framework](https://github.con/netflex-sdk/framework))
+
 This library lets you send real time messages to connected clients over WebSocket using the Netflex MessageChannel API.
 
 <a href="https://packagist.org/packages/netflex/message-channel"><img src="https://img.shields.io/packagist/v/netflex/message-channel?label=stable" alt="Stable version"></a>
