@@ -1,4 +1,4 @@
-name: Split Monorepo
+name: Build
 
 on:
     push:
