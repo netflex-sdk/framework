@@ -1,0 +1,35 @@
+{
+    "name": "netflex/console",
+    "description": "Netflex console",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "sdk",
+        "netflex",
+        "framework"
+    ],
+    "homepage": "https://github.com/netflex-sdk/console",
+    "authors": [
+        {
+            "name": "Thomas Alrek",
+            "email": "thomas@apility.no",
+            "homepage": "https://github.com/thomas-alrek",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/netflex-sdk/console/issues",
+        "source": "https://github.com/netflex-sdk/console"
+    },
+    "autoload": {
+        "psr-4": {
+            "Netflex\\Console\\": ""
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "laravel/framework": "^8.0"
+    }
+}

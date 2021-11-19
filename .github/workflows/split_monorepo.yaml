@@ -8,41 +8,90 @@ on:
             - '*'
 
 jobs:
-    provide_packages_json:
-        name: "Extract packages"
-        # see json juggling: https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#example-6
-        # see https://stackoverflow.com/a/62953566/1348344
-        runs-on: ubuntu-latest
-
-        steps:
-            -
-                uses: actions/checkout@v2
-
-            # required for matrix of packages set
-            -   uses: shivammathur/setup-php@v2
-                with:
-                    php-version: 7.4
-                    coverage: none
-
-            -   uses: "ramsey/composer-install@v1"
-
-            # get package json list
-            -
-                id: output_data
-                run: echo "::set-output name=matrix::$(vendor/bin/monorepo-builder packages-json --exclude-package easy-coding-standard --exclude-package monorepo-builder --exclude-package config-transformer)"
-
-        # this step is needed, so the output gets to the next defined job
-        outputs:
-            matrix: ${{ steps.output_data.outputs.matrix }}
-
     split_monorepo:
-        needs: provide_packages_json
         name: "Update repository"
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
             matrix:
-                package: ${{fromJson(needs.provide_packages_json.outputs.matrix)}}
+                packages: [
+                    {
+                        package: api,
+                        path: src/Netflex/API
+                    },
+                    {
+                        package: breadcrumbs,
+                        path: src/Netflex/Breadcrumbs
+                    },
+                    {
+                        package: commerce,
+                        path: src/Netflex/Commerce
+                    },
+                    {
+                        package: console,
+                        path: src/Netflex/Console
+                    },
+                    {
+                        package: customers,
+                        path: src/Netflex/Customers
+                    },
+                    {
+                        package: encryption,
+                        path: src/Netflex/Encryption
+                    },
+                    {
+                        package: files,
+                        path: src/Netflex/Files
+                    },
+                    {
+                        package: foundation,
+                        path: src/Netflex/Foundation
+                    },
+                    {
+                        package: log,
+                        path: src/Netflex/Log
+                    },
+                    {
+                        package: http,
+                        path: src/Netflex/Http
+                    },
+                    {
+                        package: message-channel,
+                        path: src/Netflex/MessageChannel
+                    },
+                    {
+                        package: notifications,
+                        path: src/Netflex/Notifications
+                    },
+                    {
+                        package: pages,
+                        path: src/Netflex/Pages
+                    },
+                    {
+                        package: query-builder,
+                        path: src/Netflex/Query
+                    },
+                    {
+                        package: renderer,
+                        path: src/Netflex/Renderer
+                    },
+                    {
+                        package: scheduler,
+                        path: src/Netflex/Scheduler
+                    },
+                    {
+                        package: sdk,
+                        path: src/Netflex/SDK
+                    },
+                    {
+                        package: structures,
+                        path: src/Netflex/Structures
+                    },
+                    {
+                        package: support,
+                        path: src/Netflex/Support
+                    }
+                ]
 
         steps:
             -   uses: actions/checkout@v2
@@ -50,14 +99,14 @@ jobs:
             -
                 if: "!startsWith(github.ref, 'refs/tags/')"
                 # Uses an action in the root directory
-                name: Monorepo Split of ${{ matrix.package }}
+                name: Monorepo Split of ${{ matrix.packages.package }}
                 uses: symplify/github-action-monorepo-split@2.1
                 env:
                     GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
                 with:
-                    package_directory: 'src/netflex/${{ matrix.package }}'
+                    package_directory: '${{ matrix.packages.path }}'
                     repository_organization: 'netflex-sdk'
-                    repository_name: '${{ matrix.package }}'
+                    repository_name: '${{ matrix.packages.package }}'
                     user_name: "Thomas Alrek"
                     user_email: "thomas@alrek.no"
                     branch: "master"
@@ -66,16 +115,16 @@ jobs:
             -
                 if: "startsWith(github.ref, 'refs/tags/')"
                 # Uses an action in the root directory
-                name: Monorepo Tagged Split of ${{ matrix.package }}
+                name: Monorepo Tagged Split of ${{ matrix.packages.package }}
                 uses: symplify/github-action-monorepo-split@2.1
                 env:
                     GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
                 with:
                     tag: ${GITHUB_REF#refs/tags/}
 
-                    package_directory: 'src/netflex/${{ matrix.package }}'
+                    package_directory: '${{ matrix.packages.path }}'
                     repository_organization: 'netflex-sdk'
-                    repository_name: '${{ matrix.package }}'
+                    repository_name: '${{ matrix.packages.package }}'
                     user_name: "Thomas Alrek"
                     user_email: "thomas@alrek.no"
                     branch: "master"

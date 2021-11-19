@@ -1,0 +1,35 @@
+{
+    "name": "netflex/log",
+    "description": "Netflex logging",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "sdk",
+        "netflex",
+        "framework"
+    ],
+    "homepage": "https://github.com/netflex-sdk/log",
+    "authors": [
+        {
+            "name": "Thomas Alrek",
+            "email": "thomas@apility.no",
+            "homepage": "https://github.com/thomas-alrek",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/netflex-sdk/log/issues",
+        "source": "https://github.com/netflex-sdk/log"
+    },
+    "autoload": {
+        "psr-4": {
+            "Netflex\\Log\\": ""
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "illuminate/log": "^8.0"
+    }
+}
