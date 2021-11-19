@@ -6,7 +6,7 @@
 <a href="https://github.com/netflex-sdk/api/graphs/contributors"><img src="https://img.shields.io/github/contributors/netflex-sdk/api.svg?color=green" alt="Contributors"></a>
 <a href="https://packagist.org/packages/netflex/api/stats"><img src="https://img.shields.io/packagist/dm/netflex/api" alt="Downloads"></a>
 
-[READ ONLY] Subtree split of the Netflex API component (see [netflex/api](https://github.con/netflex-sdk/framework))
+[READ ONLY] Subtree split of the Netflex API component (see [netflex/api](https://github.com/netflex-sdk/framework))
 
 A library for working with the Netflex API.
 

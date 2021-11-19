@@ -6,4 +6,4 @@
 <a href="https://github.com/netflex-sdk/log/graphs/contributors"><img src="https://img.shields.io/github/contributors/netflex-sdk/log.svg?color=green" alt="Contributors"></a>
 <a href="https://packagist.org/packages/netflex/log/stats"><img src="https://img.shields.io/packagist/dm/netflex/log" alt="Downloads"></a>
 
-[READ ONLY] Subtree split of the Netflex Log component (see [netflex/framework](https://github.con/netflex-sdk/framework))
+[READ ONLY] Subtree split of the Netflex Log component (see [netflex/framework](https://github.com/netflex-sdk/framework))
