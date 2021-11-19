@@ -1,12 +1,14 @@
 # Netflex API
 
-[READ ONLY] Subtree split of the Netflex API component (see [netflex/framework](https://github.con/netflex-sdk/framework))
+<a href="https://packagist.org/packages/netflex/api"><img src="https://img.shields.io/packagist/v/netflex/api?label=stable" alt="Stable version"></a>
+<a href="https://github.com/netflex-sdk/framework/actions/workflows/split_monorepo.yaml"><img src="https://github.com/netflex-sdk/framework/actions/workflows/split_monorepo.yaml/badge.svg" alt="Build status"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/netflex-sdk/framework.svg" alt="License: MIT"></a>
+<a href="https://github.com/netflex-sdk/api/graphs/contributors"><img src="https://img.shields.io/github/contributors/netflex-sdk/api.svg?color=green" alt="Contributors"></a>
+<a href="https://packagist.org/packages/netflex/api/stats"><img src="https://img.shields.io/packagist/dm/netflex/api" alt="Downloads"></a>
+
+[READ ONLY] Subtree split of the Netflex API component (see [netflex/api](https://github.con/netflex-sdk/framework))
 
 A library for working with the Netflex API.
-
-<a href="https://packagist.org/packages/netflex/api"><img src="https://img.shields.io/packagist/v/netflex/api?label=stable" alt="Stable version"></a>
-<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/netflex-sdk/api.svg" alt="License: MIT"></a>
-<a href="https://packagist.org/packages/netflex/api/stats"><img src="https://img.shields.io/packagist/dm/netflex/api" alt="Downloads"></a>
 
 [Documentation](https://netflex-sdk.github.io/#/docs/api)
 
