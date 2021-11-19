@@ -5,7 +5,6 @@ namespace Netflex\Console\Commands;
 use Netflex\API\Facades\API;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;

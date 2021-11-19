@@ -3,11 +3,7 @@
     "description": "Netflex logging",
     "type": "library",
     "license": "MIT",
-    "keywords": [
-        "sdk",
-        "netflex",
-        "framework"
-    ],
+    "keywords": ["sdk", "netflex", "framework"],
     "homepage": "https://github.com/netflex-sdk/log",
     "authors": [
         {
