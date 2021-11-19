@@ -24,9 +24,9 @@
     "require": {
         "illuminate/auth": "^8.0",
         "illuminate/contracts": "^8.0",
-        "netflex/api": "^4.0.3",
-        "netflex/query-builder": "^4.0.3",
-        "netflex/support": "^4.0.3"
+        "netflex/api": "^4.1",
+        "netflex/query-builder": "^4.1",
+        "netflex/support": "^4.1"
     },
     "extra": {
         "laravel": {
