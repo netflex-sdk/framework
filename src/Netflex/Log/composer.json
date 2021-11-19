@@ -3,7 +3,11 @@
     "description": "Netflex logging",
     "type": "library",
     "license": "MIT",
-    "keywords": ["sdk", "netflex", "framework"],
+    "keywords": [
+        "sdk",
+        "netflex",
+        "framework"
+    ],
     "homepage": "https://github.com/netflex-sdk/log",
     "authors": [
         {
@@ -27,5 +31,10 @@
     },
     "require": {
         "illuminate/log": "^8.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        }
     }
 }

@@ -3,7 +3,11 @@
     "description": "Netflex console",
     "type": "library",
     "license": "MIT",
-    "keywords": ["sdk", "netflex", "framework"],
+    "keywords": [
+        "sdk",
+        "netflex",
+        "framework"
+    ],
     "homepage": "https://github.com/netflex-sdk/console",
     "authors": [
         {
@@ -31,5 +35,10 @@
         "netflex/foundation": "^4.1",
         "netflex/pages": "^4.1",
         "apility/laravel-ngrok": "^2.2"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        }
     }
 }

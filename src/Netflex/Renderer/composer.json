@@ -3,7 +3,11 @@
     "description": "High level API for working with the Netflex Foundation PDF generator",
     "type": "library",
     "license": "MIT",
-    "keywords": ["netflex", "pdf", "renderer"],
+    "keywords": [
+        "netflex",
+        "pdf",
+        "renderer"
+    ],
     "homepage": "https://github.com/netflex-sdk/renderer",
     "authors": [
         {
@@ -37,6 +41,9 @@
         ]
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Render\\Providers\\RenderServiceProvider"

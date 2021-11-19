@@ -24,6 +24,9 @@
         "vlucas/phpdotenv": "^5.2"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Foundation\\Providers\\FoundationServiceProvider",

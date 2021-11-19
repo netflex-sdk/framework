@@ -26,5 +26,10 @@
         "illuminate/container": "^8.0",
         "illuminate/cache": "^8.0",
         "illuminate/filesystem": "^8.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        }
     }
 }

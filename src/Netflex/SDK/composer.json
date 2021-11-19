@@ -3,7 +3,11 @@
     "description": "Netflex platform SDK",
     "type": "library",
     "license": "MIT",
-    "keywords": ["sdk", "netflex", "framework"],
+    "keywords": [
+        "sdk",
+        "netflex",
+        "framework"
+    ],
     "homepage": "https://github.com/netflex-sdk/sdk",
     "authors": [
         {
@@ -37,5 +41,10 @@
     },
     "require-dev": {
         "symfony/cache": "^5.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        }
     }
 }
