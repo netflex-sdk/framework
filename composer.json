@@ -44,7 +44,7 @@
         "laravelium/sitemap": "^8.0",
         "mustache/mustache": "^2.13",
         "nunomaduro/laravel-console-menu": "^3.0",
-        "php": "^7.4",
+        "php": "^8.0",
         "symfony/psr-http-message-bridge": "^2.0"
     },
     "require-dev": {
@@ -96,6 +96,9 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "5.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider",
