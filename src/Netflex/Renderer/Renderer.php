@@ -59,7 +59,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
     /**
      * @return object
      */
-    protected static function status ()
+    protected static function status()
     {
         return API::get('foundation/pdf/status');
     }
@@ -69,7 +69,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
      * 
      * @return string
      */
-    public static function version ()
+    public static function version()
     {
         return static::status()
             ->chromium;
@@ -88,11 +88,11 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
                     'json' => $this->options
                 ]);
 
-                if (!$this->options['fetch']) {
-                    return $response;
-                }
-    
-                return $this->postProcess($response);
+            if (!$this->options['fetch']) {
+                return $response;
+            }
+
+            return $this->postProcess($response);
         } catch (ClientExceptionInterface $exception) {
             if ($exception instanceof BadResponseException) {
                 throw new RenderException($exception->getResponse());
@@ -151,7 +151,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
      * */
     public function waitUntilLoaded()
     {
-        $this->setOption('waitUntil', 'load');
+        return $this->setOption('waitUntil', 'load');
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
      * */
     public function waitUntiDOMContentLoaded()
     {
-        $this->setOption('waitUntil', 'domcontentloaded');
+        return $this->setOption('waitUntil', 'domcontentloaded');
     }
 
     /**
@@ -171,7 +171,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
      * */
     public function waitUntiNetworkIdle()
     {
-        $this->setOption('waitUntil', 'networkidle0');
+        return $this->setOption('waitUntil', 'networkidle0');
     }
 
     /**
@@ -181,7 +181,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
      * */
     public function waitUntiNetworkSettled()
     {
-        $this->setOption('waitUntil', 'networkidle2');
+        return $this->setOption('waitUntil', 'networkidle2');
     }
 
     /**
