@@ -42,6 +42,9 @@
         ]
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Render\\Providers\\RenderServiceProvider"

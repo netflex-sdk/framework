@@ -21,6 +21,9 @@
         "php": "^7.4|^8.0"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Scheduler\\Providers\\SchedulerServiceProvider"

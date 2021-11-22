@@ -32,5 +32,10 @@
     "require": {
         "illuminate/log": "^8.0",
         "php": "^7.4|^8.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev"
+        }
     }
 }
