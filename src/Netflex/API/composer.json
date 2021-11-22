@@ -11,7 +11,8 @@
     ],
     "require": {
         "illuminate/support": "^8.0",
-        "netflex/http": "^4.1"
+        "netflex/http": "^4.1",
+        "php": "^7.4|^8.0"
     },
     "require-dev": {
         "illuminate/container": "^8.0"

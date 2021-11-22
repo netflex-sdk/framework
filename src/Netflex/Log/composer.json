@@ -3,7 +3,11 @@
     "description": "Netflex logging",
     "type": "library",
     "license": "MIT",
-    "keywords": ["sdk", "netflex", "framework"],
+    "keywords": [
+        "sdk",
+        "netflex",
+        "framework"
+    ],
     "homepage": "https://github.com/netflex-sdk/log",
     "authors": [
         {
@@ -26,6 +30,7 @@
         "sort-packages": true
     },
     "require": {
-        "illuminate/log": "^8.0"
+        "illuminate/log": "^8.0",
+        "php": "^7.4|^8.0"
     }
 }

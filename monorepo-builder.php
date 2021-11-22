@@ -25,11 +25,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $parameters->set(Option::DATA_TO_APPEND, [
         ComposerJsonSection::CONFIG => [
-            'platform' => '^7.4',
             'sort-packages' => true,
         ],
         ComposerJsonSection::REQUIRE => [
-            'php' => '^7.4',
+            'php' => '^7.4|^8.0',
         ],
         ComposerJsonSection::LICENSE => 'MIT',
         ComposerJsonSection::TYPE => 'library',

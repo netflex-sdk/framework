@@ -3,7 +3,11 @@
     "description": "High level API for working with the Netflex Foundation PDF generator",
     "type": "library",
     "license": "MIT",
-    "keywords": ["netflex", "pdf", "renderer"],
+    "keywords": [
+        "netflex",
+        "pdf",
+        "renderer"
+    ],
     "homepage": "https://github.com/netflex-sdk/renderer",
     "authors": [
         {
@@ -26,7 +30,8 @@
         "illuminate/http": "^8.0",
         "illuminate/support": "^8.0",
         "illuminate/view": "^8.0",
-        "netflex/api": "^4.1"
+        "netflex/api": "^4.1",
+        "php": "^7.4|^8.0"
     },
     "autoload": {
         "psr-4": {
