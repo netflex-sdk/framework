@@ -37,7 +37,8 @@
         "netflex/foundation": "^4.1",
         "netflex/support": "^4.1",
         "nunomaduro/laravel-console-menu": "^3.0",
-        "symfony/psr-http-message-bridge": "^2.0"
+        "symfony/psr-http-message-bridge": "^2.0",
+        "php": "^7.4|^8.0"
     },
     "require-dev": {
         "symfony/cache": "^5.0"

@@ -21,7 +21,8 @@
         "illuminate/container": "^8.0",
         "illuminate/filesystem": "^8.0",
         "larapack/dd": "^1.1",
-        "vlucas/phpdotenv": "^5.2"
+        "vlucas/phpdotenv": "^5.2",
+        "php": "^7.4|^8.0"
     },
     "extra": {
         "branch-alias": {
