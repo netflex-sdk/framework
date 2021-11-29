@@ -84,7 +84,7 @@ class SDK
    */
   public function getApp()
   {
-    if ($this->isRunningInConsole() && !$this->app->bound(\Illuminate\Contracts\Http\Kernel::class)) {
+    if (!$this->app->bound(\Illuminate\Contracts\Http\Kernel::class)) {
       $this->app->singleton(
         \Illuminate\Contracts\Http\Kernel::class,
         \App\Http\Kernel::class
