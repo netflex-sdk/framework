@@ -101,7 +101,6 @@
                 "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider",
                 "Netflex\\Pages\\Providers\\MixServiceProvider",
                 "Netflex\\Pages\\Providers\\PagesServiceProvider",
-                "Netflex\\Pages\\Providers\\RouteServiceProvider",
                 "Netflex\\Pages\\Providers\\SEOToolsServiceProvider",
                 "Netflex\\Query\\Providers\\QueryBuilderServiceProvider",
                 "Netflex\\Query\\Providers\\SearchServiceProvider",
