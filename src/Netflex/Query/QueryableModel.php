@@ -431,10 +431,6 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
         if (count($dirty) > 0) {
           $dirty['revision_publish'] = true;
 
-          if ($this->autoPublishes) {
-            $dirty['published'] = true;
-          }
-
           $this->performUpdateRequest($this->getRelationId(), $this->getKey(), $dirty);
         }
 
