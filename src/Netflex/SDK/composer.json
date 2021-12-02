@@ -3,11 +3,7 @@
     "description": "Netflex platform SDK",
     "type": "library",
     "license": "MIT",
-    "keywords": [
-        "sdk",
-        "netflex",
-        "framework"
-    ],
+    "keywords": ["sdk", "netflex", "framework"],
     "homepage": "https://github.com/netflex-sdk/sdk",
     "authors": [
         {
@@ -33,9 +29,9 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
-        "netflex/api": "^4.1",
-        "netflex/foundation": "^4.1",
-        "netflex/support": "^4.1",
+        "netflex/api": "^4.0.14",
+        "netflex/foundation": "^4.0.14",
+        "netflex/support": "^4.0.14",
         "nunomaduro/laravel-console-menu": "^3.0",
         "symfony/psr-http-message-bridge": "^2.0",
         "php": "^7.4|^8.0"
