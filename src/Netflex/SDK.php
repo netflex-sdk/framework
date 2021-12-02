@@ -74,11 +74,23 @@ class SDK
     return $this->app->singleton($abstract, $concrete);
   }
 
+  public function isRunningInConsole()
+  {
+    return php_sapi_name() == 'cli' || php_sapi_name() == 'phpdbg';
+  }
+
   /**
    * @return Application
    */
   public function getApp()
   {
+    if (!$this->app->bound(\Illuminate\Contracts\Http\Kernel::class)) {
+      $this->app->singleton(
+        \Illuminate\Contracts\Http\Kernel::class,
+        \App\Http\Kernel::class
+      );
+    }
+
     return $this->app;
   }
 

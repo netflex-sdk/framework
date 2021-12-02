@@ -15,7 +15,7 @@
     ],
     "license": "MIT",
     "require": {
-        "apility/laravel-ngrok": "^2.2",
+        "apility/laravel-ngrok": "^3.0",
         "apility/rule-builder": "^1.1",
         "apility/seotools": "^1.0",
         "facade/ignition": "^2.0",
@@ -104,7 +104,6 @@
                 "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider",
                 "Netflex\\Pages\\Providers\\MixServiceProvider",
                 "Netflex\\Pages\\Providers\\PagesServiceProvider",
-                "Netflex\\Pages\\Providers\\RouteServiceProvider",
                 "Netflex\\Pages\\Providers\\SEOToolsServiceProvider",
                 "Netflex\\Query\\Providers\\QueryBuilderServiceProvider",
                 "Netflex\\Query\\Providers\\SearchServiceProvider",
