@@ -38,5 +38,10 @@
     },
     "require-dev": {
         "symfony/cache": "^5.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1.x-dev"
+        }
     }
 }

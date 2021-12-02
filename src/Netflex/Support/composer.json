@@ -27,5 +27,10 @@
     },
     "scripts": {
         "tests": "vendor/bin/phpunit --testdox --colors=always"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1.x-dev"
+        }
     }
 }

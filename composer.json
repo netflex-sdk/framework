@@ -96,6 +96,9 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "5.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider",
@@ -135,26 +138,26 @@
         }
     },
     "replace": {
-        "netflex/api": "4.0.12",
-        "netflex/breadcrumbs": "4.0.12",
-        "netflex/commerce": "4.0.12",
-        "netflex/console": "4.0.12",
-        "netflex/customers": "4.0.12",
-        "netflex/encryption": "4.0.12",
-        "netflex/files": "4.0.12",
-        "netflex/foundation": "4.0.12",
-        "netflex/http": "4.0.12",
-        "netflex/log": "4.0.12",
-        "netflex/message-channel": "4.0.12",
-        "netflex/notifications": "4.0.12",
-        "netflex/pages": "4.0.12",
-        "netflex/query-builder": "4.0.12",
-        "netflex/renderer": "4.0.12",
-        "netflex/scheduler": "4.0.12",
-        "netflex/sdk": "4.0.12",
-        "netflex/structure": "4.0.12",
-        "netflex/structures": "4.0.12",
-        "netflex/support": "4.0.12"
+        "netflex/api": "4.0.14",
+        "netflex/breadcrumbs": "4.0.14",
+        "netflex/commerce": "4.0.14",
+        "netflex/console": "4.0.14",
+        "netflex/customers": "4.0.14",
+        "netflex/encryption": "4.0.14",
+        "netflex/files": "4.0.14",
+        "netflex/foundation": "4.0.14",
+        "netflex/http": "4.0.14",
+        "netflex/log": "4.0.14",
+        "netflex/message-channel": "4.0.14",
+        "netflex/notifications": "4.0.14",
+        "netflex/pages": "4.0.14",
+        "netflex/query-builder": "4.0.14",
+        "netflex/renderer": "4.0.14",
+        "netflex/scheduler": "4.0.14",
+        "netflex/sdk": "4.0.14",
+        "netflex/structure": "4.0.14",
+        "netflex/structures": "4.0.14",
+        "netflex/support": "4.0.14"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

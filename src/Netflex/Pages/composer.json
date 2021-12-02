@@ -38,6 +38,9 @@
         "vlucas/phpdotenv": "^5.2"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "4.1.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Pages\\Providers\\MixServiceProvider",

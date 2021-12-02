@@ -30,5 +30,10 @@
         "illuminate/encryption": "^8.0",
         "netflex/foundation": "^4.1",
         "php": "^7.4|^8.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1.x-dev"
+        }
     }
 }

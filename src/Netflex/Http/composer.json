@@ -23,6 +23,9 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "4.1.x-dev"
+        },
         "laravel": {
             "providers": [
                 "Netflex\\Http\\Providers\\HttpClientServiceProvider"
