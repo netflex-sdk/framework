@@ -29,9 +29,9 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
-        "netflex/api": "^4.0.14",
-        "netflex/foundation": "^4.0.14",
-        "netflex/support": "^4.0.14",
+        "netflex/api": "^4.1",
+        "netflex/foundation": "^4.1",
+        "netflex/support": "^4.1",
         "nunomaduro/laravel-console-menu": "^3.0",
         "symfony/psr-http-message-bridge": "^2.0",
         "php": "^7.4|^8.0"
@@ -41,7 +41,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.0.x-dev"
+            "dev-master": "4.1.x-dev"
         }
     }
 }
