@@ -95,6 +95,11 @@ class Order extends ReactiveObject
     return new static($attributes);
   }
 
+  public function usesChunking()
+  {
+    return $this->useChunking ?? false;
+  }
+
   /**
    * @param string|int $id
    * @return int|null
