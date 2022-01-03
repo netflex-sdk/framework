@@ -175,7 +175,7 @@ class ServeCommand extends Command
       ];
     } else {
       $this->configuration = $this->variable()->value;
-      $this->configuration->proxies = Collection::make($this->configuration->proxies);
+      $this->configuration->proxies = Collection::make($this->configuration->proxies ?? []);
     }
 
     return $this->configuration;
