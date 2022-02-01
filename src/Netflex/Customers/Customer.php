@@ -338,7 +338,7 @@ class Customer extends Model implements Authenticatable
   }
 
   /**
-   * If customer already has an active consent assignment for the given consent, the previous assignment will get revoked
+   * Assign consent to customer
    * 
    * @param Consent|int $consent
    * @param string $source
@@ -347,9 +347,6 @@ class Customer extends Model implements Authenticatable
    */
   public function addConsent($consent, $source, $options = [])
   {
-    if ($activeConsent = $this->getConsent($consent)) {
-      $activeConsent->revoke();
-    }
 
     $options['source'] = $source;
     $assignment_id = ConsentAssignment::create($consent, $this, $options);
