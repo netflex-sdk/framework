@@ -585,7 +585,9 @@ class Page extends QueryableModel implements Responsable
   public function getAuthgroupsAttribute($authgroups)
   {
     if ($authgroups) {
-      return array_map('intval', array_values(array_filter(explode(',', $authgroups))));
+      $authgroups = array_map('intval', array_values(array_filter(explode(',', $authgroups))));
+    } else {
+      $authgroups = [];
     }
 
     $page = $this->parent;
@@ -593,11 +595,11 @@ class Page extends QueryableModel implements Responsable
     if ($page) {
       do {
         if (!$page->public && $page->children_inherits_permission) {
-          return $page->authgroups;
+          return array_values(array_unique([...$authgroups, ...$page->authgroups]));
         }
       } while ($page = $page->parent);
     }
 
-    return null;
+    return $authgroups;
   }
 }
