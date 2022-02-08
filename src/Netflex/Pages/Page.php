@@ -581,4 +581,23 @@ class Page extends QueryableModel implements Responsable
   {
     return (bool) $children_inherits_permission;
   }
+
+  public function getAuthgroupsAttribute($authgroups)
+  {
+    if ($authgroups) {
+      return array_map('intval', array_values(array_filter(explode(',', $authgroups))));
+    }
+
+    $page = $this->parent;
+
+    if ($page) {
+      do {
+        if (!$page->public && $page->children_inherits_permission) {
+          return $page->authgroups;
+        }
+      } while ($page = $page->parent);
+    }
+
+    return null;
+  }
 }
