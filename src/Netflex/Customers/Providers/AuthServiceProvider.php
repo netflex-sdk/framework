@@ -29,6 +29,11 @@ class AuthServiceProvider extends ServiceProvider implements UserProvider
     Auth::provider('netflex', function ($app, array $config) {
       return new static($app, $config['model'] ?? Customer::class);
     });
+
+    Auth::macro('attemptWithGroup', function ($credentials, $group) {
+      $credentials['group'] = $group;
+      return Auth::attempt($credentials);
+    });
   }
 
   /**
