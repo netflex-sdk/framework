@@ -268,7 +268,7 @@ class ServeCommand extends Command
   {
     chdir(public_path());
 
-    if ($this->input->getOption('local')) {
+    if ($this->input->getOption('local') ?: (bool) env("NETFLEX_SKIP_NGROK", false)) {
       passthru(implode(' ', $this->serverCommand()), $status);
 
       if ($status && $this->canTryAnotherPort()) {
@@ -389,7 +389,7 @@ class ServeCommand extends Command
   protected function getOptions()
   {
     $options = parent::getOptions();
-    $options[] = ['local', 'l', InputOption::VALUE_OPTIONAL, 'Only serve locally, skips ngrok', env("NETFLEX_SKIP_NGROK", false)];
+    $options[] = ['local', 'l', InputOption::VALUE_NONE, 'Only serve locally, skips ngrok'];
     $options[] = ['region', 'r', InputOption::VALUE_OPTIONAL, 'Specify ngrok region, defaults to eu', 'eu'];
 
     return $options;
