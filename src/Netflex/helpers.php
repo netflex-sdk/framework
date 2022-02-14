@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Config;
+
 if (!function_exists('md5_to_uuid')) {
     /**
      * Generates a UUID from a md5 hash
@@ -25,5 +27,19 @@ if (!function_exists('uuid')) {
     {
         $md5 = $from ? $from : (microtime() . uniqid());
         return md5_to_uuid(md5($md5));
+    }
+}
+
+if (!function_exists('lock_locale')) {
+    function lock_locale()
+    {
+        Config::set('app.localeHasBeenExplicitlySet', true);
+    }
+}
+
+if (!function_exists('locale_is_locked')) {
+    function locale_is_locked()
+    {
+        return config('app.localeHasBeenExplicitlySet', false);
     }
 }
