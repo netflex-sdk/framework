@@ -17,7 +17,9 @@ trait ParsesResponse
     $contentType = strtolower($response->getHeaderLine('Content-Type'));
 
     if (strpos($contentType, 'json') !== false) {
-      $jsonBody = json_decode(html_entity_decode((string) $body), $assoc);
+      $jsonBody = json_decode(preg_replace_callback("/(&#[0-9]+;)/", function ($m) {
+        return mb_convert_encoding($m[1], 'UTF-8', 'HTML-ENTITIES');
+      }, (string) $body), $assoc);
 
       if (json_last_error() === JSON_ERROR_NONE) {
         return $jsonBody;
