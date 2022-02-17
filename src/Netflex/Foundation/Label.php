@@ -3,14 +3,11 @@
 namespace Netflex\Foundation;
 
 use Netflex\API\Facades\API;
-use Netflex\Support\ReactiveObject;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Facades\Config;
 
-class Label extends ReactiveObject
+class Label
 {
   /**
    * @return static[]
@@ -27,6 +24,39 @@ class Label extends ReactiveObject
       });
     }
 
+    foreach (Config::get('labels.aliases', []) as $alias => $locale) {
+      if (array_key_exists($locale, $locales)) {
+        $aliased = $locales[$alias] ?? [];
+        foreach ($locales[$locale] as $key => $label) {
+          if (!isset($aliased[$key])) {
+            $aliased[$key] = $label;
+          }
+        }
+        $locales[$alias] = $aliased;
+      }
+    }
+
     return $locales;
+  }
+
+  public static function only(...$locales)
+  {
+    $labels = static::all();
+    $only = [];
+
+    foreach ($locales as $locale) {
+      $only[$locale] = [];
+      if (array_key_exists($locale, $labels)) {
+        $only[$locale] = $labels[$locale];
+      }
+    }
+
+    foreach ($only as &$value) {
+      if (empty($value)) {
+        $value = (object) [];
+      }
+    }
+
+    return $only;
   }
 }
