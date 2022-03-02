@@ -10,9 +10,9 @@
         "illuminate/mail": "^8.0",
         "illuminate/support": "^8.0",
         "mustache/mustache": "^2.13",
-        "netflex/api": "^4.3.11",
-        "netflex/foundation": "^4.3.11",
-        "netflex/renderer": "^4.3.11",
+        "netflex/api": "^4.4",
+        "netflex/foundation": "^4.4",
+        "netflex/renderer": "^4.4",
         "php": "^7.4|^8.0"
     },
     "autoload": {
