@@ -104,62 +104,59 @@ class Builder
     Builder::OP_LIKE
   ];
 
-  /** @var APIClient */
-  protected $connection;
+  /** @var string */
+  protected string $connection;
 
   /** @var array */
   protected $fields;
 
-  /** @var array */
-  protected $relations;
+  protected array $relations = [];
 
   /** @var int */
   protected $relation_id;
 
-  /** @var int */
-  protected $size = self::MAX_QUERY_SIZE;
+  protected int $size = self::MAX_QUERY_SIZE;
 
   /** @var string[] */
-  protected $orderBy = [];
+  protected array $orderBy = [];
 
   /** @var string[] */
-  protected $sortDir = [];
+  protected array $sortDir = [];
 
-  /** @var array */
-  protected $query;
+  protected array $query;
 
-  /** @var bool */
-  protected $respectPublishingStatus = true;
+  protected bool $respectPublishingStatus = true;
 
-  /** @var Closure */
-  protected $mapper;
+  /** @var Closure|null */
+  protected ?Closure $mapper;
 
-  /** @var bool */
-  protected $assoc = false;
+  protected bool $assoc = false;
 
-  /** @var bool */
-  protected $shouldCache = false;
+  protected bool $shouldCache = false;
 
-  /** @var string */
-  protected $cacheKey;
+  protected string $cacheKey;
 
-  /** @var bool */
-  protected $debug = false;
+  protected bool $debug = false;
 
   /** @var callable[] */
-  protected $appends = [];
+  protected array $appends = [];
 
-  /** @var string */
-  protected $model;
+  protected string $model;
 
-  protected $useScores = false;
+  protected bool $useScores = false;
 
   /**
    * @param bool $respectPublishingStatus
-   * @param array $query
+   * @param array|null $query
+   * @param Closure|null $mapper
+   * @param array $appends
    */
-  public function __construct(?bool $respectPublishingStatus = true, ?array $query = null, ?Closure $mapper = null, $appends = [])
-  {
+  public function __construct(
+    ?bool $respectPublishingStatus = true,
+    ?array $query = null,
+    ?Closure $mapper = null,
+    array $appends = []
+  ) {
     $this->query = $query ?? [];
     $this->mapper = $mapper;
     $this->respectPublishingStatus = $respectPublishingStatus ?? true;
@@ -170,7 +167,7 @@ class Builder
    * @param string|null $name
    * @return static
    */
-  public function connection($name)
+  public function connection(?string $name)
   {
     return $this->setConnectionName($name);
   }
@@ -179,7 +176,7 @@ class Builder
    * @param string|null $connection
    * @return static
    */
-  public function setConnectionName($connection)
+  public function setConnectionName(?string $connection)
   {
     $this->connection = $connection;
     return $this;
@@ -204,7 +201,7 @@ class Builder
    * @param Closure $callback
    * @return static
    */
-  public function append($callback)
+  public function append(Closure $callback)
   {
     $this->appends[] = $callback;
     return $this;
@@ -214,7 +211,7 @@ class Builder
    * @param string $model
    * @return void
    */
-  public function setModel($model)
+  public function setModel(string $model)
   {
     $this->model = $model;
   }
@@ -233,7 +230,7 @@ class Builder
    * @param string $key
    * @return static
    */
-  public function cacheResultsWithKey($key)
+  public function cacheResultsWithKey(string $key)
   {
     $this->shouldCache = true;
     $this->cacheKey = $key;
@@ -280,17 +277,17 @@ class Builder
    * @param string $relation
    * @return bool
    */
-  protected function hasRelation($relation)
+  protected function hasRelation(string $relation)
   {
     return in_array(Str::singular($relation), $this->relations ?? []);
   }
 
   /**
    * @param null|array|boolean|integer|string|DateTimeInterface $value
-   * @param string $operator
-   * @return mixed
+   * @param string|null $operator
+   * @return array|bool|DateTimeInterface|int|string|string[]|null
    */
-  protected function escapeValue($value, $operator = null)
+  protected function escapeValue($value, string $operator = null)
   {
     if (is_string($value)) {
       if ($operator !== 'like') {
@@ -301,13 +298,11 @@ class Builder
     }
 
     if (is_bool($value)) {
-      $value = (int) $value;
+      $value = (int)$value;
     }
 
-    if (is_object($value)) {
-      if ($value instanceof DateTimeInterface) {
-        return $this->escapeValue($value->format('Y-m-d h:i:s'), $operator);
-      }
+    if ($value instanceof DateTimeInterface) {
+      return $this->escapeValue($value->format('Y-m-d h:i:s'), $operator);
     }
 
     return $value;
@@ -345,7 +340,7 @@ class Builder
 
     $builder = new static(false, []);
 
-    $scopedQuery  = (function ($builder, $callback) {
+    $scopedQuery = (function ($builder, $callback) {
       $callback($builder);
       return $builder->getQuery(true);
     })($builder, $callback);
@@ -378,34 +373,35 @@ class Builder
 
   /**
    * @param string $field
-   * @param string $operator|
+   * @param string $operator
    * @param null|array|Collection|boolean|integer|QueryableModel|string|DateTimeInterface $value
    * @return string
    * @throws InvalidOperatorException If an invalid operator is passed
+   * @throws InvalidValueException
    */
-  protected function compileWhereQuery($field, $operator, $value)
+  protected function compileWhereQuery(string $field, string $operator, $value)
   {
     $field = $this->compileField($field);
 
-    if (is_object($value) && $value instanceof Collection) {
+    if ($value instanceof Collection) {
       /** @var Collection */
-      $value = $value;
       $value = $value->all();
     }
 
-    if (is_object($value) && $value instanceof QueryableModel) {
+    if ($value instanceof QueryableModel) {
       /** @var QueryableModel */
-      $value = $value;
       $value = $value->getKey();
     }
 
     if (is_object($value) && method_exists($value, '__toString')) {
       /** @var object */
-      $value = $value;
       $value = $value->__toString();
     }
 
-    if (!in_array(gettype($value), static::VALUE_TYPES) || (is_object($value) && !in_array(get_class($value), static::VALUE_TYPES))) {
+    if (
+      !in_array(gettype($value), static::VALUE_TYPES) ||
+      (is_object($value) && !in_array(get_class($value), static::VALUE_TYPES))
+    ) {
       throw new InvalidValueException($value);
     }
 
@@ -426,6 +422,7 @@ class Builder
     $term = $value === null ? $this->compileNullQuery($field) : $this->compileTermQuery($field, $value);
 
     switch ($operator) {
+      case static::OP_LIKE:
       case static::OP_EQ:
         return $term;
       case static::OP_NEQ:
@@ -472,8 +469,6 @@ class Builder
         }
 
         return "$field:<=$value";
-      case static::OP_LIKE:
-        return $term;
       default:
         throw new InvalidOperatorException($operator);
         break;
@@ -483,7 +478,7 @@ class Builder
   /**
    * Sets the debug flag of the query
    * Making the API reflect the compiled query in the output
-   * 
+   *
    * @return static
    */
   public function debug()
@@ -499,7 +494,7 @@ class Builder
    * @param bool $scoped Determines if the query shouls be compiled in a scoped context.
    * @return string
    */
-  public function getQuery($scoped = false)
+  public function getQuery(bool $scoped = false): string
   {
     return $this->compileQuery($scoped);
   }
@@ -508,10 +503,9 @@ class Builder
    * Compiles the query and retrieves the query string.
    * Used for debugging purposes.
    *
-   * @param bool $scoped Determines if the query shouls be compiled in a scoped context.
    * @return string
    */
-  public function getRequest()
+  public function getRequest(): string
   {
     return $this->compileRequest();
   }
@@ -536,7 +530,7 @@ class Builder
    * @return static
    * @throws InvalidSortingDirectionException If an invalid $direction is passed
    */
-  public function orderBy($field, $direction = Builder::DIR_DEFAULT)
+  public function orderBy(string $field, string $direction = Builder::DIR_DEFAULT)
   {
     $direction = $direction ?: static::DIR_DEFAULT;
     $this->orderBy[] = $this->compileField($field);
@@ -560,10 +554,10 @@ class Builder
    * @param string $direction
    * @return static
    * @throws InvalidSortingDirectionException If an invalid $direction is passed
-   * @throws InvalidSortingFieldException If no orderBy field has been set
+   * @throws NoSortableFieldToOrderByException If no orderBy field has been set
    * @deprecated 4.4.1 Use orderBy() with direction argument instead
    */
-  public function orderDirection($direction)
+  public function orderDirection(string $direction)
   {
     if (!in_array($direction, static::SORTING_DIRS)) {
       throw new InvalidSortingDirectionException($direction);
@@ -581,8 +575,8 @@ class Builder
   /**
    * Sets the relation for the query
    *
-   * @param string $relation
-   * @param int $relation_id
+   * @param string|null $relation
+   * @param int|null $relation_id
    * @return static
    */
   public function relation(?string $relation, ?int $relation_id = null)
@@ -631,9 +625,7 @@ class Builder
    */
   public function limit(int $limit)
   {
-    $limit = $limit > static::MAX_QUERY_SIZE ? static::MAX_QUERY_SIZE : $limit;
-    $limit = $limit < static::MIN_QUERY_SIZE ? static::MIN_QUERY_SIZE : $limit;
-    $this->size = $limit;
+    $this->size = max(min($limit, static::MAX_QUERY_SIZE), static::MIN_QUERY_SIZE);
     return $this;
   }
 
@@ -734,7 +726,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] =  "($field:[$from TO $to])";
+    $this->query[] = "($field:[$from TO $to])";
     return $this;
   }
 
@@ -751,7 +743,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] =  "(NOT ($field:[$from TO $to]))";
+    $this->query[] = "(NOT ($field:[$from TO $to]))";
     return $this;
   }
 
@@ -769,7 +761,7 @@ class Builder
   public function whereNot(...$args)
   {
     if (count($args) === 1) {
-      $this->query =  ['NOT ' . $this->compileScopedQuery([array_pop($args)])];
+      $this->query = ['NOT ' . $this->compileScopedQuery([array_pop($args)])];
       return $this;
     }
 
@@ -827,7 +819,7 @@ class Builder
       throw new InvalidAssignmentException('andWhere');
     }
 
-    $this->query = [$this->compileScopedQuery($args, 'AND')];
+    $this->query = [$this->compileScopedQuery($args)];
     return $this;
   }
 
@@ -835,15 +827,15 @@ class Builder
    * Creates a paginated result
    *
    * @param int $size
-   * @param int $page
+   * @param int|null $page
    * @return PaginatedResult
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
-  public function paginate($size = 100, $page = 1)
+  public function paginate(int $size = 100, $page = 1)
   {
     $originalSize = $this->size;
     $this->size = $size;
-    $paginator =  PaginatedResult::fromBuilder($this, $page);
+    $paginator = PaginatedResult::fromBuilder($this, $page);
     $this->size = $originalSize;
     return $paginator;
   }
@@ -901,8 +893,8 @@ class Builder
   /**
    * Retrieves the results of the query
    *
-   * @return \Illuminate\Support\Collection
-   * @throws QueryException
+   * @return Collection
+   * @throws QueryException|IndexNotFoundException
    */
   public function get()
   {
@@ -935,7 +927,7 @@ class Builder
    * Retrieves the first result
    *
    * @return object|null
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function first()
   {
@@ -952,7 +944,7 @@ class Builder
    *
    * @return object|null
    * @throws NotFoundException
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function firstOrFail()
   {
@@ -971,7 +963,8 @@ class Builder
 
   /**
    * Retrives all results for the given query, ignoring the query limit
-   * @return LazyCollection
+   * @return LazyCollection|Collection
+   * @throws QueryException|IndexNotFoundException
    */
   public function all()
   {
@@ -1010,7 +1003,7 @@ class Builder
    * Returns random results for the given query
    * @param int|null $amount If not provided, will use the current query limit
    * @return Collection
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function random($amount = null)
   {
@@ -1073,7 +1066,7 @@ class Builder
   /**
    * Only include published results
    * Only applies to entry and page relations
-   * 
+   *
    * @param bool
    *
    * @return static
@@ -1088,7 +1081,7 @@ class Builder
    * Get the count of items matching the current query
    *
    * @return int
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function count()
   {
@@ -1109,32 +1102,34 @@ class Builder
 
     $this->respectPublishingStatus(false);
 
-    $this->query[] = $this->compileScopedQuery([function (Builder $query) use ($date) {
-      return $query->where('published', true)
-        ->andWhere(function (Builder $query) use ($date) {
-          return $query->where('use_time', false)
-            ->orWhere(function (Builder $query) use ($date) {
-              return $query->where('use_time', true)
-                ->where(function (Builder $query) use ($date) {
-                  return $query->where('start', '!=', null)
-                    ->where('stop', '!=', null)
-                    ->where('start', '<=', $date->toDateTimeString())
-                    ->where('stop', '>=', $date->toDateTimeString());
-                })->orWhere(function (Builder $query) use ($date) {
-                  return $query->where('start', '!=', null)
-                    ->where('stop', '=', null)
-                    ->where('start', '<=', $date->toDateTimeString());
-                })->orWhere(function (Builder $query) use ($date) {
-                  return $query->where('start',  '=', null)
-                    ->where('stop', '!=', null)
-                    ->where('stop', '>=', $date->toDateTimeString());
-                })->orWhere(function (Builder $query) {
-                  return $query->where('start', '=', null)
-                    ->where('stop', '=', null);
-                });
-            });
-        });
-    }]);
+    $this->query[] = $this->compileScopedQuery([
+      function (Builder $query) use ($date) {
+        return $query->where('published', true)
+          ->andWhere(function (Builder $query) use ($date) {
+            return $query->where('use_time', false)
+              ->orWhere(function (Builder $query) use ($date) {
+                return $query->where('use_time', true)
+                  ->where(function (Builder $query) use ($date) {
+                    return $query->where('start', '!=', null)
+                      ->where('stop', '!=', null)
+                      ->where('start', '<=', $date->toDateTimeString())
+                      ->where('stop', '>=', $date->toDateTimeString());
+                  })->orWhere(function (Builder $query) use ($date) {
+                    return $query->where('start', '!=', null)
+                      ->where('stop', '=', null)
+                      ->where('start', '<=', $date->toDateTimeString());
+                  })->orWhere(function (Builder $query) use ($date) {
+                    return $query->where('start', '=', null)
+                      ->where('stop', '!=', null)
+                      ->where('stop', '>=', $date->toDateTimeString());
+                  })->orWhere(function (Builder $query) {
+                    return $query->where('start', '=', null)
+                      ->where('stop', '=', null);
+                  });
+              });
+          });
+      }
+    ]);
 
     return $this;
   }
@@ -1143,7 +1138,7 @@ class Builder
    * @param bool $scoped
    * @return string
    */
-  protected function compileQuery($scoped = false)
+  protected function compileQuery(bool $scoped = false)
   {
     if (!$scoped && $this->respectPublishingStatus) {
       $this->publishedAt(Carbon::now());
@@ -1157,7 +1152,7 @@ class Builder
       $this->where('directory_id', '=', $this->relation_id);
     }
 
-    $compiledQuery =  implode(' AND ', array_filter(array_map(function ($term) {
+    $compiledQuery = implode(' AND ', array_filter(array_map(function ($term) {
       return trim($term) === '()' ? null : $term;
     }, $this->query)));
 
@@ -1189,6 +1184,8 @@ class Builder
       if ($params[$key]) {
         return "{$key}={$params[$key]}";
       }
+
+      return false;
     }, array_keys($params)));
 
     $url = 'search?' . implode('&', $params);
@@ -1199,9 +1196,9 @@ class Builder
   /**
    * Conditional query
    *
-   * @param boolean|Closure $clause 
-   * @param Closure $then 
-   * @param null|Closure $else 
+   * @param boolean|Closure $clause
+   * @param Closure $then
+   * @param null|Closure $else
    * @return static
    */
   public function if($clause, Closure $then, ?Closure $else = null)
@@ -1229,7 +1226,7 @@ class Builder
     return $this->compileQuery();
   }
 
-  public function getSize()
+  public function getSize(): int
   {
     return $this->size;
   }
