@@ -327,10 +327,10 @@ class Builder
 
   /**
    * @param array $args
-   * @param string $operator
+   * @param string|null $operator
    * @return string
    */
-  protected function compileScopedQuery(array $args, string $operator = 'AND')
+  protected function compileScopedQuery(array $args, ?string $operator = 'AND')
   {
     $callback = count($args) === 1 ? array_pop($args) : function (self $scope) use ($args) {
       return $scope->where(...$args);
@@ -339,6 +339,7 @@ class Builder
     $builder = new static(false, []);
 
     $callback($builder);
+    $this->useScores = $this->useScores || $builder->useScores;
     $query = $builder->compileQuery(true, $operator);
 
     $compiledQuery = $this->compileQuery(true);
@@ -664,21 +665,92 @@ class Builder
   }
 
   /**
+   * @param array $args compiledScopeQuery arguments
+   * @param string|null $prefix
+   * @param string $operator
+   * @param boolean $wrapInParentheses
+   * @return static
+   */
+  protected function prefixedScopedQuery(
+    array $args,
+    ?string $prefix = null,
+    string $operator = 'AND',
+    bool $wrapInParentheses = false
+  ) {
+    $builder = (new static(false, []));
+    $query = $builder->compileScopedQuery($args, $operator);
+    if ($query) {
+      $combinedQuery = implode(' ', array_filter([$prefix, $query]));
+
+      $this->query[] = $wrapInParentheses
+        ? "({$combinedQuery})"
+        : $combinedQuery;
+    }
+    $this->useScores = $this->useScores || $builder->useScores;
+    return $this;
+  }
+
+  /**
+   * Creates a nested query scope.
+   *
+   * @param callable|Closure $closure
+   * @param string $operator
+   * @return static
+   */
+  public function group($closure, string $operator = 'AND')
+  {
+    return $this->prefixedScopedQuery([$closure], null, $operator);
+  }
+
+  /**
+   * Creates a nested OR separated query scope.
+   *
+   * @param callable|Closure $closure
+   * @return static
+   */
+  public function or($closure)
+  {
+    return $this->group($closure, 'OR');
+  }
+
+  /**
+   * Creates a nested AND separated query scope.
+   *
+   * @param callable|Closure $closure
+   * @return static
+   */
+  public function and($closure)
+  {
+    return $this->group($closure, 'AND');
+  }
+
+  /**
+   * Creates a negated nested query scope.
+   *
+   * @param callable|Closure $closure
+   * @param string $operator
+   * @return static
+   */
+  public function not($closure, string $operator = 'AND')
+  {
+    return $this->prefixedScopedQuery([$closure], 'NOT', $operator, true);
+  }
+
+  /**
    * Performs a 'where' query
    *
-   * If a closure is passed as the only argument, a new query scope will be created.
    * If $value is omitted, $operator is used as the $value, and the $operator will be set to '='.
    *
-   * @param Closure|string $field
+   * @param string $field
    * @param string $operator
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
    */
   public function where(...$args)
   {
+    /** @deprecated use group() instead. */
     if (count($args) === 1) {
-      $this->query = [$this->compileScopedQuery([array_pop($args)])];
-      return $this;
+      return $this->group(array_pop($args));
     }
 
     $field = $args[0] ?? null;
@@ -731,6 +803,8 @@ class Builder
    * @param null|array|boolean|integer|string|DateTimeInterface $from
    * @param null|array|boolean|integer|string|DateTimeInterface $to
    * @return static
+   *
+   * @deprecated 4.5.0 use whereBetween() inside a not() query
    */
   public function whereNotBetween(string $field, $from, $to)
   {
@@ -751,12 +825,13 @@ class Builder
    * @param string $operator
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
+   *
+   * @deprecated 4.5.0 use where('field', '!=', 'value') or where() inside a not() query
    */
   public function whereNot(...$args)
   {
     if (count($args) === 1) {
-      $this->query = ['NOT ' . $this->compileScopedQuery([array_pop($args)])];
-      return $this;
+      return $this->not(array_pop($args));
     }
 
     $field = $args[0] ?? null;
@@ -784,6 +859,8 @@ class Builder
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
    * @throws InvalidAssignmentException If left hand side of query is not set
+   *
+   * @deprecated 4.5.0 use where() inside an or() query
    */
   public function orWhere(...$args)
   {
@@ -791,8 +868,7 @@ class Builder
       throw new InvalidAssignmentException('orWhere');
     }
 
-    $this->query = [$this->compileScopedQuery($args, 'OR')];
-    return $this;
+    return $this->prefixedScopedQuery($args, 'OR');
   }
 
   /**
@@ -806,6 +882,8 @@ class Builder
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
    * @throws InvalidAssignmentException If left hand side of query is not set
+   *
+   * @deprecated 4.5.0 use where() inside an and() query
    */
   public function andWhere(...$args)
   {
@@ -813,8 +891,7 @@ class Builder
       throw new InvalidAssignmentException('andWhere');
     }
 
-    $this->query = [$this->compileScopedQuery($args)];
-    return $this;
+    return $this->prefixedScopedQuery($args, 'AND');
   }
 
   /**
@@ -1093,36 +1170,49 @@ class Builder
    */
   public function publishedAt($date)
   {
-    $date = Carbon::parse($date);
+    $date = Carbon::parse($date)->toDateTimeString();
 
     $this->respectPublishingStatus(false);
 
     $builder = new static(false, []);
 
-    $query = $builder->where('published', true)
-      ->where(function (Builder $query) use ($date) {
-        return $query->where('use_time', false)
-          ->orWhere(function (Builder $query) use ($date) {
-            return $query->where('use_time', true)
-              ->where(function (Builder $query) use ($date) {
-                return $query->where('start', '!=', null)
-                  ->where('stop', '!=', null)
-                  ->where('start', '<=', $date->toDateTimeString())
-                  ->where('stop', '>=', $date->toDateTimeString());
-              })->orWhere(function (Builder $query) use ($date) {
-                return $query->where('start', '!=', null)
-                  ->where('stop', '=', null)
-                  ->where('start', '<=', $date->toDateTimeString());
-              })->orWhere(function (Builder $query) use ($date) {
-                return $query->where('start',  '=', null)
-                  ->where('stop', '!=', null)
-                  ->where('stop', '>=', $date->toDateTimeString());
-              })->orWhere(function (Builder $query) {
-                return $query->where('start', '=', null)
-                  ->where('stop', '=', null);
-              });
-          });
-      })
+    $query = $builder
+      ->where('published', true)
+      ->or(fn (Builder $query) => (
+        $query
+          ->where('use_time', false)
+          ->and(fn (Builder $query) => (
+            $query
+              ->where('use_time', true)
+              ->or(fn (Builder $query) => (
+                $query
+                  ->and(fn (Builder $query) => (
+                    $query
+                      ->where('start', '!=', null)
+                      ->where('stop', '!=', null)
+                      ->where('start', '<=', $date)
+                      ->where('stop', '>=', $date)
+                  ))
+                  ->and(fn (Builder $query) => (
+                    $query
+                      ->where('start', '!=', null)
+                      ->where('stop', '=', null)
+                      ->where('start', '<=', $date)
+                  ))
+                  ->and(fn (Builder $query) => (
+                    $query
+                      ->where('start', '=', null)
+                      ->where('stop', '!=', null)
+                      ->where('stop', '>=', $date)
+                  ))
+                  ->and(fn (Builder $query) => (
+                    $query
+                      ->where('start', '=', null)
+                      ->where('stop', '=', null)
+                  ))
+              ))
+          ))
+      ))
       ->getQuery(true);
 
     $this->query[] = $query;
@@ -1148,9 +1238,19 @@ class Builder
       $this->where('directory_id', '=', $this->relation_id);
     }
 
-    $compiledQuery = implode(" {$operator} ", array_filter(array_map(function ($term) {
-      return trim($term) === '()' ? null : $term;
-    }, $this->query)));
+    $compiledQuery = array_reduce(
+      array_filter($this->query, fn($term) => ($term !== '()')),
+      function ($query, $term) use ($operator) {
+        if (!$query) {
+          return $term;
+        }
+
+        // This logic is here to support `orWhere` and `andWhere`, and should be removed once they are.
+        $op = Str::startsWith($term, ['AND ', 'OR ']) ? '' : $operator;
+
+        return implode(' ', array_filter([$query, $op, $term]));
+      }
+    );
 
     return count($this->query) > 1
       ? "({$compiledQuery})"
