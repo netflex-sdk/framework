@@ -1097,40 +1097,41 @@ class Builder
   /**
    * @param string|DateTimeInterface|null $date
    */
-  function publishedAt($date)
+  public function publishedAt($date)
   {
     $date = Carbon::parse($date);
 
     $this->respectPublishingStatus(false);
 
-    $this->query[] = $this->compileScopedQuery([
-      function (Builder $query) use ($date) {
-        return $query->where('published', true)
-          ->andWhere(function (Builder $query) use ($date) {
-            return $query->where('use_time', false)
-              ->orWhere(function (Builder $query) use ($date) {
-                return $query->where('use_time', true)
-                  ->where(function (Builder $query) use ($date) {
-                    return $query->where('start', '!=', null)
-                      ->where('stop', '!=', null)
-                      ->where('start', '<=', $date->toDateTimeString())
-                      ->where('stop', '>=', $date->toDateTimeString());
-                  })->orWhere(function (Builder $query) use ($date) {
-                    return $query->where('start', '!=', null)
-                      ->where('stop', '=', null)
-                      ->where('start', '<=', $date->toDateTimeString());
-                  })->orWhere(function (Builder $query) use ($date) {
-                    return $query->where('start', '=', null)
-                      ->where('stop', '!=', null)
-                      ->where('stop', '>=', $date->toDateTimeString());
-                  })->orWhere(function (Builder $query) {
-                    return $query->where('start', '=', null)
-                      ->where('stop', '=', null);
-                  });
+    $builder = new static(false, []);
+
+    $query = $builder->where('published', true)
+      ->where(function (Builder $query) use ($date) {
+        return $query->where('use_time', false)
+          ->orWhere(function (Builder $query) use ($date) {
+            return $query->where('use_time', true)
+              ->where(function (Builder $query) use ($date) {
+                return $query->where('start', '!=', null)
+                  ->where('stop', '!=', null)
+                  ->where('start', '<=', $date->toDateTimeString())
+                  ->where('stop', '>=', $date->toDateTimeString());
+              })->orWhere(function (Builder $query) use ($date) {
+                return $query->where('start', '!=', null)
+                  ->where('stop', '=', null)
+                  ->where('start', '<=', $date->toDateTimeString());
+              })->orWhere(function (Builder $query) use ($date) {
+                return $query->where('start',  '=', null)
+                  ->where('stop', '!=', null)
+                  ->where('stop', '>=', $date->toDateTimeString());
+              })->orWhere(function (Builder $query) {
+                return $query->where('start', '=', null)
+                  ->where('stop', '=', null);
               });
           });
-      }
-    ]);
+      })
+      ->getQuery(true);
+
+    $this->query[] = $query;
 
     return $this;
   }
