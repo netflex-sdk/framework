@@ -247,8 +247,6 @@ class Builder
   public function score(float $weight)
   {
     if ($query = array_pop($this->query)) {
-      $matches = [];
-      $query = preg_match('/^\((.+)\)$/', $query, $matches) ? $matches[1] : $query;
       $this->query[] = "$query^$weight";
       $this->useScores = true;
     }
@@ -340,20 +338,14 @@ class Builder
 
     $builder = new static(false, []);
 
-    $scopedQuery = (function ($builder, $callback) {
-      $callback($builder);
-      return $builder->getQuery(true);
-    })($builder, $callback);
+    $callback($builder);
+    $query = $builder->getQuery(true);
 
     $compiledQuery = $this->compileQuery(true);
 
-    if ($operator) {
-      $compiledQuery = $compiledQuery ? "($compiledQuery)" : $compiledQuery;
-      $scopedQuery = $compiledQuery ? "($scopedQuery)" : $scopedQuery;
-      $operator = ($compiledQuery && $scopedQuery && $operator) ? " $operator " : null;
-    }
-
-    return "{$compiledQuery}{$operator}$scopedQuery";
+    return $compiledQuery && $operator
+      ? "({$compiledQuery} {$operator} {$query})"
+      : $query;
   }
 
   /**
@@ -415,7 +407,9 @@ class Builder
         $queries[] = $this->compileWhereQuery($field, $operator, $item);
       }
 
-      return '(' . implode(' OR ', $queries) . ')';
+      return count($queries) > 1
+        ? '(' . implode(' OR ', $queries) . ')'
+        : array_pop($queries);
     }
 
     $value = $this->escapeValue($value, $operator);
@@ -426,7 +420,7 @@ class Builder
       case static::OP_EQ:
         return $term;
       case static::OP_NEQ:
-        return "NOT $term";
+        return "(NOT {$term})";
       case static::OP_GT:
         if ($value === null) {
           return null;
@@ -726,7 +720,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] = "($field:[$from TO $to])";
+    $this->query[] = "$field:[$from TO $to]";
     return $this;
   }
 
@@ -743,7 +737,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] = "(NOT ($field:[$from TO $to]))";
+    $this->query[] = "(NOT $field:[$from TO $to])";
     return $this;
   }
 
@@ -774,7 +768,7 @@ class Builder
       $operator = static::OP_EQ;
     }
 
-    $this->query[] = '(NOT ' . $this->compileWhereQuery($field, $operator, $value) . ')';
+    $this->query[] = 'NOT (' . $this->compileWhereQuery($field, $operator, $value) . ')';
 
     return $this;
   }
@@ -1158,7 +1152,9 @@ class Builder
       return trim($term) === '()' ? null : $term;
     }, $this->query)));
 
-    return $compiledQuery;
+    return count($this->query) > 1
+      ? "({$compiledQuery})"
+      : $compiledQuery;
   }
 
   /**
