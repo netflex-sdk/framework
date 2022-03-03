@@ -1056,6 +1056,7 @@ class Builder
    * Only applies to entry and page relations
    *
    * @return static
+   * @deprecated 4.5.0 use respectPublishingStatus(false) instead.
    */
   public function ignorePublishingStatus()
   {
