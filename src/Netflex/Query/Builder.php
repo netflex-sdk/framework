@@ -665,7 +665,7 @@ class Builder
 
   public function includeScores($includeScores = true)
   {
-    $this->useScores = true;
+    $this->useScores = $includeScores;
     return $this;
   }
 
