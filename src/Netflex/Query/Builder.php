@@ -247,7 +247,7 @@ class Builder
   public function score(float $weight)
   {
     if ($query = array_pop($this->query)) {
-      $this->query[] = "$query^$weight";
+      $this->query[] = "{$query}^{$weight}";
       $this->useScores = true;
     }
 
@@ -265,7 +265,7 @@ class Builder
     if ($query = array_pop($this->query)) {
       $matches = [];
       $query = preg_match('/^\((.+)\)$/', $query, $matches) ? $matches[1] : $query;
-      $this->query[] = "$query~" . ($distance ? $distance : null);
+      $this->query[] = "{$query}~" . ($distance ? $distance : null);
     }
 
     return $this;
@@ -313,7 +313,7 @@ class Builder
    */
   protected function compileTermQuery(string $field, $value)
   {
-    return "${field}:$value";
+    return "{$field}:{$value}";
   }
 
   /**
@@ -435,10 +435,10 @@ class Builder
         }
 
         if (is_string($value)) {
-          return "($field:[$value TO *] AND (NOT $value))";
+          return "({$field}:[{$value} TO *] AND (NOT {$value}))";
         }
 
-        return "$field:>$value";
+        return "{$field}:>{$value}";
       case static::OP_GTE:
         if ($value === null) {
           $this->query = [$this->compileWhereQuery($field, '!=', null)];
@@ -446,20 +446,20 @@ class Builder
         }
 
         if (is_string($value)) {
-          return "$field:[$value TO *]";
+          return "{$field}:[{$value} TO *]";
         }
 
-        return "$field:>=$value";
+        return "{$field}:>={$value}";
       case static::OP_LT:
         if ($value === null) {
           return null;
         }
 
         if (is_string($value)) {
-          return "($field:[* TO $value] AND (NOT $value))";
+          return "({$field}:[* TO {$value}] AND (NOT {$value}))";
         }
 
-        return "$field:<$value";
+        return "{$field}:<{$value}";
       case static::OP_LTE:
         if ($value === null) {
           $this->query = [$this->compileWhereQuery($field, '=', null)];
@@ -467,10 +467,10 @@ class Builder
         }
 
         if (is_string($value)) {
-          return "$field:[* TO $value]";
+          return "{$field}:[* TO {$value}]";
         }
 
-        return "$field:<=$value";
+        return "{$field}:<={$value}";
       default:
         throw new InvalidOperatorException($operator);
         break;
@@ -799,7 +799,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] = "$field:[$from TO $to]";
+    $this->query[] = "{$field}:[{$from} TO {$to}]";
     return $this;
   }
 
@@ -818,7 +818,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] = "(NOT $field:[$from TO $to])";
+    $this->query[] = "NOT {$field}:[{$from} TO {$to}]";
     return $this;
   }
 
@@ -1245,15 +1245,15 @@ class Builder
    */
   protected function compileQuery(bool $scoped = false, ?string $operator = 'AND')
   {
-    if (!$scoped && $this->respectPublishingStatus) {
-      $this->publishedAt(Carbon::now());
-    }
-
     $appends = $this->appends;
     $this->appends = [];
 
     foreach ($appends as $append) {
       $append($this, $scoped);
+    }
+
+    if (!$scoped && $this->respectPublishingStatus) {
+      $this->publishedAt(Carbon::now());
     }
 
     if (!$scoped && $this->hasRelation('entry') && $this->relation_id) {
