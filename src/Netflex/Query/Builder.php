@@ -149,7 +149,7 @@ class Builder
    * @param bool $respectPublishingStatus
    * @param array|null $query
    * @param Closure|null $mapper
-   * @param array $appends
+   * @param callable[] $appends
    */
   public function __construct(
     ?bool $respectPublishingStatus = true,
@@ -1230,7 +1230,10 @@ class Builder
       $this->publishedAt(Carbon::now());
     }
 
-    foreach ($this->appends as $append) {
+    $appends = $this->appends;
+    $this->appends = [];
+
+    foreach ($appends as $append) {
       $append($this, $scoped);
     }
 
@@ -1262,6 +1265,8 @@ class Builder
    */
   protected function compileRequest($size = null, $page = null)
   {
+    $query = $this->compileQuery();
+
     $params = [
       'order' => urlencode(implode(',', $this->orderBy)),
       'dir' => urlencode(implode(',', $this->sortDir)),
@@ -1270,7 +1275,7 @@ class Builder
       'relation_id' => $this->relation_id,
       'size' => $size ?? $this->size,
       'page' => $page,
-      'q' => urlencode($this->compileQuery()),
+      'q' => urlencode($query),
       'scores' => $this->useScores ? 1 : false
     ];
 
