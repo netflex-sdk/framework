@@ -414,6 +414,13 @@ class Builder
     }
 
     $value = $this->escapeValue($value, $operator);
+
+    if ($value === null && $operator === static::OP_NEQ) {
+      $value = $field;
+      $field = '_exists_';
+      $operator = static::OP_EQ;
+    }
+
     $term = $value === null ? $this->compileNullQuery($field) : $this->compileTermQuery($field, $value);
 
     switch ($operator) {
@@ -843,7 +850,19 @@ class Builder
       $operator = static::OP_EQ;
     }
 
-    $this->query[] = 'NOT (' . $this->compileWhereQuery($field, $operator, $value) . ')';
+    $prefix = 'NOT ';
+
+    if ($operator === static::OP_NEQ && $value !== null) {
+      $prefix = '';
+      $operator = static::OP_EQ;
+    }
+
+    if ($operator === static::OP_EQ && $value === null) {
+      $prefix = '';
+      $operator = static::OP_NEQ;
+    }
+
+    $this->query[] = $prefix . $this->compileWhereQuery($field, $operator, $value);
 
     return $this;
   }
