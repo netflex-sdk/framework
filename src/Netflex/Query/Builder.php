@@ -300,7 +300,7 @@ class Builder
     }
 
     if ($value instanceof DateTimeInterface) {
-      return $this->escapeValue($value->format('Y-m-d h:i:s'), $operator);
+      return $this->escapeValue($value->format('Y-m-d H:i:s'), $operator);
     }
 
     return $value;
