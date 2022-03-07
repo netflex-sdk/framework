@@ -435,7 +435,7 @@ class Builder
         }
 
         if (is_string($value)) {
-          return "({$field}:[{$value} TO *] AND (NOT {$value}))";
+          return "{$field}:{{$value} TO *}";
         }
 
         return "{$field}:>{$value}";
@@ -456,7 +456,7 @@ class Builder
         }
 
         if (is_string($value)) {
-          return "({$field}:[* TO {$value}] AND (NOT {$value}))";
+          return "{$field}:{* TO {$value}}";
         }
 
         return "{$field}:<{$value}";
