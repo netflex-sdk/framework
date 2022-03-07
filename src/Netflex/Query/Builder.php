@@ -792,14 +792,17 @@ class Builder
    * @param string $field
    * @param null|array|boolean|integer|string|DateTimeInterface $from
    * @param null|array|boolean|integer|string|DateTimeInterface $to
+   * @param bool $inclusive
    * @return static
    */
-  public function whereBetween(string $field, $from, $to)
+  public function whereBetween(string $field, $from, $to, bool $inclusive = true)
   {
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] = "{$field}:[{$from} TO {$to}]";
+    $this->query[] = $inclusive
+      ? "{$field}:[{$from} TO {$to}]"
+      : "{$field}:{{$from} TO {$to}}";
     return $this;
   }
 

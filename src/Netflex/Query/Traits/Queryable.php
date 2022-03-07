@@ -310,6 +310,7 @@ trait Queryable
    * @param string $field
    * @param @param null|array|boolean|integer|string|DateTimeInterface $from
    * @param @param null|array|boolean|integer|string|DateTimeInterface $to
+   * @param bool $inclusive
    * @return Builder
    * @throws NotQueryableException If object not queryable
    * @see \Netflex\Query\Builder::whereBetween
