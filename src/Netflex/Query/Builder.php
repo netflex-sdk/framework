@@ -1196,42 +1196,46 @@ class Builder
     $builder = new static(false, []);
 
     $query = $builder
-      ->where('published', true)
-      ->or(fn (Builder $query) => (
+      ->and(fn(Builder $query) => (
         $query
-          ->where('use_time', false)
-          ->and(fn (Builder $query) => (
+          ->where('published', true)
+          ->or(fn(Builder $query) => (
             $query
-              ->where('use_time', true)
-              ->or(fn (Builder $query) => (
+              ->where('use_time', false)
+              ->and(fn(Builder $query) => (
                 $query
-                  ->and(fn (Builder $query) => (
+                  ->where('use_time', true)
+                  ->or(fn(Builder $query) => (
                     $query
-                      ->where('start', '!=', null)
-                      ->where('stop', '!=', null)
-                      ->where('start', '<=', $date)
-                      ->where('stop', '>=', $date)
-                  ))
-                  ->and(fn (Builder $query) => (
-                    $query
-                      ->where('start', '!=', null)
-                      ->where('stop', '=', null)
-                      ->where('start', '<=', $date)
-                  ))
-                  ->and(fn (Builder $query) => (
-                    $query
-                      ->where('start', '=', null)
-                      ->where('stop', '!=', null)
-                      ->where('stop', '>=', $date)
-                  ))
-                  ->and(fn (Builder $query) => (
-                    $query
-                      ->where('start', '=', null)
-                      ->where('stop', '=', null)
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '!=', null)
+                          ->where('stop', '!=', null)
+                          ->where('start', '<=', $date)
+                          ->where('stop', '>=', $date)
+                      ))
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '!=', null)
+                          ->where('stop', '=', null)
+                          ->where('start', '<=', $date)
+                      ))
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '=', null)
+                          ->where('stop', '!=', null)
+                          ->where('stop', '>=', $date)
+                      ))
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '=', null)
+                          ->where('stop', '=', null)
+                      ))
                   ))
               ))
           ))
       ))
+      ->score(0)
       ->getQuery(true);
 
     $this->query[] = $query;
@@ -1257,7 +1261,7 @@ class Builder
     }
 
     if (!$scoped && $this->hasRelation('entry') && $this->relation_id) {
-      $this->where('directory_id', '=', $this->relation_id);
+      $this->where('directory_id', '=', $this->relation_id)->score(0);
     }
 
     $compiledQuery = array_reduce(
