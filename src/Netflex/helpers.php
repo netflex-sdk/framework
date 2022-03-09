@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 
 if (!function_exists('md5_to_uuid')) {
@@ -41,5 +42,18 @@ if (!function_exists('locale_is_locked')) {
     function locale_is_locked()
     {
         return config('app.localeHasBeenExplicitlySet', false);
+    }
+}
+
+if (!function_exists('seconds_until_end_of_day')) {
+    /**
+     * Calculates the number of seconds until the end of the current day
+     * Usefull when caching things that should be refreshed at the end of the day
+     *
+     * @return int
+     */
+    function seconds_until_end_of_day()
+    {
+        return Carbon::today()->endOfDay()->diffInSeconds(Carbon::now());
     }
 }
