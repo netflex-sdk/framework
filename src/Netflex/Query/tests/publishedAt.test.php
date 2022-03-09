@@ -8,8 +8,7 @@ use PHPUnit\Framework\TestCase;
 final class PublishedAtTest extends TestCase
 {
   private function mockPublishedAtQuery ($date) {
-    $date = urlencode($date);
-    return 'search?size=' . Builder::MAX_QUERY_SIZE . '&q=' . urlencode('(published:1) AND ((use_time:0) OR (((((use_time:1) AND (NOT (NOT _exists_:start) AND NOT (NOT _exists_:stop) AND start:[* TO "') . $date . urlencode('"] AND stop:["') . $date . urlencode('" TO *])) OR (NOT (NOT _exists_:start) AND (NOT _exists_:stop) AND start:[* TO "') . $date . urlencode('"])) OR ((NOT _exists_:start) AND NOT (NOT _exists_:stop) AND stop:["') . $date . urlencode('" TO *])) OR ((NOT _exists_:start) AND (NOT _exists_:stop))))');
+    return "(published:1 AND (use_time:0 OR (use_time:1 AND ((_exists_:start AND _exists_:stop AND start:[* TO \"{$date}\"] AND stop:[\"{$date}\" TO *]) OR (_exists_:start AND NOT _exists_:stop AND start:[* TO \"{$date}\"]) OR (NOT _exists_:start AND _exists_:stop AND stop:[\"{$date}\" TO *]) OR (NOT _exists_:start AND NOT _exists_:stop)))))^0";
   }
 
   public function testCanPerformPublishedAtDateFromStringQuery()
@@ -20,7 +19,7 @@ final class PublishedAtTest extends TestCase
 
     $this->assertSame(
       $this->mockPublishedAtQuery($date . ' 00:00:00'),
-      $query->getRequest()
+      $query->getQuery()
     );
   }
 
@@ -34,7 +33,7 @@ final class PublishedAtTest extends TestCase
 
     $this->assertSame(
       $this->mockPublishedAtQuery($date),
-      $query->getRequest()
+      $query->getQuery()
     );
   }
 
@@ -46,7 +45,7 @@ final class PublishedAtTest extends TestCase
 
     $this->assertSame(
       $this->mockPublishedAtQuery($date->toDateTimeString()),
-      $query->getRequest()
+      $query->getQuery()
     );
   }
 
@@ -60,7 +59,9 @@ final class PublishedAtTest extends TestCase
 
     $this->assertSame(
       $this->mockPublishedAtQuery($date),
-      $query->getRequest()
+      $query->getQuery()
     );
   }
 }
+
+//    return "(published:1 AND (use_time:0 OR ((((use_time:1 AND (_exists_:start AND _exists_:stop AND start:[* TO \"{$date}\"] AND stop:[\"{$date}\" TO *])) OR (_exists_:start AND (NOT _exists_:stop) AND start:[* TO \"{$date}\"])) OR (NOT _exists_:start AND _exists_:stop AND stop:[\"{$date}\" TO *])) OR (NOT _exists_:start AND NOT _exists_:stop)))^0";
