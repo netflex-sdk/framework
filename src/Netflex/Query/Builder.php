@@ -565,6 +565,10 @@ class Builder
       throw new InvalidSortingDirectionException($direction);
     }
 
+    if (count($this->orderBy) === count($this->sortDir)) {
+      array_pop($this->sortDir);
+    }
+
     $this->sortDir[] = $direction;
 
     if (!count($this->orderBy)) {
