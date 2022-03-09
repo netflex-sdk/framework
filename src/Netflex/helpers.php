@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 if (!function_exists('md5_to_uuid')) {
@@ -52,7 +53,7 @@ if (!function_exists('seconds_until_end_of_day')) {
      *
      * @return int
      */
-    function seconds_until_end_of_day()
+    function seconds_until_end_of_today()
     {
         return Carbon::today()->endOfDay()->diffInSeconds(Carbon::now());
     }

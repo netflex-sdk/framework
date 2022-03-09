@@ -10,6 +10,7 @@ use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Foundation\Application as BaseApplication;
 use Illuminate\Foundation\Mix;
+use Netflex\Cache\Providers\CacheServiceProvider;
 
 class Application extends BaseApplication
 {
@@ -55,6 +56,7 @@ class Application extends BaseApplication
     $this->register(new EventServiceProvider($this));
     $this->register(new LogServiceProvider($this));
     $this->register(new RoutingServiceProvider($this));
+    $this->register(new CacheServiceProvider($this));
   }
 
   /**
