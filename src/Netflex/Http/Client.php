@@ -8,6 +8,8 @@ use Psr\Http\Message\ResponseInterface;
 use Netflex\Http\Concerns\ParsesResponse;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Exception\GuzzleException as Exception;
 
 class Client implements HttpClient
@@ -41,6 +43,15 @@ class Client implements HttpClient
 
   /**
    * @param string $url
+   * @return PromiseInterface
+   */
+  public function getRawAsync($url)
+  {
+    return $this->client->getAsync($url);
+  }
+
+  /**
+   * @param string $url
    * @param boolean $assoc = false
    * @return mixed
    * @throws Exception
@@ -52,12 +63,33 @@ class Client implements HttpClient
 
   /**
    * @param string $url
+   * @param boolean $assoc = false
+   * @return PromiseInterface
+   */
+  public function getAsync($url, $assoc = false)
+  {
+    return $this->getRawAsync($url)
+      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+  }
+
+  /**
+   * @param string $url
    * @param array|null $payload = []
    * @return ResponseInterface
    */
   public function putRaw($url, $payload)
   {
     return $this->client->put($url, $this->buildPayload($payload));
+  }
+
+  /**
+   * @param string $url
+   * @param array|null $payload = []
+   * @return PromiseInterface
+   */
+  public function putRawAsync($url, $payload)
+  {
+    return $this->client->putAsync($url);
   }
 
   /**
@@ -75,11 +107,33 @@ class Client implements HttpClient
   /**
    * @param string $url
    * @param array|null $payload = []
+   * @param boolean $assoc = false
+   * @return PromiseInterface
+   */
+  public function putAsync($url, $payload = [], $assoc = false)
+  {
+    return $this->putRawAsync($url, $payload)
+      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+  }
+
+  /**
+   * @param string $url
+   * @param array|null $payload = []
    * @return ResponseInterface
    */
   public function postRaw($url, $payload)
   {
     return $this->client->post($url, $this->buildPayload($payload));
+  }
+
+  /**
+   * @param string $url
+   * @param array|null $payload = []
+   * @return PromiseInterface
+   */
+  public function postRawAsync($url, $payload)
+  {
+    return $this->client->postAsync($url);
   }
 
   /**
@@ -96,11 +150,32 @@ class Client implements HttpClient
 
   /**
    * @param string $url
+   * @param array|null $payload = []
+   * @param boolean $assoc = false
+   * @return PromiseInterface
+   */
+  public function postAsync($url, $payload = [], $assoc = false)
+  {
+    return $this->postRawAsync($url, $payload)
+      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+  }
+
+  /**
+   * @param string $url
    * @return ResponseInterface
    */
   public function deleteRaw($url)
   {
     return $this->client->delete($url);
+  }
+
+  /**
+   * @param string $url
+   * @return PromiseInterface
+   */
+  public function deleteRawAsync($url)
+  {
+    return $this->client->deleteAsync($url);
   }
 
   /**
@@ -111,5 +186,16 @@ class Client implements HttpClient
   public function delete($url, $assoc = false)
   {
     return $this->parseResponse($this->deleteRaw($url), $assoc);
+  }
+
+  /**
+   * @param string $url
+   * @param boolean $assoc = false
+   * @return PromiseInterface
+   */
+  public function deleteAsync($url, $assoc = false)
+  {
+    return $this->deleteRawAsync($url)
+      ->then(fn ($response) => $this->parseResponse($response, $assoc));
   }
 }
