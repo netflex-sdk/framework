@@ -3,11 +3,14 @@
 namespace Netflex\Commerce;
 
 use Exception;
+use Netflex\Structure\Traits\Localizable;
 use Netflex\Support\ReactiveObject;
 
 class Properties extends ReactiveObject
 {
   protected $readOnlyAttributes = [];
+
+  use Localizable;
 
   /**
    * @return array
