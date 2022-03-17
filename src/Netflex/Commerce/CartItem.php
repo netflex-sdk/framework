@@ -5,6 +5,7 @@ namespace Netflex\Commerce;
 use Carbon\Carbon;
 use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\CartItemAPI;
+use Netflex\Structure\Traits\Localizable;
 
 /**
  * @property-read int $id
@@ -42,6 +43,7 @@ use Netflex\Commerce\Traits\API\CartItemAPI;
 class CartItem extends ReactiveObject
 {
   use CartItemAPI;
+  use Localizable;
 
   protected $readOnlyAttributes = [
     'id',
