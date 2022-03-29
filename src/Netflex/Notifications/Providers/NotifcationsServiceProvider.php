@@ -13,10 +13,10 @@ class NotifcationsServiceProvider extends ServiceProvider
   public function boot()
   {
     if ($this->app->has(ChannelManager::class)) {
-        $this->app->make(ChannelManager::class)
-            ->extend('sms', function () {
-                return new SMS;
-            });
+      $this->app->make(ChannelManager::class)
+        ->extend('sms', function () {
+          return new SMS;
+        });
     }
 
     if ($this->app->has('mail.manager')) {
