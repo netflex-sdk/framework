@@ -48,6 +48,7 @@ use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
+use Illuminate\Queue\Console\WorkCommand;
 use Netflex\Console\Commands\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 
@@ -77,6 +78,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     'Up' => 'command.up',
     'ViewCache' => 'command.view.cache',
     'ViewClear' => 'command.view.clear',
+    'QueueWork' => 'command.queue.work',
   ];
 
   /**
@@ -135,6 +137,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     }
 
     $this->commands(array_values($commands));
+  }
+
+  /**
+   * Register the command.
+   *
+   * @return void
+   */
+  protected function registerQueueWorkCommand()
+  {
+    $this->app->singleton('command.queue.work', function ($app) {
+      return new WorkCommand($app['queue.worker'], $app['cache.store']);
+    });
   }
 
   /**
