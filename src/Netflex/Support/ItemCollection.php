@@ -15,6 +15,23 @@ abstract class ItemCollection extends BaseCollection implements JsonSerializable
   /** @var string */
   protected static $type = ReactiveObject::class;
 
+    /**
+     *
+     * Runs the type factory on the item received.
+     *
+     * This function can be overridden to enable simple polymorphism of cart items
+     * in cart.
+     *
+     * If this function is overridden then the developer must ensure data integrity
+     * itself by doing any type checking needed to ensure homogenity amongst members
+     *
+     * @param array|mixed $item Item payload that is to be converted to an object of collection type
+     * @return T something that conforms with static::$type
+     */
+    protected function generateInstance($item) {
+        return static::$type::factory($item);
+    }
+
   /**
    * @param array|null $items = []
    */
@@ -25,7 +42,7 @@ abstract class ItemCollection extends BaseCollection implements JsonSerializable
     if ($items) {
       parent::__construct(array_map(function ($item) {
         if (!($item instanceof static::$type)) {
-          $item = static::$type::factory($item);
+          $item = $this->generateInstance($item);
         }
 
         $item->setParent($this);
