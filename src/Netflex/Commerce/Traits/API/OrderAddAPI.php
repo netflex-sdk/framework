@@ -16,7 +16,7 @@ trait OrderAddAPI
     public function addCart($item)
     {
         if (!is_array($item) && $item instanceof CartItem) {
-            $item->properties['class'] = get_class($item);
+            $item->properties['_class'] = get_class($item);
         }
 
         if (!$this->id) {

@@ -18,7 +18,7 @@ class CartItemCollection extends ItemCollection
     protected function generateInstance($item)
     {
         try {
-            if (is_array($item['properties']) && ($class = $item['properties']['class'] ?? null) != null) {
+            if (is_array($item['properties']) && ($class = $item['properties']['_class'] ?? null) != null) {
                 return $class::factory($item);
             }
         } catch (\Exception $e) {
