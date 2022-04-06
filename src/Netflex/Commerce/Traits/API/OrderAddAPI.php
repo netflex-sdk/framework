@@ -4,19 +4,24 @@ namespace Netflex\Commerce\Traits\API;
 
 use Exception;
 use Netflex\API\Facades\API;
+use Netflex\Commerce\CartItem;
 
 trait OrderAddAPI
 {
-  /**
-   * @param array $item
-   * @return static
-   * @throws Exception
-   */
-  public function addCart($item)
-  {
-    if (!$this->id) {
-      $this->save();
-    }
+    /**
+     * @param array|CartItem $item
+     * @return static
+     * @throws Exception
+     */
+    public function addCart($item)
+    {
+        if (!is_array($item) && $item instanceof CartItem) {
+            $item->properties['class'] = get_class($item);
+        }
+
+        if (!$this->id) {
+            $this->save();
+        }
 
     API::post(static::basePath() . $this->id . '/cart', $item);
 
