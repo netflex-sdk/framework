@@ -22,7 +22,7 @@ use Illuminate\Support\Str;
 
 use Netflex\Render\Contracts\Renderable;
 use Illuminate\Contracts\Support\Jsonable;
-
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 abstract class Renderer implements Renderable, Jsonable, JsonSerializable
@@ -82,24 +82,32 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
     {
         $this->options['format'] = $this->format;
 
-        try {
-            $response = API::getGuzzleInstance()
-                ->post('foundation/pdf', [
-                    'json' => $this->options
-                ]);
-
-            if (!$this->options['fetch']) {
-                return $response;
-            }
-
-            return $this->postProcess($response);
-        } catch (ClientExceptionInterface $exception) {
-            if ($exception instanceof BadResponseException) {
-                throw new RenderException($exception->getResponse());
-            }
-
-            throw $exception;
+        if (!Str::startsWith($this->options['url'], 'data:')) {
+            $this->options['time'] = time();
         }
+
+        $hash = md5(json_encode($this->options));
+
+        return Cache::rememberForever('renderer.' . $hash, function () {
+            try {
+                $response = API::getGuzzleInstance()
+                    ->post('foundation/pdf', [
+                        'json' => $this->options
+                    ]);
+
+                if (!$this->options['fetch']) {
+                    return $response;
+                }
+
+                return $this->postProcess($response);
+            } catch (ClientExceptionInterface $exception) {
+                if ($exception instanceof BadResponseException) {
+                    throw new RenderException($exception->getResponse());
+                }
+
+                throw $exception;
+            }
+        });
     }
 
     /**
