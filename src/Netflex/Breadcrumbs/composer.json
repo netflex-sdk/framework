@@ -9,7 +9,7 @@
     "require": {
         "illuminate/support": "^8.0",
         "illuminate/view": "^8.0",
-        "netflex/pages": "^4.9.10",
+        "netflex/pages": "^4.10",
         "php": "^7.4|^8.0"
     },
     "autoload": {
