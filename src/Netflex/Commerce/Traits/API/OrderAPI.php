@@ -275,7 +275,7 @@ trait OrderAPI
   /**
    * @param string $id
    * @return static
-   * @throws Exception|OrderNotFoundException
+   * @throws OrderNotFoundException
    */
   public static function retrieve($id)
   {
