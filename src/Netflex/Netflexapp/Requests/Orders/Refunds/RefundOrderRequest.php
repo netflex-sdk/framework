@@ -18,6 +18,7 @@ class RefundOrderRequest extends FormRequest
     }
 
     public function messages() {
+        return [];
     }
 
     public function getOrder(): Order {
