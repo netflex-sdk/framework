@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Providers;
+
+use Netflex\Actions\Exceptions\InvalidActionClassException;
+use Netflex\Actions\Exceptions\InvalidFormDescriberException;
+use ReflectionException;
+
+class ActionServiceProvider extends \Netflex\Actions\Providers\NetflexappConnectionProvider
+{
+
+    /**
+     *
+     * Register action functions here.
+     *
+     * In order to register an action call the corresponding setter function here
+     * for example $this->setReservationsActionController or $this->setOrdersRefundsActionControllers
+     *
+     * @throws ReflectionException
+     * @throws InvalidActionClassException
+     * @throws InvalidFormDescriberException
+     */
+    function registerProviders()
+    {
+
+    }
+}

@@ -12,9 +12,31 @@ final class Integer extends BookingFormField
         parent::__construct($alias, $label);
     }
 
+    public static function create(string $alias, ?string $label = "", ?int $minQty = null, ?int $maxQty = null)
+    {
+        return new static($alias, $label, $minQty, $maxQty);
+    }
+
     function getType(): string
     {
         return "integer";
+    }
+
+    function withRange(?int $min, ?int $max)
+    {
+        return $this->withMinValue($min)->withMaxValue($max);
+    }
+
+    function withMaxValue(?int $max): self
+    {
+        $this->maxQty = $max;
+        return $this;
+    }
+
+    function withMinValue(?int $min): self
+    {
+        $this->minQty = $min;
+        return $this;
     }
 
     public function toPayload(): array
@@ -29,10 +51,5 @@ final class Integer extends BookingFormField
         }
 
         return $payload;
-    }
-
-    public static function create(string $alias, ?string $label = "", ?int $minQty = null, ?int $maxQty = null)
-    {
-        return new static($alias, $label, $minQty, $maxQty);
     }
 }

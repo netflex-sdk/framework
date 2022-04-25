@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Netflex\Actions\Contracts\Reservations\ActionControllerContract;
 use Netflex\Actions\Controllers\Orders\Refunds\FormController as OrdersRefundsFormController;
 use Netflex\Actions\Controllers\Reservations\FormController;
-use Netflex\Actions\Excpetions\InvalidActionClassException;
-use Netflex\Actions\Excpetions\InvalidFormDescriberException;
+use Netflex\Actions\Exceptions\InvalidActionClassException;
+use Netflex\Actions\Exceptions\InvalidFormDescriberException;
 use Netflex\Actions\Middlewares\WebhookAuthMiddleware;
 
 abstract class NetflexappConnectionProvider extends RouteServiceProvider
@@ -29,8 +29,9 @@ abstract class NetflexappConnectionProvider extends RouteServiceProvider
     }
 
     /**
+     * Registers which controller is to be used for the reservations functionality
      *
-     *
+     * @param string $actionController Must be a class string to a class that implements the [ActionControllerContract] for the Reservations module
      * @throws \ReflectionException
      * @throws InvalidActionClassException
      */
@@ -47,6 +48,14 @@ abstract class NetflexappConnectionProvider extends RouteServiceProvider
 
 
     /**
+     *
+     * Registers a handler for the Orders/Refunds action
+     *
+     * You must supply a form controller that is used to resolve the correct order and cart item
+     * As well as an action controller that must implement the action controller interface
+     *
+     * @param string $formDescriber Must be a class that is a subclass of the [Netflex\Actions\Controllers\Orders\Refunds\FormController] class.
+     * @param string $actionController Must be a class that implements the [Netflex\Actions\Contracts\Orders\Refunds\ActionControllerContract::class]
      * @throws InvalidFormDescriberException
      * @throws \ReflectionException
      * @throws InvalidActionClassException

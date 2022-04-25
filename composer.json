@@ -46,7 +46,7 @@
         "nunomaduro/laravel-console-menu": "^3.0",
         "symfony/psr-http-message-bridge": "^2.0",
         "php": "^7.4|^8.0",
-        "jetbrains/phpstorm-attributes": "^1.0"
+        "jetbrains/phpstorm-attributes": "^1.0",
     },
     "require-dev": {
         "illuminate/cache": "^8.0",
@@ -103,6 +103,7 @@
         },
         "laravel": {
             "providers": [
+                "Netflex\\Actions\\Providers\\CommandProvider",
                 "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider",
                 "Netflex\\Pages\\Providers\\MixServiceProvider",
                 "Netflex\\Pages\\Providers\\PagesServiceProvider",

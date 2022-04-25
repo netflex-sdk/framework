@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Actions\Orders\Refunds;
+
+
+use Netflex\Actions\Contracts\Orders\Refunds\ActionControllerContract;
+use Netflex\Actions\Requests\Orders\Refunds\RefundCartItemRequest;
+use Netflex\Actions\Requests\Orders\Refunds\RefundOrderRequest;
+
+
+class ActionController implements ActionControllerContract
+{
+
+    public function refundOrder(RefundOrderRequest $request)
+    {
+
+    }
+
+    public function refundCartItem(RefundCartItemRequest $request)
+    {
+
+    }
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Netflex\Actions\Excpetions;
+namespace Netflex\Actions\Exceptions;
 
 class InvalidActionClassException extends NetflexappConnectionException
 {

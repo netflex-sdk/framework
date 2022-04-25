@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Actions\Orders\Refunds;
+
+use Netflex\Commerce\CartItem;
+use Netflex\Commerce\Order;
+use Netflex\Actions\Contracts\Orders\Refunds\FormDescriber;
+
+class FormController extends \Netflex\Actions\Controllers\Orders\Refunds\FormController implements FormDescriber
+{
+
+    /**
+     *
+     * Needs to resolve a FormDescriber that knows which forms are supposed to be rendered for this data type
+     *
+     * @throws \Exception
+     */
+    function resolveFormDescriber(Order $order, ?CartItem $cartItem): FormDescriber
+    {
+        return $this;
+    }
+
+    public function refundOrderForm(Order $order): array
+    {
+        return [
+            /// Form Fields goes here
+            /// Check out the classes in the Netflex\Actions\Modules\Form namespace for
+            /// a list of possible form field types
+        ];
+    }
+
+    public function refundCartItemForm(Order $order, CartItem $cartItem): array
+    {
+        return [
+            /// Form Fields goes here
+            /// Check out the classes in the Netflex\Actions\Modules\Form namespace for
+            /// a list of possible form field types
+        ];
+    }
+}
