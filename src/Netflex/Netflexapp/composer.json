@@ -1,0 +1,36 @@
+{
+  "name": "netflex/netflexapp",
+  "description": "Netflexapp plugins",
+  "type": "library",
+  "license": "MIT",
+  "keywords": ["sdk", "netflex", "framework"],
+  "homepage": "https://github.com/netflex-sdk/log",
+  "authors": [
+    {
+      "name": "Thomas Alrek",
+      "email": "thomas@apility.no",
+      "homepage": "https://github.com/thomas-alrek",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/netflex-sdk/log/issues",
+    "source": "https://github.com/netflex-sdk/log"
+  },
+  "autoload": {
+    "psr-4": {
+      "Netflex\\Log\\": ""
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "require": {
+    "php": "^7.4|^8.0"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "4.1.x-dev"
+    }
+  }
+}

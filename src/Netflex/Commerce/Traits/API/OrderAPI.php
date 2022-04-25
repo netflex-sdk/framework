@@ -34,9 +34,13 @@ trait OrderAPI
       $payload[$modifiedKey] = $this->{$modifiedKey};
     }
 
+    $payload['data'] = $payload['data'] ?? [];
+    $payload['data']['_class'] = get_class($this);
+
     // Post new
     if (!$this->id) {
       $this->attributes['id'] = API::post(trim(static::$base_path, '/'), $payload)->order_id;
+
 
       $this->refresh();
 
@@ -175,9 +179,7 @@ trait OrderAPI
    */
   public static function create($order = [])
   {
-    return static::retrieve(
-      API::post(trim(static::$base_path, '/'), $order)->order_id
-    );
+    return (new static)->newFromBuilder($order)->save();
   }
 
   /**
@@ -226,7 +228,7 @@ trait OrderAPI
       }
     } else {
       $order = new static();
-      $order->triedReceivedBySession = true;      
+      $order->triedReceivedBySession = true;
     }
 
     return $order;
@@ -243,7 +245,7 @@ trait OrderAPI
       $data = API::get(static::basePath() . 'secret/' . $secret);
     }
 
-    $order = new static($data);
+    $order = (new static)->newFromBuilder($data);
 
     if (!$order->id) {
       throw new OrderNotFoundException('Order not found with secret ' . $secret);
@@ -261,7 +263,7 @@ trait OrderAPI
   {
     $data = API::get(static::basePath() . 'register/' . $id);
 
-    $order = new static($data);
+    $order = (new static)->newFromBuilder($data);
 
     if (!$order->id) {
       throw new OrderNotFoundException('Order not found with register id ' . $id);
@@ -273,7 +275,7 @@ trait OrderAPI
   /**
    * @param string $id
    * @return static
-   * @throws Exception|OrderNotFoundException
+   * @throws OrderNotFoundException
    */
   public static function retrieve($id)
   {
@@ -281,7 +283,7 @@ trait OrderAPI
       $data = API::get(static::basePath() . $id);
     }
 
-    $order = new static($data);
+    $order = (new static)->newFromBuilder($data);
 
     if (!$order->id) {
       throw new OrderNotFoundException('Order not found with id ' . $id);
