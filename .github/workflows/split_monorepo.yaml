@@ -16,6 +16,10 @@ jobs:
             matrix:
                 packages: [
                     {
+                        package: actions,
+                        path: src/Netflex/Actions
+                    },
+                    {
                         package: api,
                         path: src/Netflex/API
                     },

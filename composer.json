@@ -75,6 +75,7 @@
         ],
         "psr-4": {
             "Netflex\\": "src/Netflex/",
+            "Netflex\\Actions\\": "src/Netflex/Actions/",
             "Netflex\\API\\": "src/Netflex/API/",
             "Netflex\\Breadcrumbs\\": "src/Netflex/Breadcrumbs/",
             "Netflex\\Commerce\\": "src/Netflex/Commerce/",
@@ -139,6 +140,7 @@
         }
     },
     "replace": {
+        "netflex/actions": "4.9.10",
         "netflex/api": "4.9.10",
         "netflex/breadcrumbs": "4.9.10",
         "netflex/commerce": "4.9.10",
