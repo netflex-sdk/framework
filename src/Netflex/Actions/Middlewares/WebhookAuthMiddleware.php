@@ -25,7 +25,7 @@ class WebhookAuthMiddleware
         $ts = $request->headers->get('X-Timestamp');
         $cTs = Carbon::parse($ts);
 
-        $digestOk = ($digest && hash_hmac('SHA256', '$ts$nonce', variable('netflex_api') === $digest);
+        $digestOk = $digest && hash_hmac('SHA256', '$ts$nonce', variable('netflex_api') === $digest);
         $timeOk = $cTs && abs($cTs->diffInSeconds(Carbon::now())) < 30;
         $notRunned = \Cache::get("run-$nonce", false) == false;
 
