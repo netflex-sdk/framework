@@ -21,18 +21,4 @@ class RefundOrderFormRequest extends \Illuminate\Foundation\Http\FormRequest
         return [];
     }
 
-    public function getOrder(): ?Order {
-        try {
-            $this->order ??= Order::retrieve($this->get('order_id'));
-            return $this->order;
-        } catch(OrderNotFoundException $e) {
-            return null;
-        }
-    }
-
-
-    public function getCartItem(): ?CartItem {
-        return $this->getOrder()->cart->items
-            ->first(fn(CartItem $ci) => $ci->id == $this->get('cart_item_id'));
-    }
 }

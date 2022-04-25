@@ -2,10 +2,13 @@
 
 namespace Netflex\Netflexapp\Modules\Form;
 
-use App\Modules\BookingForm\BookingFormField;
-
 class TextField extends BookingFormField
 {
+    public static function create(string $alias, string $label = "")
+    {
+        return new static($alias, $label);
+    }
+
     function getType(): string
     {
         return "text";

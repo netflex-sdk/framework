@@ -13,7 +13,7 @@ class RefundOrderRequest extends FormRequest
 
     public function rules() {
         return [
-            'order_id' => ['required', 'numeric']
+            'order_id' => ['required', 'numeric'],
         ];
     }
 

@@ -2,8 +2,8 @@
 
 namespace Netflex\Netflexapp\Providers;
 
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
 use Netflex\Netflexapp\Contracts\Reservations\ActionControllerContract;
 use Netflex\Netflexapp\Controllers\Orders\Refunds\FormController as OrdersRefundsFormController;
 use Netflex\Netflexapp\Controllers\Reservations\FormController;
@@ -11,8 +11,22 @@ use Netflex\Netflexapp\Excpetions\InvalidActionClassException;
 use Netflex\Netflexapp\Excpetions\InvalidFormDescriberException;
 use Netflex\Netflexapp\Middlewares\WebhookAuthMiddleware;
 
-abstract class NetflexappConnectionProvider extends ServiceProvider {
+abstract class NetflexappConnectionProvider extends RouteServiceProvider
+{
 
+
+    abstract function registerProviders();
+
+    private ?string $reservationsActionController = null;
+    private ?string $ordersRefundFormController = null;
+    private ?string $ordersRefundActionController = null;
+
+
+    public function register()
+    {
+        $this->registerProviders();
+        parent::register();
+    }
 
     /**
      *
@@ -20,17 +34,11 @@ abstract class NetflexappConnectionProvider extends ServiceProvider {
      * @throws \ReflectionException
      * @throws InvalidActionClassException
      */
-    protected function setReservationsActionController(string $actionController) {
+    protected function setReservationsActionController(string $actionController)
+    {
 
-        if((new \ReflectionClass($actionController))->implementsInterface(ActionControllerContract::class)) {
-            Route::namespace('api')->prefix(".well-known/netflex/actions/")->group(function() use ($actionController) {
-                Route::middleware(WebhookAuthMiddleware::class)->group(function() use ($actionController) {
-                    Route::any('reservations/form', [FormController::class, 'createForm'])->name('netflexapp.actions.reservations.form');
-                    Route::post("reservations/create", [$actionController, 'create'])->name("netflexapp.actions.reservations.create");
-                    Route::post("reservations/update", [$actionController, 'update'])->name("netflexapp.actions.reservations.update");
-                    Route::post("reservations/destroy", [$actionController, 'destroy'])->name("netflexapp.actions.reservations.destroy");
-                });
-            });
+        if ((new \ReflectionClass($actionController))->implementsInterface(ActionControllerContract::class)) {
+            $this->reservationsActionController = $actionController;
         } else {
             $acc = ActionControllerContract::class;
             throw new InvalidActionClassException($actionController, $acc);
@@ -43,24 +51,51 @@ abstract class NetflexappConnectionProvider extends ServiceProvider {
      * @throws \ReflectionException
      * @throws InvalidActionClassException
      */
-    protected function setOrdersRefundsActionControllers(string $formDescriber, string $actionController) {
-        if(is_subclass_of($formDescriber, OrdersRefundsFormController::class) == false) {
+    protected function setOrdersRefundsActionControllers(string $formDescriber, string $actionController)
+    {
+        if (is_subclass_of($formDescriber, OrdersRefundsFormController::class) == false) {
             $acc = OrdersRefundsFormController::class;
             throw new InvalidFormDescriberException("Class [$formDescriber] should extend [$acc], but it does not");
         }
 
-        if((new \ReflectionClass($actionController))->implementsInterface(ActionControllerContract::class) == false) {
+        if ((new \ReflectionClass($actionController))->implementsInterface(\Netflex\Netflexapp\Contracts\Orders\Refunds\ActionControllerContract::class) == false) {
             $acc = \Netflex\Netflexapp\Contracts\Orders\Refunds\ActionControllerContract::class;
             throw new InvalidActionClassException($actionController, $acc);
         }
 
-        Route::namespace('api')->prefix(".well-known/netflex/actions/")->group(function() use ($formDescriber, $actionController) {
-            Route::middleware(WebhookAuthMiddleware::class)->group(function() use ($formDescriber, $actionController) {
-                Route::any('orders/refunds/form/order', [$formDescriber, 'renderRefundOrderForm']);
-                Route::any('orders/refunds/form/cartItem', [$formDescriber, 'renderRefundCartItemForm']);
-                Route::post('orders/refunds/refund/order', [$actionController, 'refundOrder']);
-                Route::post('orders/refunds/refund/cartItem', [$actionController, 'refundCartItem']);
+        $this->ordersRefundFormController = $formDescriber;
+        $this->ordersRefundActionController = $actionController;
+
+    }
+
+    public function map()
+    {
+        if ($this->reservationsActionController) {
+            $actionController = $this->reservationsActionController;
+            Route::middleware('api')->prefix(".well-known/netflex/actions/")->group(function () use ($actionController) {
+                Route::middleware(WebhookAuthMiddleware::class)->group(function () use ($actionController) {
+                    Route::any('reservations/form', [FormController::class, 'createForm'])->name('netflexapp.actions.reservations.form');
+                    Route::post("reservations/create", [$actionController, 'create'])->name("netflexapp.actions.reservations.create");
+                    Route::post("reservations/update", [$actionController, 'update'])->name("netflexapp.actions.reservations.update");
+                    Route::post("reservations/destroy", [$actionController, 'destroy'])->name("netflexapp.actions.reservations.destroy");
+                });
             });
-        });
+        }
+
+        if ($this->ordersRefundActionController) {
+            $formDescriber = $this->ordersRefundFormController;
+            $actionController = $this->ordersRefundActionController;
+
+            Route::group([
+                'middleware' => ['api', WebhookAuthMiddleware::class],
+                'prefix' => '.well-known/netflex/actions/'
+            ], function () use ($formDescriber, $actionController) {
+                Route::any('orders/refunds/form/order', [$formDescriber, 'renderRefundOrderForm']);
+                Route::any('orders/refunds/form/cartitem', [$formDescriber, 'renderRefundCartItemForm']);
+                Route::post('orders/refunds/refund/order', [$actionController, 'refundOrder']);
+                Route::post('orders/refunds/refund/cartitem', [$actionController, 'refundCartItem']);
+            });
+
+        }
     }
 }
