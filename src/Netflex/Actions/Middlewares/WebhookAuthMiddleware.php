@@ -2,12 +2,9 @@
 
 namespace Netflex\Actions\Middlewares;
 
-use Closure;
-
 use Carbon\Carbon;
-
+use Closure;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -28,7 +25,11 @@ class WebhookAuthMiddleware
         $ts = $request->headers->get('X-Timestamp');
         $cTs = Carbon::parse($ts);
 
-        if (($digest && hash_hmac('SHA256', '$ts$nonce', variable('netflex_api')) === $digest && $cTs && abs($cTs->diffInSeconds(Carbon::now())) < 30) || App::environment() === 'local') {
+        $digestOk = ($digest && hash_hmac('SHA256', '$ts$nonce', variable('netflex_api') === $digest);
+        $timeOk = $cTs && abs($cTs->diffInSeconds(Carbon::now())) < 30;
+        $notRunned = \Cache::get("run-$nonce", false) == false;
+
+        if (($digestOk && $timeOk && $notRunned) || App::environment() === 'local') {
             Cache::set('run-{$nonce}', true);
             Log::debug('Authorized webhook', ['ts' => $ts, 'nonce' => $nonce, 'digest' => $digest]);
             return $next($request);
