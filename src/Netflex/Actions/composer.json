@@ -35,11 +35,6 @@
   "extra": {
     "branch-alias": {
       "dev-master": "4.11.x-dev"
-    },
-    "laravel": {
-      "providers": [
-        "Netflex\\Actions\\Providers\\CommandProvider"
-      ]
     }
   }
 }
