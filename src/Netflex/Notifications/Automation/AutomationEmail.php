@@ -6,7 +6,7 @@ use Exception;
 use Netflex\API\Facades\API;
 use Netflex\Query\QueryableModel;
 use Netflex\Customers\Customer;
-use Netflex\Notifications\Automation\AutomationEmailJob;
+use Netflex\Notifications\Automation\Jobs\AutomationEmailJob;
 use Netflex\Query\Exceptions\NotFoundException;
 
 class AutomationEmail extends QueryableModel

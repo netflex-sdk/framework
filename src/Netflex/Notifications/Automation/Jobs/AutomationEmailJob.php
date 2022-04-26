@@ -1,6 +1,6 @@
 <?php
 
-namespace Netflex\Notifications\Automation;
+namespace Netflex\Notifications\Automation\Jobs;
 
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
