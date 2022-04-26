@@ -373,4 +373,10 @@ class Customer extends Model implements Authenticatable
 
     return false;
   }
+
+  public function addToGroup(int $id): bool
+  {
+    $this->getConnection()->put("relations/customers/membership/{$this->id}/$id");
+    return true;
+  }
 }
