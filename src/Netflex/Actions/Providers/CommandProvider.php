@@ -9,15 +9,12 @@ use Netflex\Actions\Console\Commands\ScaffoldOrdersRefunds;
 
 class CommandProvider extends \Illuminate\Support\ServiceProvider
 {
-
-    public function boot()
+    public function register()
     {
-        if(app()->runningInConsole()) {
-            $this->commands([
-                InstallCommand::class,
-                InstallServiceProvider::class,
-                ScaffoldOrdersRefunds::class,
-            ]);
-        }
+        $this->commands([
+            InstallCommand::class,
+            InstallServiceProvider::class,
+            ScaffoldOrdersRefunds::class,
+        ]);
     }
 }
