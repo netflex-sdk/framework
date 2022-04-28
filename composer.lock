@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b28cddaa209ee57f40b1d36becdf5e39",
+    "content-hash": "b9a4ba01c18c309801ba9a68a1ecfc25",
     "packages": [
         {
             "name": "apility/laravel-ngrok",
@@ -1211,16 +1211,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.1.1",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "53491b6394cdcb66880063b82c0b16cf082711eb"
+                "reference": "c94a94f120803a18554c1805ef2e539f8285f9a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/53491b6394cdcb66880063b82c0b16cf082711eb",
-                "reference": "53491b6394cdcb66880063b82c0b16cf082711eb",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/c94a94f120803a18554c1805ef2e539f8285f9a2",
+                "reference": "c94a94f120803a18554c1805ef2e539f8285f9a2",
                 "shasum": ""
             },
             "require": {
@@ -1244,7 +1244,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.1-dev"
+                    "dev-master": "2.2-dev"
                 }
             },
             "autoload": {
@@ -1306,7 +1306,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.1.1"
+                "source": "https://github.com/guzzle/psr7/tree/2.2.1"
             },
             "funding": [
                 {
@@ -1322,7 +1322,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-20T13:45:05+00:00"
+            "time": "2022-03-20T21:55:58+00:00"
         },
         {
             "name": "haydenpierce/class-finder",
