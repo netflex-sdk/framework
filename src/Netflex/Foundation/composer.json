@@ -5,8 +5,8 @@
     "license": "MIT",
     "require": {
         "illuminate/translation": "^8.0",
-        "netflex/api": "^4.10.9",
-        "netflex/support": "^4.10.9"
+        "netflex/api": "^4.11",
+        "netflex/support": "^4.11"
     },
     "autoload": {
         "psr-4": {
