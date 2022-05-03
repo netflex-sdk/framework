@@ -76,30 +76,28 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
     }
 
     /**
-     * @return ResponseInterface
+     * @return string|null
      */
-    protected function fetch()
+    protected function fetchAsUrl()
     {
         $this->options['format'] = $this->format;
+        $this->options['fetch'] = false;
 
         if (!Str::startsWith($this->options['url'], 'data:')) {
             $this->options['time'] = time();
         }
 
+
         $hash = md5(json_encode($this->options));
 
-        return Cache::rememberForever('renderer.' . $hash, function () {
+        return Cache::rememberForever('netflex.renderer.' . $this->format . '.' . $hash, function () {
             try {
                 $response = API::getGuzzleInstance()
                     ->post('foundation/pdf', [
                         'json' => $this->options
                     ]);
 
-                if (!$this->options['fetch']) {
-                    return $response;
-                }
-
-                return $this->postProcess($response);
+                return json_decode($response->getBody())->url;
             } catch (ClientExceptionInterface $exception) {
                 if ($exception instanceof BadResponseException) {
                     throw new RenderException($exception->getResponse());
@@ -108,6 +106,26 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
                 throw $exception;
             }
         });
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    protected function fetch()
+    {
+        $this->options['format'] = $this->format;
+        $this->options['fetch'] = true;
+
+        if (!Str::startsWith($this->options['url'], 'data:')) {
+            $this->options['time'] = time();
+        }
+
+        $response = API::getGuzzleInstance()
+            ->post('foundation/pdf', [
+                'json' => $this->options
+            ]);
+
+        return $this->postProcess($response);
     }
 
     /**
@@ -276,7 +294,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
         return with(new Response($content, 200, $headers->all()))
             ->header('Content-Type', $contentType, true)
             ->header('X-SSR', 1, true)
-            ->header('X-SSR-Renderer-In', (microtime(true) - $time) . 's', true);
+            ->header('X-SSR-Rendered-In', (microtime(true) - $time) . 's', true);
     }
 
     /**
@@ -286,12 +304,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
      */
     public function link(): string
     {
-        $this->options['fetch'] = false;
-
-        $response = $this->fetch();
-        $content = json_decode($response->getBody());
-
-        return $content->url;
+        return $this->fetchAsUrl();
     }
 
     /**
