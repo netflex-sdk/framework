@@ -37,6 +37,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
     protected $options = [
         'url' => 'about:blank',
         'fetch' => false,
+        'cache' => true,
         'options' => [
             'dpi' => 1,
             'timeout' => 30000
@@ -87,10 +88,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
             $this->options['time'] = time();
         }
 
-
-        $hash = md5(json_encode($this->options));
-
-        return Cache::rememberForever('netflex.renderer.' . $this->format . '.' . $hash, function () {
+        $render = function () {
             try {
                 $response = API::getGuzzleInstance()
                     ->post('foundation/pdf', [
@@ -105,7 +103,14 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
                 throw $exception;
             }
-        });
+        };
+
+        if ($this->options['cache'] ?? false) {
+            $hash = md5(json_encode($this->options));
+            return Cache::rememberForever('netflex.renderer.' . $this->format . '.' . $hash, fn () => $render());
+        }
+
+        return $render();
     }
 
     /**
