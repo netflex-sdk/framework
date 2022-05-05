@@ -5,6 +5,7 @@ namespace Netflex\Pages;
 use Exception;
 use JsonSerializable;
 
+use Netflex\Query\Builder;
 use Netflex\Support\Accessors;
 
 use Illuminate\Support\Collection;
@@ -86,7 +87,7 @@ class NavigationData implements JsonSerializable
 
   /**
    * Resolves navigation data
-   * 
+   *
    * @param int $parent
    * @param string $type
    * @param string $root
@@ -95,11 +96,19 @@ class NavigationData implements JsonSerializable
   public static function get($parent = null, $type = 'nav', $root = null)
   {
     try {
-      $pages = $parent ? Page::model()::find($parent)->children : Page::model()::where('published', true)
-        ->where(function ($query) {
-          return $query->where('parent_id', null)
-            ->orWhere('parent_id', 0);
-        })->get();
+      $pages = $parent
+        ? Page::model()
+          ::find($parent)
+          ->children
+          ->where('published', true)
+        : Page::model()
+          ::where('published', true)
+          ->where(function (Builder $query) {
+            return $query
+              ->where('parent_id', null)
+              ->orWhere('parent_id', 0);
+          })
+          ->get();
 
       $mapPage = function (Page $page) use ($root, $type) {
         $target = $page->nav_target;
