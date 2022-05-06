@@ -87,30 +87,19 @@ class NavigationData implements JsonSerializable
 
   /**
    * Resolves navigation data
-   *
-   * @param int $parent
-   * @param string $type
-   * @param string $root
+   * 
+   * @param int|null $parent = null
+   * @param string $type = 'nav'
+   * @param string|null $root = null
    * @return Collection
    */
-  public static function get($parent = null, $type = 'nav', $root = null)
+  public static function get($parent = null, string $type = 'nav', ?string $root = null)
   {
-    try {
-      $pages = $parent
-        ? Page::model()
-          ::find($parent)
-          ->children
-          ->where('published', true)
-        : Page::model()
-          ::where('published', true)
-          ->where(function (Builder $query) {
-            return $query
-              ->where('parent_id', null)
-              ->orWhere('parent_id', 0);
-          })
-          ->get();
-
-      $mapPage = function (Page $page) use ($root, $type) {
+    return Page::model()::all()
+      ->where('published', true)
+      ->where('parent_id', $parent)
+      ->where('visible_' . $type)
+      ->map(function (Page $page) use ($root, $type) {
         $target = $page->nav_target;
         $url = $page->url;
 
@@ -133,16 +122,7 @@ class NavigationData implements JsonSerializable
           'title' => $page->nav_title ? $page->nav_title : $page->name,
           'children' => static::get($page->id, $type, $root)
         ]);
-      };
-
-      return $pages->filter(function (Page $page) use ($type) {
-        return (bool) $page->{'visible_' . $type};
       })
-        ->map($mapPage)
-        ->values();
-    } catch (Exception $e) {
-      throw $e;
-      return Collection::make();
-    }
+      ->values();
   }
 }
