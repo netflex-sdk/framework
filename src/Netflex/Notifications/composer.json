@@ -10,9 +10,9 @@
         "illuminate/mail": "^8.0",
         "illuminate/support": "^8.0",
         "mustache/mustache": "^2.13",
-        "netflex/api": "^4.12",
-        "netflex/foundation": "^4.12",
-        "netflex/renderer": "^4.12",
+        "netflex/api": "^4.13",
+        "netflex/foundation": "^4.13",
+        "netflex/renderer": "^4.13",
         "php": "^7.4|^8.0"
     },
     "autoload": {
@@ -25,7 +25,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.12.x-dev"
+            "dev-master": "4.13.x-dev"
         },
         "laravel": {
             "providers": [
