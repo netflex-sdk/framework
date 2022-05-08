@@ -127,7 +127,7 @@ class ConsentAssignment implements JsonSerializable, Jsonable
         $ip = null;
 
         if (isset($options['timestamp'])) {
-            $timestamp = ($timestamp instanceof Carbon) ? $timestamp->toDateTimeString() : $timestamp;
+            $timestamp = ($options['timestamp'] instanceof Carbon) ? $options['timestamp']->toDateTimeString() : $options['timestamp'];
         }
 
         if (array_key_exists('ip', $options)) {
