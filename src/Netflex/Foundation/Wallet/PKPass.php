@@ -1379,6 +1379,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable
         }
 
         foreach ($options as $optionKey => $optionValue) {
+            if ($optionValue instanceof HtmlString) {
+                $optionValue = $optionValue->toHtml();
+            }
+
+            if (is_object($optionValue) && method_exists($optionValue, '__toString')) {
+                $optionValue = (string) $optionValue;
+            }
+
             switch ($optionKey) {
                 case 'isRelative':
                     $field[$optionKey] = (bool) $optionValue;
