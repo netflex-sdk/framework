@@ -47,7 +47,9 @@
         "symfony/psr-http-message-bridge": "^2.0",
         "php": "^7.4|^8.0",
         "jetbrains/phpstorm-attributes": "^1.0",
-        "guzzlehttp/psr7": "^2.2.1"
+        "guzzlehttp/psr7": "^2.2.1",
+        "pkpass/pkpass": "^1.2",
+        "justinrainbow/json-schema": "^5.2"
     },
     "require-dev": {
         "illuminate/cache": "^8.0",

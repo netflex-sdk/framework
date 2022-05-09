@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "86930df8533316e11cfa5cc7c93158e4",
+    "content-hash": "fb255c153078ebec7949694a7bb6c104",
     "packages": [
         {
             "name": "apility/laravel-ngrok",
@@ -1410,6 +1410,76 @@
                 "source": "https://github.com/JetBrains/phpstorm-attributes/tree/1.0"
             },
             "time": "2020-11-17T11:09:47+00:00"
+        },
+        {
+            "name": "justinrainbow/json-schema",
+            "version": "5.2.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/justinrainbow/json-schema.git",
+                "reference": "ad87d5a5ca981228e0e205c2bc7dfb8e24559b60"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/ad87d5a5ca981228e0e205c2bc7dfb8e24559b60",
+                "reference": "ad87d5a5ca981228e0e205c2bc7dfb8e24559b60",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "~2.2.20||~2.15.1",
+                "json-schema/json-schema-test-suite": "1.2.0",
+                "phpunit/phpunit": "^4.8.35"
+            },
+            "bin": [
+                "bin/validate-json"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JsonSchema\\": "src/JsonSchema/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Prieto Reis",
+                    "email": "bruno.p.reis@gmail.com"
+                },
+                {
+                    "name": "Justin Rainbow",
+                    "email": "justin.rainbow@gmail.com"
+                },
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch"
+                },
+                {
+                    "name": "Robert Schönthal",
+                    "email": "seroscho@googlemail.com"
+                }
+            ],
+            "description": "A library to validate a json schema.",
+            "homepage": "https://github.com/justinrainbow/json-schema",
+            "keywords": [
+                "json",
+                "schema"
+            ],
+            "support": {
+                "issues": "https://github.com/justinrainbow/json-schema/issues",
+                "source": "https://github.com/justinrainbow/json-schema/tree/5.2.12"
+            },
+            "time": "2022-04-13T08:02:27+00:00"
         },
         {
             "name": "larapack/dd",
@@ -2938,6 +3008,64 @@
                 }
             ],
             "time": "2021-12-04T23:24:31+00:00"
+        },
+        {
+            "name": "pkpass/pkpass",
+            "version": "v1.2.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tschoffelen/php-pkpass.git",
+                "reference": "282b4076e3e046a94538e50e755d580f1b817a56"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tschoffelen/php-pkpass/zipball/282b4076e3e046a94538e50e755d580f1b817a56",
+                "reference": "282b4076e3e046a94538e50e755d580f1b817a56",
+                "shasum": ""
+            },
+            "require": {
+                "ext-zip": "*",
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PKPass\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Schoffelen",
+                    "email": "thomas@scholica.com",
+                    "homepage": "http://thomasschoffelen.com/"
+                }
+            ],
+            "description": "PHP PKPass class for iOS Wallet",
+            "homepage": "https://github.com/tschoffelen/PHP-PKPass",
+            "keywords": [
+                "apple",
+                "ios",
+                "ipad",
+                "iphone",
+                "passbook",
+                "php",
+                "wallet"
+            ],
+            "support": {
+                "issues": "https://github.com/tschoffelen/php-pkpass/issues",
+                "source": "https://github.com/tschoffelen/php-pkpass/tree/v1.2.7"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/tschoffelen",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-07-27T11:25:48+00:00"
         },
         {
             "name": "psr/container",
