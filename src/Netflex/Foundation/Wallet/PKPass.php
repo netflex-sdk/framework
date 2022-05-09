@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use JsonSchema\Constraints\Constraint;
@@ -1356,6 +1357,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable
     {
         if ($value instanceof DateTimeInterface) {
             $value = Carbon::parse($value)->toIso8601ZuluString();
+        }
+
+        if ($value instanceof HtmlString) {
+            $value = $value->toHtml();
+        }
+
+        if (is_object($value) && method_exists($value, '__toString')) {
+            $value = (string) $value;
         }
 
         $field = [
