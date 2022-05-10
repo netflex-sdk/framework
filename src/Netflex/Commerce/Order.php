@@ -79,7 +79,7 @@ class Order extends ReactiveObject
     'abandoned_reminder_mail' => null,
     'register' => null,
     'data' => [
-        '_class' => self::class,
+      '_class' => self::class,
     ],
     'cart' => null,
     'log' => null,
@@ -94,17 +94,15 @@ class Order extends ReactiveObject
    */
   public function newFromBuilder($attributes = [])
   {
-      try {
-          $data = $attributes['data'] ?? [];
-          if($class = $data['_class'])
-              return new $class($attributes);
-          else
-              return new static($attributes);
-
-      } catch (\Throwable $t) {
-          return new static($attributes);
-      }
-
+    try {
+      $data = $attributes['data'] ?? [];
+      if ($class = $data['_class'] ?? null)
+        return new $class($attributes);
+      else
+        return new static($attributes);
+    } catch (\Throwable $t) {
+      return new static($attributes);
+    }
   }
 
   public function usesChunking()
