@@ -6,6 +6,10 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use JsonSerializable;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Http\File;
+use Netflex\Pages\Contracts\MediaUrlResolvable;
+
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
@@ -71,6 +75,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable
     ];
 
     protected $files = [];
+    protected $i18n = [];
 
     protected $fields = [
         'headerFields' => [],
@@ -188,6 +193,12 @@ class PKPass implements Responsable, JsonSerializable, Jsonable
         }
 
         throw new InvalidArgumentException('This pass type does not support transit type');
+    }
+
+    public function addLocale(string $locale, array $messages)
+    {
+        $this->i18n[$locale] = $messages;
+        return $this;
     }
 
     /**
@@ -480,9 +491,69 @@ class PKPass implements Responsable, JsonSerializable, Jsonable
         return $this;
     }
 
-    public function addFile(string $name, string $path)
+    /**
+     * @param UploadedFile|File|MediaUrlResolvable|string $file A file or a path to a file
+     * @param string|null $name
+     * @return array
+     */
+    protected function filePayload($file, ?string $name = null)
     {
-        $this->files[] = ['name' => $name, 'path' => $path];
+        if (($file instanceof UploadedFile) || ($file instanceof File)) {
+            if (!$name) {
+                $name = $file->getClientOriginalName();
+            }
+
+            $path = 'data:text/plain;base64,' . base64_encode(file_get_contents($file->getRealPath()));
+        }
+
+        if ($file instanceof MediaUrlResolvable) {
+            $path = $file->url();
+            if (!$name) {
+                $name = basename($path);
+            }
+        }
+
+        if (is_string($file)) {
+            $path = $file;
+
+            if (!$name) {
+                $name = basename($path);
+            }
+
+            if (!Str::startsWith($path, 'http')) {
+                $path = 'data:text/plain;base64,' . base64_encode(file_get_contents($file));
+            }
+        }
+
+        return ['name' => $name, 'path' => $path];;
+    }
+
+    /**
+     * @param string $locale
+     * @param UploadedFile|File|MediaUrlResolvable|string $file
+     * @param string|null $name
+     * @return static
+     */
+    public function addLocalizedFile(string $locale, $file, ?string $name = null)
+    {
+        $payload = $this->filePayload($file, $name);
+        $payload['locale'] = $locale;
+        $this->files[] = $payload;
+
+        return $this;
+    }
+
+    /**
+     * @param UploadedFile|File|MediaUrlResolvable|string $file A file or a path to a file
+     * @param string|null $name
+     * @param string|null $locale
+     * @return static
+     */
+    public function addFile($file, ?string $name = null, $locale = null)
+    {
+        $this->files[] = $this->filePayload($file, $name);
+
+        return $this;
     }
 
     /**
@@ -509,7 +580,8 @@ class PKPass implements Responsable, JsonSerializable, Jsonable
             ->post('foundation/wallet/pkpass', [
                 'json' => [
                     'data' => $this->jsonSerialize(),
-                    'files' => $this->files
+                    'files' => $this->files,
+                    'i18n' => $this->i18n,
                 ]
             ]);
 
