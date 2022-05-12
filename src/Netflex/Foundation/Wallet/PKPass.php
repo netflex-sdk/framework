@@ -170,7 +170,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     public function associatedStoreIdentifier(int $storeIdentifier)
     {
         $this->data['associatedStoreIdentifiers'] = $this->data['associatedStoreIdentifiers'] ?? [];
-        $this->data['associatedStoreIdentifiers'][] = [$storeIdentifier];
+        $this->data['associatedStoreIdentifiers'][] = $storeIdentifier;
         return $this;
     }
 
