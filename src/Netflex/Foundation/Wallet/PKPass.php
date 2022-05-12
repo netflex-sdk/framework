@@ -86,15 +86,15 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
         'backFields' => [],
     ];
 
-    protected function __construct(string $type = PKPass::TYPE_GENERIC, array $data = [], array $fields = [])
+    protected function __construct(string $type = PKPass::TYPE_GENERIC, ?array $data = [], ?array $fields = [])
     {
         $this->type = $type;
 
         $this->data = array_merge([
             'formatVersion' => 1,
-        ], $data);
+        ], $data ?? []);
 
-        $this->fields = $fields ? $fields : [
+        $this->fields = $fields ?? [
             'headerFields' => [],
             'primaryFields' => [],
             'secondaryFields' => [],
