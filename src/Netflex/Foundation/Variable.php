@@ -59,8 +59,8 @@ class Variable extends ReactiveObject
    */
   public static function all()
   {
-    $templates = Cache::rememberForever('variables', function () {
-      return API::get('foundation/variables');
+    $templates = app('cache')->rememberForever('variables', function () {
+      return app('api.client')->get('foundation/variables');
     });
 
     return collect($templates)->map(function ($content) {
@@ -74,7 +74,10 @@ class Variable extends ReactiveObject
    */
   public static function retrieve($alias)
   {
-    if (Facade::getFacadeApplication() && App::isBooted()) {
+      $services_uncached = app()->has('api.client') && app()->has('cache');
+      $services_cached = app()->has('cache') && app('cache')->has('variables');
+
+    if ($services_uncached || $services_cached) {
       return static::all()->first(function ($content) use ($alias) {
         return $content->alias === $alias;
       });
