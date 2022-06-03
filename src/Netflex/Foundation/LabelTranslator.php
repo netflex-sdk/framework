@@ -65,7 +65,7 @@ class LabelTranslator extends Translator
     if (!isset($line)) {
       try {
         API::post('foundation/labels', [
-            'label' => base64_encode($key)
+          'label' => base64_encode($key)
         ]);
         Cache::forget('labels');
         Label::all();
@@ -78,5 +78,13 @@ class LabelTranslator extends Translator
     // that will be quick to spot in the UI if language keys are wrong or missing
     // from the application's language files. Otherwise we can return the line.
     return $this->makeReplacements($line ?: $key, $replace);
+  }
+
+  protected function makeReplacements($line, array $replace)
+  {
+    return parent::makeReplacements(
+      $line,
+      array_map(fn ($value) => (string) $value, $replace)
+    );
   }
 }
