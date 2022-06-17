@@ -61,7 +61,7 @@ class Structure
   public static function isModelRegistered(string $model)
   {
     $instance = new $model([], false);
-    
+
     if ($instance instanceof Model) {
       return App::bound('structure.' . $instance->getRelationId());
     }
@@ -100,11 +100,13 @@ class Structure
    */
   public static function resolveModel($id)
   {
-    try {
-      return App::make('structure.' . $id);
-    } catch (BindingResolutionException $e) {
-      return App::make(Entry::class);
-    }
+    return once(function () use ($id) {
+      try {
+        return App::make('structure.' . $id);
+      } catch (BindingResolutionException $e) {
+        return App::make(Entry::class);
+      }
+    });
   }
 
   /**
@@ -113,7 +115,7 @@ class Structure
    */
   public function model()
   {
-    return static::resolveModel($this->id);
+    return once(fn () => static::resolveModel($this->id));
   }
 
   /**
@@ -123,18 +125,20 @@ class Structure
    */
   public static function retrieve($id, $client = null)
   {
-    $client = $client ?? API::connection();
-    $prefix = $client->getConnectionName();
-    $prefix = $prefix !== 'default' ? $prefix : null;
-    $key = implode('/', array_filter([$prefix, 'structures', $id]));
+    return once(function () use ($id, $client) {
+      $client = $client ?? API::connection();
+      $prefix = $client->getConnectionName();
+      $prefix = $prefix !== 'default' ? $prefix : null;
+      $key = implode('/', array_filter([$prefix, 'structures', $id]));
 
-    try {
-      return Cache::rememberForever($key, function () use ($id, $client) {
-        return new static($client->get("builder/structures/$id/basic", true));
-      });
-    } catch (Exception $e) {
-      return null;
-    }
+      try {
+        return Cache::rememberForever($key, function () use ($id, $client) {
+          return new static($client->get("builder/structures/$id/basic", true));
+        });
+      } catch (Exception $e) {
+        return null;
+      }
+    });
   }
 
   public function getIdAttribute($id)

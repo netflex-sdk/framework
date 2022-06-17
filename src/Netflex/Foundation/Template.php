@@ -38,7 +38,8 @@ class Template extends ReactiveObject implements Responsable
    * @param string|null $alias 
    * @return string|null
    */
-  public function getAliasAttribute ($alias) {
+  public function getAliasAttribute($alias)
+  {
     if ($alias) {
       return str_replace('/', '.', $alias);
     }
@@ -47,7 +48,8 @@ class Template extends ReactiveObject implements Responsable
   /**
    * @param string|null $alias 
    */
-  public function setAliasAttribute ($alias) {
+  public function setAliasAttribute($alias)
+  {
     if ($alias) {
       $alias = str_replace('.', '/', $alias);
     }
@@ -68,27 +70,27 @@ class Template extends ReactiveObject implements Responsable
   }
 
   /**
-   * @return static[]
+   * @return Collection
    */
   public static function all()
   {
-    $templates = Cache::rememberForever('templates', function () {
-      return API::get('foundation/templates');
-    });
+    return once(function () {
+      $templates = Cache::rememberForever('templates', function () {
+        return API::get('foundation/templates');
+      });
 
-    return collect($templates)->map(function ($template) {
-      return new static($template);
+      return collect($templates)->map(function ($template) {
+        return new static($template);
+      });
     });
   }
 
-    /**
+  /**
    * @param int $id
    * @return static|void
    */
   public static function retrieve($id)
   {
-    return static::all()->first(function ($template) use ($id) {
-      return $template->id === $id;
-    });
+    return once(fn () => static::all()->first(fn ($template) => $template->id === $id));
   }
 }

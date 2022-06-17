@@ -528,34 +528,45 @@ if (!function_exists('content')) {
    */
   function content($alias, $field = 'auto')
   {
-    $settings = page_first_editable($alias);
+    $retrieveContent = function () use ($alias, $field) {
+      $settings = page_first_editable($alias);
 
-    if (!$settings) {
-      $settings = ['alias' => $alias, 'type' => 'text'];
-    }
-
-    if ($page = current_page()) {
-      $content = $page->content->filter(function ($content) use ($settings) {
-        return $content->area === $settings['alias'];
-      });
-
-      $blockContent = $page->content->filter(function ($content) use ($settings) {
-        return $content->area === blockhash_append($settings['alias']);
-      });
-
-      $content = $blockContent->count() ? $blockContent : $content;
-
-      $content = $content->filter(function ($item) {
-        return $item->published;
-      });
-
-      if ($field !== 'auto') {
-        $settings['type'] = $field;
-        return map_content($content, $settings, $field);
+      if (!$settings) {
+        $settings = ['alias' => $alias, 'type' => 'text'];
       }
 
-      return map_content($content, $settings);
+      if ($page = current_page()) {
+        $content = $page->content->filter(function ($content) use ($settings) {
+          return $content->area === $settings['alias'];
+        });
+
+        $blockContent = $page->content->filter(function ($content) use ($settings) {
+          return $content->area === blockhash_append($settings['alias']);
+        });
+
+        $content = $blockContent->count() ? $blockContent : $content;
+
+        $content = $content->filter(function ($item) {
+          return $item->published;
+        });
+
+        if ($field !== 'auto') {
+          $settings['type'] = $field;
+          return map_content($content, $settings, $field);
+        }
+
+        return map_content($content, $settings);
+      }
+    };
+
+    if (current_mode() !== 'live') {
+      return $retrieveContent();
     }
+
+    $page = current_page();
+    $key = implode('.', array_values(array_filter([$page ? $page->id : null, $page ? $page->revision_id : null, blockhash_append($alias), $field])));
+
+    return Cache::rememberForever($key, $retrieveContent);
   }
 }
 
@@ -602,23 +613,25 @@ if (!function_exists('page_first_editable')) {
    */
   function page_first_editable(string $alias)
   {
-    $editable = array_filter(page_editable(), function ($editable) use ($alias) {
-      return $editable['alias'] === blockhash_append($alias);
+    return once(function () use ($alias) {
+      $editable = array_filter(page_editable(), function ($editable) use ($alias) {
+        return $editable['alias'] === blockhash_append($alias);
+      });
+
+      if ($editable) {
+        return array_shift($editable);
+      }
+
+      $editable = array_filter(page_editable(), function ($editable) use ($alias) {
+        return $editable['alias'] === $alias;
+      });
+
+      if ($editable) {
+        return array_shift($editable);
+      }
+
+      return page_editable_push($alias, 'html');
     });
-
-    if ($editable) {
-      return array_shift($editable);
-    }
-
-    $editable = array_filter(page_editable(), function ($editable) use ($alias) {
-      return $editable['alias'] === $alias;
-    });
-
-    if ($editable) {
-      return array_shift($editable);
-    }
-
-    return page_editable_push($alias, 'html');
   }
 }
 
@@ -798,27 +811,29 @@ if (!function_exists('current_mode')) {
    */
   function current_mode(...$args)
   {
-    if (!count($args)) {
-      if (App::has('__mode__')) {
-        return App::get('__mode__');
+    once(function () use ($args) {
+      if (!count($args)) {
+        if (App::has('__mode__')) {
+          return App::get('__mode__');
+        }
+
+        return 'live';
       }
 
-      return 'live';
-    }
+      $value = array_shift($args) ?? null;
 
-    $value = array_shift($args) ?? null;
+      if ($value && !is_string($value)) {
+        $frame = debug_backtrace()[0];
+        $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
+        throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be of type string, ' . $type . ' given on line ' . $frame['line']);
+      }
 
-    if ($value && !is_string($value)) {
-      $frame = debug_backtrace()[0];
-      $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
-      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be of type string, ' . $type . ' given on line ' . $frame['line']);
-    }
+      App::bind('__mode__', function () use ($value) {
+        return $value;
+      });
 
-    App::bind('__mode__', function () use ($value) {
       return $value;
     });
-
-    return $value;
   }
 }
 
@@ -831,14 +846,16 @@ if (!function_exists('cdn_url')) {
    */
   function cdn_url($path = null)
   {
-    $schema = Variable::get('site_cdn_protocol');
-    $cdn = Variable::get('site_cdn_url');
+    return once(function () use ($path) {
+      $schema = Variable::get('site_cdn_protocol');
+      $cdn = Variable::get('site_cdn_url');
 
-    if ($path instanceof MediaUrlResolvable) {
-      $path = $path->getPathAttribute();
-    }
+      if ($path instanceof MediaUrlResolvable) {
+        $path = $path->getPathAttribute();
+      }
 
-    return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
+      return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
+    });
   }
 }
 
@@ -855,72 +872,74 @@ if (!function_exists('media_url')) {
    */
   function media_url($file, $presetOrSize = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
   {
-    if ($file instanceof MediaUrlResolvable) {
-      $file = $file->getPathAttribute();
-    } else {
-      if (is_array($file) || is_object($file)) {
-        $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
-        $file = data_get($file, 'path', $fallback);
-      }
-    }
-
-    $size = $presetOrSize;
-    $preset = ($presetOrSize instanceof MediaPreset) ? $presetOrSize : null;
-    $preset = !$preset ? MediaPreset::find($presetOrSize) : null;
-
-    if ($preset) {
-      $size = $preset->size ?? null;
-      $type = $preset->mode ?? $type;
-      $color = $preset->fill ?? $color;
-      $direction = $preset->direction ?? $direction;
-    }
-
-    if (!$size && !$type && empty($gb)) {
-      return cdn_url($file);
-    }
-
-    $size = (is_string($size) && !(strpos($size, 'x') > 0)) ? "{$size}x{$size}" : $size;
-    $size = is_float($size) ? floor($size) : $size;
-    $size = is_int($size) ? "{$size}x{$size}" : $size;
-
-    $width = is_array($size) ? floor(($size[0] ?? 0)) : 0;
-    $height = is_array($size) ? floor(($size[1] ?? 0)) : 0;
-    $size = is_array($size) ? "{$width}x{$height}" : $size;
-
-    if ($direction && $type === 'rc') {
-      $type = 'rcf';
-    }
-
-    $options = null;
-
-    if ($type === 'fill') {
-      if (is_string($color)) {
-        $color = explode(',', $color);
+    return once(function () use ($file, $presetOrSize, $type, $color, $direction) {
+      if ($file instanceof MediaUrlResolvable) {
+        $file = $file->getPathAttribute();
+      } else {
+        if (is_array($file) || is_object($file)) {
+          $fallback = (is_object($file) && method_exists($file, '__toString')) ? (string) $file : null;
+          $file = data_get($file, 'path', $fallback);
+        }
       }
 
-      if (is_int($color) || is_float($color)) {
-        $color = floor($color % 256);
-        $color = "$color,$color,$color,1";
+      $size = $presetOrSize;
+      $preset = ($presetOrSize instanceof MediaPreset) ? $presetOrSize : null;
+      $preset = !$preset ? MediaPreset::find($presetOrSize) : null;
+
+      if ($preset) {
+        $size = $preset->size ?? null;
+        $type = $preset->mode ?? $type;
+        $color = $preset->fill ?? $color;
+        $direction = $preset->direction ?? $direction;
       }
 
-      if (is_array($color)) {
-        $r = floor((intval($color[0] ?? 0)) % 256);
-        $g = floor((intval($color[1] ?? 0)) % 256);
-        $b = floor((intval($color[2] ?? 0)) % 256);
-        $a = floatval($color[3] ?? 1.0);
-        $color = "$r,$g,$b,$a";
+      if (!$size && !$type && empty($gb)) {
+        return cdn_url($file);
       }
 
-      $options = $color . "/";
-    }
+      $size = (is_string($size) && !(strpos($size, 'x') > 0)) ? "{$size}x{$size}" : $size;
+      $size = is_float($size) ? floor($size) : $size;
+      $size = is_int($size) ? "{$size}x{$size}" : $size;
 
-    if ($type === 'rcf') {
-      $options = $direction . '/';
-    }
+      $width = is_array($size) ? floor(($size[0] ?? 0)) : 0;
+      $height = is_array($size) ? floor(($size[1] ?? 0)) : 0;
+      $size = is_array($size) ? "{$width}x{$height}" : $size;
 
-    $size = $type === 'o' ?  null : "$size/";
+      if ($direction && $type === 'rc') {
+        $type = 'rcf';
+      }
 
-    return cdn_url("/media/$type/{$size}{$options}{$file}");
+      $options = null;
+
+      if ($type === 'fill') {
+        if (is_string($color)) {
+          $color = explode(',', $color);
+        }
+
+        if (is_int($color) || is_float($color)) {
+          $color = floor($color % 256);
+          $color = "$color,$color,$color,1";
+        }
+
+        if (is_array($color)) {
+          $r = floor((intval($color[0] ?? 0)) % 256);
+          $g = floor((intval($color[1] ?? 0)) % 256);
+          $b = floor((intval($color[2] ?? 0)) % 256);
+          $a = floatval($color[3] ?? 1.0);
+          $color = "$r,$g,$b,$a";
+        }
+
+        $options = $color . "/";
+      }
+
+      if ($type === 'rcf') {
+        $options = $direction . '/';
+      }
+
+      $size = $type === 'o' ?  null : "$size/";
+
+      return cdn_url("/media/$type/{$size}{$options}{$file}");
+    });
   }
 }
 

@@ -80,14 +80,6 @@ class Page extends QueryableModel implements Responsable
   const TYPE_PAGE = 'page';
 
   /**
-   * Holds all page objects
-   * Avoids recursive resolution of pages
-   *
-   * @var Collection|null
-   */
-  protected static $allItems = null;
-
-  /**
    * The relation associated with the model.
    *
    * @var string
@@ -185,9 +177,11 @@ class Page extends QueryableModel implements Responsable
 
   public function route($name, $parameters = [], $absolute = true)
   {
-    $pageRouteName = $this->config->route_name ?? Str::slug($this->name);
+    return once(function () use ($name, $parameters, $absolute) {
+      $pageRouteName = $this->config->route_name ?? Str::slug($this->name);
 
-    return route(implode('.', [$pageRouteName, Str::slug($name)]), $parameters, $absolute);
+      return route(implode('.', [$pageRouteName, Str::slug($name)]), $parameters, $absolute);
+    });
   }
 
   /**
@@ -268,15 +262,17 @@ class Page extends QueryableModel implements Responsable
    */
   public function getBlocks($area)
   {
-    $blocks = $this->content->filter(function ($content) use ($area) {
-      return $content->published && $content->area === $area;
-    })->map(function ($block) {
-      if ($template = Template::retrieve((int) $block->text)) {
-        return [$template->alias, $block->title ? $block->title : null];
-      };
-    });
+    return once(function () use ($area) {
+      $blocks = $this->content->filter(function ($content) use ($area) {
+        return $content->published && $content->area === $area;
+      })->map(function ($block) {
+        if ($template = Template::retrieve((int) $block->text)) {
+          return [$template->alias, $block->title ? $block->title : null];
+        };
+      });
 
-    return $blocks->filter();
+      return $blocks->filter();
+    });
   }
 
   /**
@@ -290,11 +286,13 @@ class Page extends QueryableModel implements Responsable
 
   public function getMasterAttribute()
   {
-    if (!$this->parent) {
-      return $this;
-    }
+    return once(function () {
+      if (!$this->parent) {
+        return $this;
+      }
 
-    return $this->parent->master ?? null;
+      return $this->parent->master ?? null;
+    });
   }
 
   /**
@@ -304,31 +302,35 @@ class Page extends QueryableModel implements Responsable
    */
   public function getDomainAttribute()
   {
-    $master = $this->master;
+    return once(function () {
+      $master = $this->master;
 
-    if ($master && $master !== $this) {
-      if ($master->type === static::TYPE_DOMAIN && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
-        return $master->name;
+      if ($master && $master !== $this) {
+        if ($master->type === static::TYPE_DOMAIN && preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $master->name) !== false) {
+          return $master->name;
+        }
       }
-    }
+    });
   }
 
   public function getLangAttribute()
   {
-    if (!$this->attributes['lang']) {
-      $parent = $this->parent;
-      while ($parent && !$parent->lang) {
-        $parent = $parent->parent;
+    return once(function () {
+      if (!$this->attributes['lang']) {
+        $parent = $this->parent;
+        while ($parent && !$parent->lang) {
+          $parent = $parent->parent;
+        }
+
+        if ($parent) {
+          return $parent->lang;
+        }
+
+        return App::getLocale();
       }
 
-      if ($parent) {
-        return $parent->lang;
-      }
-
-      return App::getLocale();
-    }
-
-    return $this->attributes['lang'];
+      return $this->attributes['lang'];
+    });
   }
 
   /**
@@ -384,7 +386,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function getParentAttribute()
   {
-    return static::find((int) $this->parent_id);
+    return once(fn () => static::find((int) $this->parent_id));
   }
 
   /**
@@ -410,15 +412,13 @@ class Page extends QueryableModel implements Responsable
    */
   public static function all()
   {
-    if (!static::$allItems) {
-      /** @var Collection */
-      static::$allItems = collect(Cache::rememberForever('pages', function () {
+    return once(function () {
+      return collect(Cache::rememberForever('pages', function () {
         return API::get('builder/pages/content', true);
-      }))->sortBy('sorting');
-    }
-
-    return static::$allItems->map(function ($attributes) {
-      return (new static)->newFromBuilder($attributes);
+      }))->sortBy('sorting')
+        ->map(function ($attributes) {
+          return (new static)->newFromBuilder($attributes);
+        });
     });
   }
 
@@ -432,10 +432,10 @@ class Page extends QueryableModel implements Responsable
    */
   public static function find($id)
   {
-    return static::all()
+    return once(fn () => static::all()
       ->first(function (Page $page) use ($id) {
         return $page->getKey() === (int) $id;
-      });
+      }));
   }
 
 
@@ -450,25 +450,27 @@ class Page extends QueryableModel implements Responsable
    */
   public static function resolve($resolveBy, $field = null)
   {
-    $resolveBy = Collection::make([$resolveBy])
-      ->flatten()
-      ->toArray();
+    return once(function () use ($resolveBy, $field) {
+      $resolveBy = Collection::make([$resolveBy])
+        ->flatten()
+        ->toArray();
 
-    foreach ($resolveBy as $value) {
-      $value = $value === '/' ? '/index' : $value;
-      $resolveBy[] = $value;
-      $resolveBy[] = "$value/";
-      $resolveBy[] = Str::replaceFirst('/', '', "$value/");
-    }
+      foreach ($resolveBy as $value) {
+        $value = $value === '/' ? '/index' : $value;
+        $resolveBy[] = $value;
+        $resolveBy[] = "$value/";
+        $resolveBy[] = Str::replaceFirst('/', '', "$value/");
+      }
 
-    $resolveBy = array_map('strtolower', array_unique($resolveBy));
+      $resolveBy = array_map('strtolower', array_unique($resolveBy));
 
-    $resolved = static::all()->filter(function (self $page) use ($resolveBy, $field) {
-      $key = strtolower($page->{$field ?? $page->resolvableField});
-      return in_array($key, $resolveBy);
+      $resolved = static::all()->filter(function (self $page) use ($resolveBy, $field) {
+        $key = strtolower($page->{$field ?? $page->resolvableField});
+        return in_array($key, $resolveBy);
+      });
+
+      return count($resolveBy) === 1 ? $resolved->first() : $resolved;
     });
-
-    return count($resolveBy) === 1 ? $resolved->first() : $resolved;
   }
 
   /**
@@ -513,7 +515,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function navigationData($type = 'nav', $root = null)
   {
-    return NavigationData::get($this->id, $type, $root);
+    return once(fn () => NavigationData::get($this->id, $type, $root));
   }
 
   /**
@@ -537,7 +539,7 @@ class Page extends QueryableModel implements Responsable
       return true;
     }
 
-    return $this->isSubPageOf($page, $pointer->parent);
+    return once(fn () => $this->isSubPageOf($page, $pointer->parent));
   }
 
   /**
@@ -549,7 +551,7 @@ class Page extends QueryableModel implements Responsable
    */
   public function isParentPageOf(Page $page)
   {
-    return $page->isSubPageOf($this);
+    return once(fn () => $page->isSubPageOf($this));
   }
 
   /**
@@ -560,7 +562,7 @@ class Page extends QueryableModel implements Responsable
   public static function model()
   {
     /** @var Page */
-    return Config::get('pages.model', Page::class) ?? Page::class;
+    return once(fn () => Config::get('pages.model', Page::class) ?? Page::class);
   }
 
   /**
