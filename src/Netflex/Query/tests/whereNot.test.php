@@ -16,7 +16,7 @@ final class WhereNotTest extends TestCase
     $whereEqualsQuery = $query->getQuery();
 
     $this->assertSame(
-      '(NOT id:10000)',
+      'NOT id:10000',
       $whereEqualsQuery
     );
 
@@ -37,7 +37,7 @@ final class WhereNotTest extends TestCase
 
 
     $this->assertSame(
-      '(NOT should##D##encode:10000)',
+      'NOT should##D##encode:10000',
       $whereEqualsQuery
     );
   }
@@ -65,7 +65,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('id', null);
 
     $this->assertSame(
-      '(NOT (NOT _exists_:id))',
+      '_exists_:id',
       $query->getQuery()
     );
   }
@@ -75,7 +75,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('published', true);
 
     $this->assertSame(
-      '(NOT published:1)',
+      'NOT published:1',
       $query->getQuery()
     );
 
@@ -83,7 +83,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('published', false);
 
     $this->assertSame(
-      '(NOT published:0)',
+      'NOT published:0',
       $query->getQuery()
     );
   }
@@ -93,7 +93,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('name', 'Test string');
 
     $this->assertSame(
-      '(NOT name:"Test string")',
+      'NOT name:"Test string"',
       $query->getQuery()
     );
   }
@@ -104,7 +104,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('id', [1, null, 'Test string', true, [1, null, 'Test string']]);
 
     $this->assertSame(
-      '(NOT (id:1 OR (NOT _exists_:id) OR id:"Test string" OR id:1 OR (id:1 OR (NOT _exists_:id) OR id:"Test string")))',
+      'NOT (id:1 OR NOT _exists_:id OR id:"Test string" OR id:1 OR (id:1 OR NOT _exists_:id OR id:"Test string"))',
       $query->getQuery()
     );
   }
@@ -114,7 +114,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('id', '!=', 10000);
 
     $this->assertSame(
-      '(NOT NOT id:10000)',
+      'id:10000',
       $query->getQuery()
     );
   }
@@ -125,7 +125,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('id', '!=', null);
 
     $this->assertSame(
-      '(NOT NOT (NOT _exists_:id))',
+      'NOT _exists_:id',
       $query->getQuery()
     );
   }
@@ -135,7 +135,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('published', '!=', true);
 
     $this->assertSame(
-      '(NOT NOT published:1)',
+      'published:1',
       $query->getQuery()
     );
 
@@ -143,7 +143,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('published', '!=', false);
 
     $this->assertSame(
-      '(NOT NOT published:0)',
+      'published:0',
       $query->getQuery()
     );
   }
@@ -153,7 +153,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('name', '!=', 'Test string');
 
     $this->assertSame(
-      '(NOT NOT name:"Test string")',
+      'name:"Test string"',
       $query->getQuery()
     );
   }
@@ -164,7 +164,7 @@ final class WhereNotTest extends TestCase
     $query->whereNot('id', '!=', [1, null, 'Test string', true, [1, null, 'Test string']]);
 
     $this->assertSame(
-      '(NOT (NOT id:1 OR NOT (NOT _exists_:id) OR NOT id:"Test string" OR NOT id:1 OR (NOT id:1 OR NOT (NOT _exists_:id) OR NOT id:"Test string")))',
+      '(id:1 OR NOT _exists_:id OR id:"Test string" OR id:1 OR (id:1 OR NOT _exists_:id OR id:"Test string"))',
       $query->getQuery()
     );
   }
@@ -180,7 +180,7 @@ final class WhereNotTest extends TestCase
     });
 
     $this->assertSame(
-      'NOT ((NOT published:1)) AND ((NOT id:10000) AND name:"Test string")',
+      '(NOT published:1 AND NOT (NOT id:10000 AND name:"Test string"))',
       $query->getQuery()
     );
   }

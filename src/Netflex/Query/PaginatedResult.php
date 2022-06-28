@@ -9,6 +9,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
+use Netflex\Query\Exceptions\IndexNotFoundException;
+use Netflex\Query\Exceptions\QueryException;
 
 /**
  * @method void setPath(string $path)
@@ -40,6 +42,13 @@ class PaginatedResult extends LengthAwarePaginator
     $this->onEachSide($onEachSide);
   }
 
+  /**
+   * @param Builder $query
+   * @param $page
+   * @param $onEachSide
+   * @return static
+   * @throws QueryException|IndexNotFoundException
+   */
   public static function fromBuilder(Builder $query, $page = 1, $onEachSide = 0)
   {
     $result = $query->fetch($query->getSize(), $page);

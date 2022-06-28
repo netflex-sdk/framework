@@ -13,8 +13,8 @@ final class RawTest extends TestCase
     $query->raw($raw);
 
     $this->assertSame(
-      'search?size=' . Builder::MAX_QUERY_SIZE . '&q=' . urlencode($raw),
-      $query->getRequest()
+      $raw,
+      $query->getQuery()
     );
   }
 
@@ -30,8 +30,8 @@ final class RawTest extends TestCase
     $query->raw($queries[1]);
 
     $this->assertSame(
-      'search?size=' . Builder::MAX_QUERY_SIZE . '&q=' . urlencode($queries[0] . ' AND ' . $queries[1]),
-      $query->getRequest()
+      '(' . $queries[0] . ' AND ' . $queries[1] . ')',
+      $query->getQuery()
     );
   }
 }
