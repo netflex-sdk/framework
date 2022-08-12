@@ -5,6 +5,7 @@ namespace Netflex\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
+use Netflex\Pages\Events\CacheCleared;
 
 class ClearCache
 {
@@ -23,6 +24,7 @@ class ClearCache
       Log::debug('Middleware => ClearCache');
       $request->request->remove($this->parameter);
       Artisan::call('cache:clear');
+      CacheCleared::dispatch();
       usleep(random_int(250000, 1500000));
     }
 
