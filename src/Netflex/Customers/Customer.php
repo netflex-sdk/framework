@@ -251,25 +251,25 @@ class Customer extends Model implements Authenticatable
 
   /**
    * Retrives all consent assignment of the given consent, or all assignments if none specified
-   * 
+   *
    * @param Consent|int|null $consent
    * @return ConsentAssignment[]
    */
   public function getConsents($consent = null)
   {
-    return collect($this->getConnection()->get('relations/consents/customer/' . $this->id, true))
-      ->filter(function ($attributes) use ($consent) {
-        if (!$consent) {
-          return true;
-        }
-
-        return $attributes['consent']['id'] == (($consent instanceof Consent) ? $consent->id : $consent);
-      })
-      ->values()
-      ->map(function ($consent) {
-        $consent['customer_id'] = $this->id;
-        return ConsentAssignment::newFromBuilder($consent);
-      });
+      return collect($this->getConnection()->get('relations/consents/customer/' . $this->id, true))
+          ->filter(function ($attributes) use ($consent) {
+              if ($consent) {
+                  if (isset($attributes['consent']['id'])) {
+                      return $attributes['consent']['id'] == (($consent instanceof Consent) ? $consent->id : $consent);
+                  }
+              }
+          })
+          ->values()
+          ->map(function ($consent) {
+              $consent['customer_id'] = $this->id;
+              return ConsentAssignment::newFromBuilder($consent);
+          });
   }
 
   /**
