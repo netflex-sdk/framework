@@ -7,8 +7,8 @@ use Netflex\Commerce\Contracts\CartItem;
 
 interface Order
 {
-    public function getOrderId(): int;
-    public function getOrderSecret(): string;
+    public function getOrderId(): ?int;
+    public function getOrderSecret(): ?string;
 
     public function getOrderCustomerEmail(): ?string;
     public function setOrderCustomerEmail(?string $email): void;

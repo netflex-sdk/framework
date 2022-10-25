@@ -266,12 +266,12 @@ class Order extends ReactiveObject implements OrderContract
     return trim(static::$base_path, '/') . '/';
   }
 
-  public function getOrderId(): int
+  public function getOrderId(): ?int
   {
     return $this->id;
   }
 
-  public function getOrderSecret(): string
+  public function getOrderSecret(): ?string
   {
     return $this->secret;
   }
