@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\CartItemAPI;
 use Netflex\Structure\Traits\Localizable;
+use Netflex\Commerce\Contracts\CartItem as CartItemContract;
 
 /**
  * @property-read int $id
@@ -40,7 +41,7 @@ use Netflex\Structure\Traits\Localizable;
  * @property-read float $original_tax_cost
  * @property-read id $order_id
  */
-class CartItem extends ReactiveObject
+class CartItem extends ReactiveObject implements CartItemContract
 {
   use CartItemAPI;
   use Localizable;
@@ -179,5 +180,126 @@ class CartItem extends ReactiveObject
     $json['properties'] = $this->properties->jsonSerialize();
 
     return $json;
+  }
+
+  public function getCartItemLineNumber(): int
+  {
+    return $this->id;
+  }
+
+  public function getCartItemProductId(): int
+  {
+    return $this->entry_id;
+  }
+
+  public function setCartItemProductId(int $productId): void
+  {
+    $this->entry_id = $productId;
+  }
+
+  public function getCartItemProductName(): int
+  {
+    return $this->entry_name;
+  }
+
+  public function setCartItemProductName(int $productName): void
+  {
+    $this->entry_name = $productName;
+  }
+
+  public function getCartItemVariantId(): int
+  {
+    return (int) $this->variant_id;
+  }
+
+  public function setCartItemVariantId(int $variantId): void
+  {
+    $this->variant_id = $variantId;
+  }
+
+  public function getCartItemVariantName(): ?string
+  {
+    return $this->variant_name;
+  }
+
+  public function setCartItemVariantName(string $variantName): void
+  {
+    $this->variant_name = $variantName;
+  }
+
+  public function getCartItemQuantity(): int
+  {
+    return (int) $this->no_of_entries;
+  }
+
+  public function setCartItemQuantity(int $quantity): void
+  {
+    $this->no_of_entries = $quantity;
+  }
+
+  public function getCartItemPrice(): float
+  {
+    return (float) $this->variant_cost;
+  }
+
+  public function setCartItemPrice(float $price): void
+  {
+    $this->variant_cost = $price;
+  }
+
+  public function getCartItemTotal(): float
+  {
+    return (float) $this->entries_total;
+  }
+
+  public function getCartItemSubtotal(): float
+  {
+    return (float) $this->entries_cost;
+  }
+
+  public function getCartItemTax(): float
+  {
+    return (float) $this->tax_cost;
+  }
+
+  public function getCartItemTaxRate(): float
+  {
+    return (float) $this->tax_percent;
+  }
+
+  public function setCartItemTaxRate(float $taxRate): void
+  {
+    $this->tax_percent = $taxRate;
+  }
+
+  public function saveCartItem(): void
+  {
+    $this->save();
+  }
+
+  public function deleteCartItem(): void
+  {
+    $this->delete();
+  }
+
+  public function getCartItemProperty(string $key)
+  {
+    if ($this->properties->offsetExists($key)) {
+      return $this->properties->offsetGet($key);
+    }
+
+    return null;
+  }
+
+  public function setCartItemProperty(string $key, $value): void
+  {
+    $properties = $this->properties;
+    $properties->offsetSet($key, $value);
+    $this->properties = $properties;
+  }
+
+  public function getCartItemProperties(): array
+  {
+    return $this->properties->toArray();
   }
 }

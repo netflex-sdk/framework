@@ -2,6 +2,10 @@
 
 namespace Netflex\Commerce;
 
+use DateTimeInterface;
+use Netflex\Commerce\Contracts\CartItem;
+use Netflex\Commerce\Contracts\Order as OrderContract;
+
 use Netflex\Query\Traits\HasRelation;
 use Netflex\Query\Traits\ModelMapper;
 use Netflex\Query\Traits\Queryable;
@@ -35,7 +39,7 @@ use Netflex\Commerce\Traits\API\OrderAPI;
  * @property-read Checkout $checkout
  * @property-read DiscountItemCollection $discounts
  */
-class Order extends ReactiveObject
+class Order extends ReactiveObject implements OrderContract
 {
   use OrderAPI;
   use Queryable;
@@ -260,5 +264,140 @@ class Order extends ReactiveObject
   public static function basePath()
   {
     return trim(static::$base_path, '/') . '/';
+  }
+
+  public function getOrderId(): int
+  {
+    return $this->id;
+  }
+
+  public function getOrderSecret(): string
+  {
+    return $this->secret;
+  }
+
+  public function getOrderCustomerEmail(): ?string
+  {
+    return $this->customer_mail;
+  }
+
+  public function setOrderCustomerEmail(?string $email): void
+  {
+    $this->customer_mail = $email;
+  }
+
+  public function getOrderCustomerPhone(): ?string
+  {
+    return $this->customer_phone;
+  }
+
+  public function setOrderCustomerPhone(?string $phone): void
+  {
+    $this->customer_phone = $phone;
+  }
+
+  public function getOrderCustomerFirstname(): ?string
+  {
+    return $this->checkout->firstname;
+  }
+
+  public function setOrderCustomerFirstname(?string $firstname): void
+  {
+    $this->checkout(['firstname' => $firstname]);
+  }
+
+  public function getOrderCustomerSurname(): ?string
+  {
+    return $this->checkout->surname;
+  }
+
+  public function setOrderCustomerSurname(?string $surname): void
+  {
+    $this->checkout(['surname' => $surname]);
+  }
+
+  public function getOrderTax(): float
+  {
+    return $this->order_tax;
+  }
+
+  public function getOrderSubtotal(): float
+  {
+    return $this->cart->subtotal;
+  }
+
+  public function getOrderTotal(): float
+  {
+    return $this->order_total;
+  }
+
+  public function getOrderData(string $key)
+  {
+    return $this->data[$key] ?? null;
+  }
+
+  public function setOrderData(string $key, $value, ?string $label = null): void
+  {
+    $this->addData($key, $value, $label ?? $key);
+  }
+
+  public function getOrderStatus(): string
+  {
+    return $this->status;
+  }
+
+  public function setOrderStatus(string $status): void
+  {
+    $this->saveStatus($status);
+  }
+
+  public function getOrderCartItems(): array
+  {
+    return $this->cart->items->all();
+  }
+
+  public function addOrderCartItem(CartItem $cartItem)
+  {
+    $this->addCart([
+      'entry_id' => $cartItem->getCartItemProductId(),
+      'entry_name' => $cartItem->getCartItemProductName(),
+      'no_of_entries' => $cartItem->getCartItemQuantity(),
+      'variant_id' => $cartItem->getCartItemVariantId(),
+      'variant_name' => $cartItem->getCartItemVariantName(),
+      'tax_percent' => $cartItem->getCartItemTaxRate(),
+      'ip' => request()->ip(),
+      'user_agent' => request()->userAgent(),
+      'properties' => $cartItem->getCartItemProperties(),
+    ]);
+  }
+
+  public function saveOrder(): void
+  {
+    $this->save();
+  }
+
+  public function deleteOrder(): void
+  {
+    $this->delete();
+  }
+
+  public function getOrderCheckoutStart(): DateTimeInterface
+  {
+    return $this->checkout->checkout_start;
+  }
+
+  public function setOrderCheckoutStart(DateTimeInterface $date): void
+  {
+    $this->checkout(['checkout_start' => $date->format('Y-m-d H:i:s')]);
+  }
+
+  public function getOrderCheckoutEnd(): DateTimeInterface
+  {
+    return $this->checkout->checkout_end;
+  }
+
+  public function setOrderCheckoutEnd(DateTimeInterface $date): void
+  {
+    $this->checkout(['checkout_end' => $date->format('Y-m-d H:i:s')]);
   }
 }
