@@ -197,12 +197,12 @@ class CartItem extends ReactiveObject implements CartItemContract
     $this->entry_id = $productId;
   }
 
-  public function getCartItemProductName(): int
+  public function getCartItemProductName(): string
   {
     return $this->entry_name;
   }
 
-  public function setCartItemProductName(int $productName): void
+  public function setCartItemProductName(string $productName): void
   {
     $this->entry_name = $productName;
   }
