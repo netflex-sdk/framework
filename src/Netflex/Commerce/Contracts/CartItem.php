@@ -9,8 +9,8 @@ interface CartItem
     public function getCartItemProductId(): int;
     public function setCartItemProductId(int $productId): void;
 
-    public function getCartItemProductName(): int;
-    public function setCartItemProductName(int $productName): void;
+    public function getCartItemProductName(): string;
+    public function setCartItemProductName(string $productName): void;
 
     public function getCartItemVariantId(): int;
     public function setCartItemVariantId(int $variantId): void;
