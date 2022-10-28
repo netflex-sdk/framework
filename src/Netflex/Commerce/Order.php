@@ -401,4 +401,9 @@ class Order extends ReactiveObject implements OrderContract
   {
     $this->checkout(['checkout_end' => $date->format('Y-m-d H:i:s')]);
   }
+
+  public function refreshOrder(): OrderContract
+  {
+    return $this->refresh();
+  }
 }

@@ -50,4 +50,6 @@ interface Order
     public function deleteOrder(): void;
 
     public function saveOrder();
+
+    public function refreshOrder(): Order;
 }
