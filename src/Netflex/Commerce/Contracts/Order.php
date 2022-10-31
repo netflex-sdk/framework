@@ -52,4 +52,7 @@ interface Order
     public function saveOrder();
 
     public function refreshOrder(): Order;
+
+    /** @return string|int */
+    public function getOrderReceiptId();
 }

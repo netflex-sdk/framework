@@ -406,4 +406,9 @@ class Order extends ReactiveObject implements OrderContract
   {
     return $this->refresh();
   }
+
+  public function getOrderReceiptId()
+  {
+    return $this->register->receipt_order_id;
+  }
 }
