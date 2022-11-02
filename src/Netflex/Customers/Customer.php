@@ -6,7 +6,9 @@ use Exception;
 
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Str;
 
+use Brick\PhoneNumber\PhoneNumber;
 use Netflex\Query\QueryableModel as Model;
 
 /**
@@ -231,6 +233,23 @@ class Customer extends Model implements Authenticatable
     }
   }
 
+  public function setPhoneAttribute($phone)
+  {
+    if (Str::startsWith($phone, '+') || Str::startsWith($phone, '00')) {
+      try {
+        $parsed = PhoneNumber::parse($phone, 'NO');
+        $phone = $parsed->getNationalNumber();
+        $phone_countrycode = $parsed->getCountryCode();
+        $this->attributes['phone'] = $phone;
+        $this->attributes['phone_countrycode'] = $phone_countrycode;
+        return;
+      } catch (Exception $e) {
+      }
+    }
+
+    $this->attributes['phone'] = $phone;
+  }
+
   /**
    * Alias for mail field
    *
@@ -257,19 +276,19 @@ class Customer extends Model implements Authenticatable
    */
   public function getConsents($consent = null)
   {
-      return collect($this->getConnection()->get('relations/consents/customer/' . $this->id, true))
-          ->filter(function ($attributes) use ($consent) {
-              if ($consent) {
-                  if (isset($attributes['consent']['id'])) {
-                      return $attributes['consent']['id'] == (($consent instanceof Consent) ? $consent->id : $consent);
-                  }
-              }
-          })
-          ->values()
-          ->map(function ($consent) {
-              $consent['customer_id'] = $this->id;
-              return ConsentAssignment::newFromBuilder($consent);
-          });
+    return collect($this->getConnection()->get('relations/consents/customer/' . $this->id, true))
+      ->filter(function ($attributes) use ($consent) {
+        if ($consent) {
+          if (isset($attributes['consent']['id'])) {
+            return $attributes['consent']['id'] == (($consent instanceof Consent) ? $consent->id : $consent);
+          }
+        }
+      })
+      ->values()
+      ->map(function ($consent) {
+        $consent['customer_id'] = $this->id;
+        return ConsentAssignment::newFromBuilder($consent);
+      });
   }
 
   /**
