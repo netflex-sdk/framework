@@ -55,4 +55,7 @@ interface Order
 
     /** @return string|int */
     public function getOrderReceiptId();
+
+    /** @return int|string */
+    public function getCustomerId();
 }

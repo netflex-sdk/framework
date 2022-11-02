@@ -88,6 +88,10 @@ jobs:
                         path: src/Netflex/SDK
                     },
                     {
+                        package: signups,
+                        path: src/Netflex/Signups
+                    },
+                    {
                         package: structures,
                         path: src/Netflex/Structures
                     },

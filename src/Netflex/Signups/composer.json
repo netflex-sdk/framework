@@ -1,0 +1,29 @@
+{
+    "name": "netflex/signups",
+    "description": "Netflex Signups library",
+    "type": "library",
+    "license": "MIT",
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Netflex\\Signups\\": ""
+        }
+    },
+    "replace": {
+        "netflex/signups": "*"
+    },
+    "require": {
+        "netflex/structures": "^4.15.7",
+        "netflex/customers": "^4.15.7",
+        "netflex/query-builder": "^4.15.7",
+        "netflex/support": "^4.15.7",
+        "php": "^7.4|^8.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.16.x-dev"
+        }
+    }
+}

@@ -11,6 +11,7 @@ use Netflex\Query\Traits\ModelMapper;
 use Netflex\Query\Traits\Queryable;
 use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\OrderAPI;
+use Netflex\Signups\Signup;
 
 /**
  * @property-read int $id
@@ -410,5 +411,15 @@ class Order extends ReactiveObject implements OrderContract
   public function getOrderReceiptId()
   {
     return $this->register->receipt_order_id;
+  }
+
+  public function getSignupsAttribute()
+  {
+    return Signup::forOrder($this);
+  }
+
+  public function getCustomerId()
+  {
+    return $this->customer_id;
   }
 }
