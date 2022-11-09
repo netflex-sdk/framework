@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Config;
 
 class Label
 {
+  public static function locales(): array
+  {
+    return array_keys(static::all());
+  }
+
   /**
    * @return static[]
    */
