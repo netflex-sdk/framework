@@ -2,6 +2,7 @@
 
 namespace Netflex\Commerce;
 
+use Carbon\Carbon;
 use DateTimeInterface;
 
 use Netflex\Commerce\Contracts\CartItem;
@@ -493,6 +494,16 @@ class Order extends ReactiveObject implements OrderContract, UrlRoutable
   public function getPaymentMethod(): ?string
   {
     return $this->payment_method;
+  }
+
+  public function checkoutOrder()
+  {
+    $this->checkout(['checkout_end' => Carbon::now()->toDateString()]);
+  }
+
+  public function registerOrder()
+  {
+    $this->register();
   }
 
   public function registerPayment(Payment $payment): void

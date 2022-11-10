@@ -63,6 +63,10 @@ interface Order
 
     public function registerPayment(Payment $payment): void;
 
+    public function registerOrder();
+
+    public function checkoutOrder();
+
     public function getTotalPaid(): float;
 
     public function getPaymentMethod(): ?string;
