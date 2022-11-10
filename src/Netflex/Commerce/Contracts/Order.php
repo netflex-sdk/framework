@@ -60,4 +60,6 @@ interface Order
     public function getCustomerId();
 
     public function getOrderCurrency(): string;
+
+    public function registerPayment(Payment $payment): void;
 }

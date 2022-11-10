@@ -14,7 +14,8 @@ use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\OrderAPI;
 use Netflex\Signups\Signup;
 
-use Illuminate\Contracts\Routing\UrlRoutable;;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Netflex\Commerce\Contracts\Payment;;
 
 /**
  * @property-read int $id
@@ -482,5 +483,17 @@ class Order extends ReactiveObject implements OrderContract, UrlRoutable
   public function getOrderCurrency(): string
   {
     return $this->currency ?? 'NOK';
+  }
+
+  public function registerPayment(Payment $payment): void
+  {
+    $this->addPayment([
+      'payment_method' => $payment->getPaymentMethod(),
+      'status' => $payment->getPaymentStatus(),
+      'capture_status' => $payment->getCaptureStatus(),
+      'transaction_id' => $payment->getTransactionId(),
+      'card_type_name' => $payment->getCardType(),
+      'amount' => $payment->getPaymentAmount(),
+    ]);
   }
 }
