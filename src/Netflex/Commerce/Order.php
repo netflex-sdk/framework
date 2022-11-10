@@ -377,17 +377,17 @@ class Order extends ReactiveObject implements OrderContract, UrlRoutable
 
   public function getOrderTax(): float
   {
-    return $this->order_tax;
+    return (float) $this->order_tax;
   }
 
   public function getOrderSubtotal(): float
   {
-    return $this->cart->subtotal;
+    return (float) $this->order_cost;
   }
 
   public function getOrderTotal(): float
   {
-    return $this->order_total;
+    return (float) $this->order_total;
   }
 
   public function getOrderData(string $key)
