@@ -62,4 +62,8 @@ interface Order
     public function getOrderCurrency(): string;
 
     public function registerPayment(Payment $payment): void;
+
+    public function getTotalPaid(): float;
+
+    public function getPaymentMethod(): ?string
 }

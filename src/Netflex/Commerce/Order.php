@@ -485,6 +485,16 @@ class Order extends ReactiveObject implements OrderContract, UrlRoutable
     return $this->currency ?? 'NOK';
   }
 
+  public function getTotalPaid(): float
+  {
+    return (float) $this->payments->total;
+  }
+
+  public function getPaymentMethod(): ?string
+  {
+    return $this->payment_method;
+  }
+
   public function registerPayment(Payment $payment): void
   {
     $this->addPayment([
@@ -495,5 +505,8 @@ class Order extends ReactiveObject implements OrderContract, UrlRoutable
       'card_type_name' => $payment->getCardType(),
       'amount' => $payment->getPaymentAmount(),
     ]);
+
+    $this->save(['payment_method' => $payment->getPaymentMethod()]);
+    $this->refreshOrder();
   }
 }
