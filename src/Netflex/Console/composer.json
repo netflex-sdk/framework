@@ -27,9 +27,9 @@
     },
     "require": {
         "laravel/framework": "^8.0",
-        "netflex/api": "^4.17.4",
-        "netflex/foundation": "^4.17.4",
-        "netflex/pages": "^4.17.4",
+        "netflex/api": "^4.17.5",
+        "netflex/foundation": "^4.17.5",
+        "netflex/pages": "^4.17.5",
         "apility/laravel-ngrok": "^2.2",
         "php": "^7.4|^8.0"
     },
