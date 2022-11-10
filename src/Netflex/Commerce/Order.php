@@ -3,6 +3,7 @@
 namespace Netflex\Commerce;
 
 use DateTimeInterface;
+
 use Netflex\Commerce\Contracts\CartItem;
 use Netflex\Commerce\Contracts\Order as OrderContract;
 
@@ -12,6 +13,8 @@ use Netflex\Query\Traits\Queryable;
 use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\OrderAPI;
 use Netflex\Signups\Signup;
+
+use Illuminate\Contracts\Routing\UrlRoutable;;
 
 /**
  * @property-read int $id
@@ -40,7 +43,7 @@ use Netflex\Signups\Signup;
  * @property-read Checkout $checkout
  * @property-read DiscountItemCollection $discounts
  */
-class Order extends ReactiveObject implements OrderContract
+class Order extends ReactiveObject implements OrderContract, UrlRoutable
 {
   use OrderAPI;
   use Queryable;
@@ -92,6 +95,59 @@ class Order extends ReactiveObject implements OrderContract
     'payments' => null,
     'discounts' => null,
   ];
+
+  /**
+   * Get the value of the model's route key.
+   *
+   * @return mixed
+   */
+  public function getRouteKey()
+  {
+    return $this->{$this->getRouteKeyName()};
+  }
+
+  /**
+   * Get the route key for the model.
+   *
+   * @return string
+   */
+  public function getRouteKeyName()
+  {
+    return 'secret';
+  }
+
+  /**
+   * Retrieve the model for a bound value.
+   *
+   * @param  mixed  $value
+   * @param  string|null  $field
+   * @return \Illuminate\Database\Eloquent\Model|null
+   */
+  public function resolveRouteBinding($value, $field = null)
+  {
+    if ($field === null) {
+      $field = $this->getRouteKeyName();
+    }
+
+    if ($field === 'secret') {
+      return static::retrieveBySecret($value);
+    }
+
+    return static::where($field, $value)->first();
+  }
+
+  /**
+   * Retrieve the child model for a bound value.
+   *
+   * @param  string  $childType
+   * @param  mixed  $value
+   * @param  string|null  $field
+   * @return \Illuminate\Database\Eloquent\Model|null
+   */
+  public function resolveChildRouteBinding($childType, $value, $field)
+  {
+    return $this->resolveRouteBinding($value, $field);
+  }
 
   /**
    * @param array $attributes
