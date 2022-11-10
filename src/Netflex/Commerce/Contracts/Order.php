@@ -58,4 +58,6 @@ interface Order
 
     /** @return int|string */
     public function getCustomerId();
+
+    public function getOrderCurrency(): string;
 }

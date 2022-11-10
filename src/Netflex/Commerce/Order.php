@@ -422,4 +422,9 @@ class Order extends ReactiveObject implements OrderContract
   {
     return $this->customer_id;
   }
+
+  public function getOrderCurrency(): string
+  {
+    return $this->currency ?? 'NOK';
+  }
 }
