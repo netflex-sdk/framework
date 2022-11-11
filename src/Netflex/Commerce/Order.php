@@ -27,9 +27,7 @@ class Order extends AbstractOrder
   protected static function registerModelEvent($event, $callback)
   {
     if (isset(static::$dispatcher)) {
-      $name = static::class;
-
-      static::$dispatcher->listen("netflex.commerce.order.{$event}*", $callback);
+      static::$dispatcher->listen("netflex.commerce.order.{$event}", $callback);
     }
   }
 
@@ -60,7 +58,7 @@ class Order extends AbstractOrder
     }
 
     return !empty($result) ? $result : static::$dispatcher->{$method}(
-      "netflex.commerce.order.{$event}: " . static::class,
+      "netflex.commerce.order.{$event}",
       $this
     );
   }
@@ -79,7 +77,7 @@ class Order extends AbstractOrder
     $instance = new static;
 
     foreach ($instance->getObservableEvents() as $event) {
-      static::$dispatcher->forget("netflex.commerce.order.{$event}: " . static::class);
+      static::$dispatcher->forget("netflex.commerce.order.{$event}");
     }
 
     foreach (array_values($instance->dispatchesEvents) as $event) {
