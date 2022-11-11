@@ -70,4 +70,6 @@ interface Order
     public function getTotalPaid(): float;
 
     public function getPaymentMethod(): ?string;
+
+    public function lockOrder();
 }

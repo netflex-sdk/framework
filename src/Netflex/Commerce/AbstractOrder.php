@@ -530,4 +530,9 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         $this->save(['payment_method' => $payment->getPaymentMethod()]);
         $this->refreshOrder();
     }
+
+    public function lockOrder()
+    {
+        $this->lock();
+    }
 }

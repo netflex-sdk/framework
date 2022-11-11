@@ -14,7 +14,9 @@ class Order extends AbstractOrder
   protected $observables = [
     'registered',
     'locked',
-    'checkout'
+    'checkout',
+    'paying',
+    'paid',
   ];
 
   /**

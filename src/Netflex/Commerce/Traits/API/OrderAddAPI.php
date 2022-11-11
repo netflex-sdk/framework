@@ -41,18 +41,26 @@ trait OrderAddAPI
 
   /**
    * @param array $item
-   * @return static
+   * @return static|bool
    * @throws Exception
    */
   public function addPayment($item)
   {
+    if ($this->fireModelEvent('paying') === false) {
+      return false;
+    }
+
     if (!$this->id) {
       $this->save();
     }
 
     API::post(static::basePath() . $this->id . '/payment', $item);
 
-    return $this->forgetInCache();
+    $order = $this->forgetInCache();
+
+    $this->fireModelEvent('paid', false);
+
+    return $order;
   }
 
   /**
