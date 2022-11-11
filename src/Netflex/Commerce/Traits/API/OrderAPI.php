@@ -30,6 +30,10 @@ trait OrderAPI
    */
   public function save($payload = [])
   {
+    if ($this->fireModelEvent('saving') === false) {
+      return $this;
+    }
+
     foreach ($this->modified as $modifiedKey) {
       $payload[$modifiedKey] = $this->{$modifiedKey};
     }
@@ -39,6 +43,10 @@ trait OrderAPI
 
     // Post new
     if (!$this->id) {
+      if ($this->fireModelEvent('creating') === false) {
+        return $this;
+      }
+
       $this->attributes['id'] = API::post(trim(static::$base_path, '/'), $payload)->order_id;
 
 
@@ -47,16 +55,26 @@ trait OrderAPI
       if ($this->triedReceivedBySession) {
         $this->addToSession();
       }
+
+      $this->fireModelEvent('created', false);
     } else {
+      if ($this->fireModelEvent('updating') === false) {
+        return $this;
+      }
+
       // Put updates
       if (!empty($payload)) {
         API::put(static::basePath() . $this->id, $payload);
 
         $this->forgetInCache();
       }
+
+      $this->fireModelEvent('updated', false);
     }
 
     $this->modified = [];
+
+    $this->fireModelEvent('saved', false);
 
     return $this;
   }
@@ -71,6 +89,7 @@ trait OrderAPI
       $this->attributes = API::get(static::basePath() . $this->id, true);
 
       $this->addToCache();
+      $this->fireModelEvent('retrieved', false);
     } else {
       $this->save();
     }
@@ -122,7 +141,10 @@ trait OrderAPI
   {
     API::put(static::basePath() . $this->id . '/checkout', $payload);
 
-    return $this->forgetInCache();
+    $order = $this->forgetInCache();
+    $order->fireModelEvent('checkout', false);
+
+    return $order;
   }
 
   /**
@@ -133,7 +155,10 @@ trait OrderAPI
   {
     API::put(static::basePath() . $this->id . '/register');
 
-    return $this->forgetInCache();
+    $order = $this->forgetInCache();
+    $order->fireModelEvent('registered', false);
+
+    return $order;
   }
 
   /**
@@ -145,7 +170,10 @@ trait OrderAPI
   {
     API::put(static::basePath() . $this->id . '/lock');
 
-    return $this->forgetInCache();
+    $order = $this->forgetInCache();
+    $order->fireModelEvent('locked', false);
+
+    return $order;
   }
 
   /**
@@ -165,9 +193,17 @@ trait OrderAPI
    */
   public function delete()
   {
+    if ($this->fireModelEvent('deleting') === false) {
+      return $this;
+    }
+
     API::delete(static::basePath() . $this->id);
 
-    return $this->removeFromSession()->forgetInCache();
+    $order = $this->removeFromSession()->forgetInCache();
+
+    $this->fireModelEvent('deleted', false);
+
+    return $order;
   }
 
   /**
@@ -231,6 +267,8 @@ trait OrderAPI
       $order->triedReceivedBySession = true;
     }
 
+    $order->fireModelEvent('retrieved', false);
+
     return $order;
   }
 
@@ -251,7 +289,11 @@ trait OrderAPI
       throw new OrderNotFoundException('Order not found with secret ' . $secret);
     }
 
-    return $order->addToCache();
+    $order = $order->addToCache();
+
+    $order->fireModelEvent('retrieved', false);
+
+    return $order;
   }
 
   /**
@@ -269,7 +311,10 @@ trait OrderAPI
       throw new OrderNotFoundException('Order not found with register id ' . $id);
     }
 
-    return $order->addToCache();
+    $order = $order->addToCache();
+    $order->fireModelEvent('retrieved', false);
+
+    return $order;
   }
 
   /**
@@ -289,7 +334,10 @@ trait OrderAPI
       throw new OrderNotFoundException('Order not found with id ' . $id);
     }
 
-    return $order->addToCache();
+    $order = $order->addToCache();
+    $order->fireModelEvent('retrieved', false);
+
+    return $order;
   }
 
   /**

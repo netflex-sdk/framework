@@ -31,6 +31,11 @@
     "extra": {
         "branch-alias": {
             "dev-master": "4.16.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Netflex\\Commerce\\Providers\\CommerceServiceProvider"
+            ]
         }
     }
 }

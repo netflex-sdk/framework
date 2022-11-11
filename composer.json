@@ -123,7 +123,8 @@
                 "Netflex\\Scheduler\\Providers\\SchedulerServiceProvider",
                 "Netflex\\Structure\\Providers\\StructureServiceProvider",
                 "Netflex\\Render\\Providers\\RenderServiceProvider",
-                "Netflex\\Customers\\Providers\\AuthServiceProvider"
+                "Netflex\\Customers\\Providers\\AuthServiceProvider",
+                "Netflex\\Commerce\\Providers\\CommerceServiceProvider"
             ],
             "aliases": {
                 "SEOMeta": "Apility\\SEOTools\\Facades\\SEOMeta",
