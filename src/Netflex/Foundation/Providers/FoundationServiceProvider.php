@@ -14,9 +14,7 @@ class FoundationServiceProvider extends ServiceProvider
     {
         app('events')->listen("bootstrapping: Illuminate\Foundation\Bootstrap\BootProviders", function() {
             $old = app('config')->all();
-            $new = new Repository($this->replace_variables($old));
-            unset($old);
-            $this->app->singleton('config', fn() => $new);
+            $this->app->instance('config', new Repository($this->replace_variables($old)));
         });
     }
 
