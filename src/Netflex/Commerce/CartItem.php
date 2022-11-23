@@ -7,6 +7,7 @@ use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\CartItemAPI;
 use Netflex\Structure\Traits\Localizable;
 use Netflex\Commerce\Contracts\CartItem as CartItemContract;
+use Netflex\Commerce\Contracts\Discount;
 
 /**
  * @property-read int $id
@@ -301,5 +302,17 @@ class CartItem extends ReactiveObject implements CartItemContract
   public function getCartItemProperties(): array
   {
     return $this->properties->toArray();
+  }
+
+  public function addCartItemDiscount(Discount $discount)
+  {
+    $this->addDiscount([
+      'scope' => 'item',
+      'scope_key' => $this->getCartItemLineNumber(),
+      'discount_id' => $discount->getDiscountId(),
+      'discount' => $discount->getDiscountValue(),
+      'label' => $discount->getDiscountLabel(),
+      'type' => $discount->getDiscountType(),
+    ]);
   }
 }

@@ -38,4 +38,6 @@ interface CartItem
     public function setCartItemProperty(string $key, $value): void;
 
     public function getCartItemProperties(): array;
+
+    public function addCartItemDiscount(Discount $discount);
 }

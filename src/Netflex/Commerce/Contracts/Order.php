@@ -72,4 +72,6 @@ interface Order
     public function getPaymentMethod(): ?string;
 
     public function lockOrder();
+
+    public function addOrderDiscount(Discount $discount);
 }

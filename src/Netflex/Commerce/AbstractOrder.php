@@ -19,6 +19,8 @@ use Netflex\Commerce\Contracts\Payment;;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
+use Netflex\API\Facades\API;
+use Netflex\Commerce\Contracts\Discount;
 
 /**
  * @property-read int $id
@@ -534,5 +536,16 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     public function lockOrder()
     {
         $this->lock();
+    }
+
+    public function addOrderDiscount(Discount $item)
+    {
+        $this->addDiscount([
+            'scope' => 'cart',
+            'discount_id' => $item->getDiscountId(),
+            'discount' => $item->getDiscountValue(),
+            'label' => $item->getDiscountLabel(),
+            'type' => $item->getDiscountType(),
+        ]);
     }
 }
