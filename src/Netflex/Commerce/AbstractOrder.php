@@ -555,4 +555,9 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
         $this->refresh();
     }
+
+    public function getOrderPayments(): array
+    {
+        return $this->payments->items->all();
+    }
 }
