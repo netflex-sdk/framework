@@ -547,5 +547,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
             'label' => $item->getDiscountLabel(),
             'type' => $item->getDiscountType(),
         ]);
+
+        $this->refresh();
     }
 }
