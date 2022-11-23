@@ -50,6 +50,6 @@ trait CartItemAPI
       $item['scope_key'] = $this->id;
     }
 
-    API::put(Order::basePath() . $this->order_id . '/discount/' . $this->id, $item);
+    API::post(Order::basePath() . $this->order_id . '/discount/' . $this->id, $item);
   }
 }

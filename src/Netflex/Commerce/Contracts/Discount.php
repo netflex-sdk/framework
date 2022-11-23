@@ -4,7 +4,7 @@ namespace Netflex\Commerce\Contracts;
 
 interface Discount
 {
-    const TYPE_PERCENTAGE = 'percentage';
+    const TYPE_PERCENTAGE = 'percent';
     const TYPE_AMOUNT = 'amount';
     const TYPE_FIXED = 'fixed';
 

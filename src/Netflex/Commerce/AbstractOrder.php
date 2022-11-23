@@ -21,6 +21,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Netflex\API\Facades\API;
 use Netflex\Commerce\Contracts\Discount;
+use TypeError;
 
 /**
  * @property-read int $id
@@ -540,6 +541,10 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
     public function addOrderDiscount(Discount $item)
     {
+        if ($item->getDiscountType() !== Discount::TYPE_PERCENTAGE) {
+            throw new TypeError('Only percentage discounts are supported at the cart scope');
+        }
+
         $this->addDiscount([
             'scope' => 'cart',
             'discount_id' => $item->getDiscountId(),
