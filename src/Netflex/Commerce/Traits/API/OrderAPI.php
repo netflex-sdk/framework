@@ -169,6 +169,7 @@ trait OrderAPI
   public function lock()
   {
     API::put(static::basePath() . $this->id . '/lock');
+    $this->setLocked(true);
 
     $order = $this->forgetInCache();
     $order->fireModelEvent('locked', false);

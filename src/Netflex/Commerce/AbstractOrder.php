@@ -2,12 +2,15 @@
 
 namespace Netflex\Commerce;
 
+use Apility\Ticketing\Models\Product;
 use Carbon\Carbon;
 use DateTimeInterface;
 
+use Exception;
 use Netflex\Commerce\Contracts\CartItem;
 use Netflex\Commerce\Contracts\Order as OrderContract;
 
+use Netflex\Commerce\Exceptions\CartNotMutableException;
 use Netflex\Query\Traits\HasRelation;
 use Netflex\Query\Traits\ModelMapper;
 use Netflex\Query\Traits\Queryable;
@@ -428,8 +431,18 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         return $this->cart->items->all();
     }
 
+    /**
+     * @param CartItem $cartItem
+     * @return void
+     * @throws CartNotMutableException
+     * @throws Exception
+     */
     public function addOrderCartItem(CartItem $cartItem)
     {
+        if(!$this->isCartMutable()) {
+            throw new CartNotMutableException();
+        }
+
         $this->addCart([
             'entry_id' => $cartItem->getCartItemProductId(),
             'entry_name' => $cartItem->getCartItemProductName(),
@@ -506,7 +519,13 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
     public function getPaymentMethod(): ?string
     {
-        return $this->payment_method;
+        return collect($this->getOrderPayments())
+            ->reject(fn(Payment $p) => $p->getIsPending())
+            ->reject(fn(Payment $p) => $p->getPaymentAmount() == 0)
+            ->map(fn(Payment $p) => $p->getCardType())
+            ->unique()
+            ->filter()
+            ->join(", ");
     }
 
     public function checkoutOrder()
@@ -519,6 +538,9 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         $this->register();
     }
 
+    /**
+     * @throws Exception
+     */
     public function registerPayment(Payment $payment): void
     {
         $this->addPayment([
@@ -528,9 +550,11 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
             'transaction_id' => $payment->getTransactionId(),
             'card_type_name' => $payment->getCardType(),
             'amount' => $payment->getPaymentAmount(),
+            'data' => [
+                'isLocked' => $payment->isLocked()
+            ]
         ]);
-
-        $this->save(['payment_method' => $payment->getPaymentMethod()]);
+        $this->save();
         $this->refreshOrder();
     }
 
@@ -559,5 +583,82 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     public function getOrderPayments(): array
     {
         return $this->payments->items->all();
+    }
+
+
+    /**
+     *
+     * Checks if the cart is mutable by checking first if the order is mutable
+     * and then checks payments for any payment that is considered reserved or captured.
+     *
+     */
+    public function isCartMutable(): bool
+    {
+        return !$this->isLocked() && collect($this->getOrderPayments())
+            ->reject(fn(Payment $payment) => $payment->getIsPending())
+            ->count() === 0;
+    }
+
+    public function isLocked(): bool
+    {
+        return (bool)($this->data->_mutable ?? "0");
+    }
+
+    public function setLocked(bool $isLocked)
+    {
+        $this->setOrderData('_mutable', $isLocked);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function updatePayment(Payment $payment): ?Payment
+    {
+        $updatePayment = collect($this->getOrderPayments())
+            ->first(fn(Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
+
+        if($updatePayment) {
+            /** @var PaymentItem $updatePayment */
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+            $updatePayment->save([
+                'payment_method' => $payment->getPaymentMethod(),
+                'status' => $payment->getPaymentStatus(),
+                'capture_status' => $payment->getCaptureStatus(),
+                'transaction_id' => $payment->getTransactionId(),
+                'card_type_name' => $payment->getCardType(),
+                'amount' => $payment->getPaymentAmount(),
+                'data' => [
+                    'isLocked' => $payment->isLocked()
+                ]
+            ]);
+        }
+
+        return $updatePayment;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function deletePayment(Payment $payment): ?Payment
+    {
+        $deletePayment = $this->getOrderPayments()
+            ->first(fn(Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
+
+        if($deletePayment) {
+            /** @var PaymentItem $deletePayment */
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+            $deletePayment->delete();
+        }
+
+        return $deletePayment;
+    }
+
+    public function isCompleted(): bool {
+        return !!($this->register && $this->register->receipt_order_id);
+    }
+
+    public function isCompletable(): bool
+    {
+        return $this->cart->count_items > 0 && $this->getTotalPaid() >= $this->getOrderTotal();
     }
 }

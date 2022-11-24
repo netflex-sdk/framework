@@ -7,7 +7,7 @@ use DateTimeInterface;
 use Netflex\Commerce\Contracts\Payment;
 use Netflex\Commerce\Contracts\CartItem;
 
-interface Order
+interface Order extends Lockable
 {
     public function getOrderId(): ?int;
     public function getOrderSecret(): ?string;
@@ -79,4 +79,14 @@ interface Order
 
     /** @return Payment[] */
     public function getOrderPayments(): array;
+
+    public function isCartMutable(): bool;
+
+    public function deletePayment(Payment $payment): ?Payment;
+
+    public function updatePayment(Payment $payment): ?Payment;
+
+    public function isCompletable(): bool;
+    public function isCompleted(): bool;
+
 }
