@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2bc7a32acb1756ebc48f5cb04854cabc",
+    "content-hash": "7c3ab7b92e9f05c47db5223f2bda75f9",
     "packages": [
         {
             "name": "apility/laravel-ngrok",
