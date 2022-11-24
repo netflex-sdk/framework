@@ -108,7 +108,7 @@ trait Queryable
 
   /**
    * Override the publishing status for the model
-   * 
+   *
    * @param bool $disregarding
    * @return Builder
    */
@@ -199,12 +199,66 @@ trait Queryable
   }
 
   /**
+   * Creates a nested query scope.
+   *
+   * @param callable|Closure $closure
+   * @param string|null $operator
+   * @return Builder
+   * @throws NotQueryableException
+   * @see \Netflex\Query\Builder::group
+   */
+  public static function group($closure, ?string $operator = null): Builder
+  {
+    return static::makeQueryBuilder()->group($closure, $operator);
+  }
+
+  /**
+   * Creates a nested OR separated query scope.
+   *
+   * @param callable|Closure $closure
+   * @return Builder
+   * @throws NotQueryableException
+   * @see \Netflex\Query\Builder::or
+   */
+  public static function or($closure): Builder
+  {
+    return static::makeQueryBuilder()->or($closure);
+  }
+
+  /**
+   * Creates a nested AND separated query scope.
+   *
+   * @param callable|Closure $closure
+   * @return Builder
+   * @throws NotQueryableException
+   * @see \Netflex\Query\Builder::and
+   */
+  public static function and($closure): Builder
+  {
+    return static::makeQueryBuilder()->and($closure);
+  }
+
+  /**
+   * Creates a negated nested query scope.
+   *
+   * @param callable|Closure $closure
+   * @param string|null $operator
+   * @return Builder
+   * @throws NotQueryableException
+   * @see \Netflex\Query\Builder::and
+   */
+  public static function not($closure, ?string $operator = null): Builder
+  {
+    return static::makeQueryBuilder()->not($closure, $operator);
+  }
+
+  /**
    * Performs a 'where' query
    *
    * If a closure is passed as the only argument, a new query scope will be created.
    * If $value is omitted, $operator is used as the $value, and the $operator will be set to '='.
    *
-   * @param Closure|string $field
+   * @param string $field
    * @param string $operator
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return Builder
@@ -242,6 +296,8 @@ trait Queryable
    * @return Builder
    * @throws NotQueryableException If object not queryable
    * @see \Netflex\Query\Builder::whereNot
+   *
+   * @deprecated 4.5.0 use where('field', '!=', 'value') or where() inside a not() query
    */
   public static function whereNot(...$args)
   {
@@ -254,6 +310,7 @@ trait Queryable
    * @param string $field
    * @param @param null|array|boolean|integer|string|DateTimeInterface $from
    * @param @param null|array|boolean|integer|string|DateTimeInterface $to
+   * @param bool $inclusive
    * @return Builder
    * @throws NotQueryableException If object not queryable
    * @see \Netflex\Query\Builder::whereBetween
@@ -272,6 +329,8 @@ trait Queryable
    * @return Builder
    * @throws NotQueryableException If object not queryable
    * @see \Netflex\Query\Builder::whereNotBetween
+   *
+   * @deprecated 4.5.0 use whereBetween() inside a not() query
    */
   public static function whereNotBetween(...$args)
   {
@@ -361,7 +420,7 @@ trait Queryable
 
   /**
    * Picks random items
-   * 
+   *
    * @param int $amount
    * @return static|Collection
    */
@@ -373,9 +432,9 @@ trait Queryable
   }
 
   /**
-   * @param string $query 
-   * @return Builder 
-   * @throws NotQueryableException 
+   * @param string $query
+   * @return Builder
+   * @throws NotQueryableException
    */
   public static function query($query = '*')
   {

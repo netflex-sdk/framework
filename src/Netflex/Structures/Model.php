@@ -3,6 +3,7 @@
 namespace Netflex\Structure;
 
 use Exception;
+use Netflex\Query\Builder;
 use Throwable;
 
 use Apility\SEOTools\Facades\SEOTools;
@@ -276,7 +277,7 @@ abstract class Model extends QueryableModel
    *
    * @param  mixed  $rawValue
    * @param  string|null $field
-   * @return \Illuminate\Database\Eloquent\Model|null
+   * @return static
    * @throws NotFoundException
    */
   public function resolveRouteBinding($rawValue, $field = null)
@@ -287,13 +288,15 @@ abstract class Model extends QueryableModel
       return static::resolvedRouteBinding(static::find($rawValue));
     }
 
-    $query = static::where($field, $rawValue);
+    $query = static::or(function (Builder $query) use ($field, $rawValue) {
+      $query->where($field, $rawValue);
 
-    if ($field === 'url') {
-      $query = $query->orWhere($field, $rawValue . '/');
-    }
+      if ($field === 'url') {
+        $query->where('url', $rawValue . '/');
+      }
+    });
 
-    /** @var static */
+    /** @var $model static */
     if ($model = $query->first()) {
       return static::resolvedRouteBinding($model);
     }
@@ -318,7 +321,7 @@ abstract class Model extends QueryableModel
   /**
    * Register the model
    * @return bool
-   * @throws Exception 
+   * @throws Exception
    */
   public static function register()
   {

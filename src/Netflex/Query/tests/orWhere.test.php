@@ -27,7 +27,7 @@ final class OrWhereTest extends TestCase
     $orWhereEqualsQuery = $query->getQuery();
 
     $this->assertSame(
-      '(id:10000) OR (id:10001)',
+      '(id:10000 OR id:10001)',
       $orWhereEqualsQuery
     );
 
@@ -51,7 +51,7 @@ final class OrWhereTest extends TestCase
 
 
     $this->assertSame(
-      '(id:10000) OR (should##D##encode:10001)',
+      '(id:10000 OR should##D##encode:10001)',
       $orWhereEqualsQuery
     );
   }
@@ -83,7 +83,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('id', null);
 
     $this->assertSame(
-      '(id:10000) OR ((NOT _exists_:id))',
+      '(id:10000 OR NOT _exists_:id)',
       $query->getQuery()
     );
   }
@@ -96,7 +96,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('published', true);
 
     $this->assertSame(
-      '(id:10000) OR (published:1)',
+      '(id:10000 OR published:1)',
       $query->getQuery()
     );
 
@@ -106,7 +106,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('published', false);
 
     $this->assertSame(
-      '(id:10000) OR (published:0)',
+      '(id:10000 OR published:0)',
       $query->getQuery()
     );
   }
@@ -119,7 +119,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('name', 'Test string');
 
     $this->assertSame(
-      '(id:10000) OR (name:"Test string")',
+      '(id:10000 OR name:"Test string")',
       $query->getQuery()
     );
   }
@@ -132,7 +132,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('id', [1, null, 'Test string', true, [1, null, 'Test string']]);
 
     $this->assertSame(
-      '(id:10000) OR ((id:1 OR (NOT _exists_:id) OR id:"Test string" OR id:1 OR (id:1 OR (NOT _exists_:id) OR id:"Test string")))',
+      '(id:10000 OR (id:1 OR NOT _exists_:id OR id:"Test string" OR id:1 OR (id:1 OR NOT _exists_:id OR id:"Test string")))',
       $query->getQuery()
     );
   }
@@ -145,7 +145,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('id', '!=', 10001);
 
     $this->assertSame(
-      '(id:10000) OR (NOT id:10001)',
+      '(id:10000 OR NOT id:10001)',
       $query->getQuery()
     );
   }
@@ -158,7 +158,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('id', '!=', null);
 
     $this->assertSame(
-      '(id:10000) OR (NOT (NOT _exists_:id))',
+      '(id:10000 OR _exists_:id)',
       $query->getQuery()
     );
   }
@@ -171,7 +171,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('published', '!=', true);
 
     $this->assertSame(
-      '(id:10000) OR (NOT published:1)',
+      '(id:10000 OR NOT published:1)',
       $query->getQuery()
     );
 
@@ -181,7 +181,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('published', '!=', false);
 
     $this->assertSame(
-      '(id:10000) OR (NOT published:0)',
+      '(id:10000 OR NOT published:0)',
       $query->getQuery()
     );
   }
@@ -194,7 +194,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('name', '!=', 'Test string');
 
     $this->assertSame(
-      '(id:10000) OR (NOT name:"Test string")',
+      '(id:10000 OR NOT name:"Test string")',
       $query->getQuery()
     );
   }
@@ -207,7 +207,7 @@ final class OrWhereTest extends TestCase
       ->orWhere('id', '!=', [1, null, 'Test string', true, [1, null, 'Test string']]);
 
     $this->assertSame(
-      '(id:10000) OR ((NOT id:1 OR NOT (NOT _exists_:id) OR NOT id:"Test string" OR NOT id:1 OR (NOT id:1 OR NOT (NOT _exists_:id) OR NOT id:"Test string")))',
+      '(id:10000 OR (NOT id:1 OR _exists_:id OR NOT id:"Test string" OR NOT id:1 OR (NOT id:1 OR _exists_:id OR NOT id:"Test string")))',
       $query->getQuery()
     );
   }
@@ -226,7 +226,7 @@ final class OrWhereTest extends TestCase
       });
 
     $this->assertSame(
-      '(id:10000) OR ((published:1) AND ((id:10001) OR (name:"Test string")))',
+      '(id:10000 OR (published:1 AND (id:10001 OR name:"Test string")))',
       $query->getQuery()
     );
   }

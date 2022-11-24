@@ -104,62 +104,59 @@ class Builder
     Builder::OP_LIKE
   ];
 
-  /** @var APIClient */
-  protected $connection;
+  /** @var string */
+  protected string $connection;
 
   /** @var array */
   protected $fields;
 
-  /** @var array */
-  protected $relations;
+  protected array $relations = [];
 
   /** @var int */
   protected $relation_id;
 
-  /** @var int */
-  protected $size = self::MAX_QUERY_SIZE;
+  protected int $size = self::MAX_QUERY_SIZE;
 
   /** @var string[] */
-  protected $orderBy = [];
+  protected array $orderBy = [];
 
   /** @var string[] */
-  protected $sortDir = [];
+  protected array $sortDir = [];
 
-  /** @var array */
-  protected $query;
+  protected array $query;
 
-  /** @var bool */
-  protected $respectPublishingStatus = true;
+  protected bool $respectPublishingStatus = true;
 
-  /** @var Closure */
-  protected $mapper;
+  /** @var Closure|null */
+  protected ?Closure $mapper;
 
-  /** @var bool */
-  protected $assoc = false;
+  protected bool $assoc = false;
 
-  /** @var bool */
-  protected $shouldCache = false;
+  protected bool $shouldCache = false;
 
-  /** @var string */
-  protected $cacheKey;
+  protected string $cacheKey;
 
-  /** @var bool */
-  protected $debug = false;
+  protected bool $debug = false;
 
   /** @var callable[] */
-  protected $appends = [];
+  protected array $appends = [];
 
-  /** @var string */
-  protected $model;
+  protected string $model;
 
-  protected $useScores = false;
+  protected bool $useScores = false;
 
   /**
    * @param bool $respectPublishingStatus
-   * @param array $query
+   * @param array|null $query
+   * @param Closure|null $mapper
+   * @param callable[] $appends
    */
-  public function __construct(?bool $respectPublishingStatus = true, ?array $query = null, ?Closure $mapper = null, $appends = [])
-  {
+  public function __construct(
+    ?bool $respectPublishingStatus = true,
+    ?array $query = null,
+    ?Closure $mapper = null,
+    array $appends = []
+  ) {
     $this->query = $query ?? [];
     $this->mapper = $mapper;
     $this->respectPublishingStatus = $respectPublishingStatus ?? true;
@@ -170,7 +167,7 @@ class Builder
    * @param string|null $name
    * @return static
    */
-  public function connection($name)
+  public function connection(?string $name)
   {
     return $this->setConnectionName($name);
   }
@@ -179,7 +176,7 @@ class Builder
    * @param string|null $connection
    * @return static
    */
-  public function setConnectionName($connection)
+  public function setConnectionName(?string $connection)
   {
     $this->connection = $connection;
     return $this;
@@ -204,7 +201,7 @@ class Builder
    * @param Closure $callback
    * @return static
    */
-  public function append($callback)
+  public function append(Closure $callback)
   {
     $this->appends[] = $callback;
     return $this;
@@ -214,7 +211,7 @@ class Builder
    * @param string $model
    * @return void
    */
-  public function setModel($model)
+  public function setModel(string $model)
   {
     $this->model = $model;
   }
@@ -233,7 +230,7 @@ class Builder
    * @param string $key
    * @return static
    */
-  public function cacheResultsWithKey($key)
+  public function cacheResultsWithKey(string $key)
   {
     $this->shouldCache = true;
     $this->cacheKey = $key;
@@ -250,9 +247,7 @@ class Builder
   public function score(float $weight)
   {
     if ($query = array_pop($this->query)) {
-      $matches = [];
-      $query = preg_match('/^\((.+)\)$/', $query, $matches) ? $matches[1] : $query;
-      $this->query[] = "$query^$weight";
+      $this->query[] = "{$query}^{$weight}";
       $this->useScores = true;
     }
 
@@ -270,7 +265,7 @@ class Builder
     if ($query = array_pop($this->query)) {
       $matches = [];
       $query = preg_match('/^\((.+)\)$/', $query, $matches) ? $matches[1] : $query;
-      $this->query[] = "$query~" . ($distance ? $distance : null);
+      $this->query[] = "{$query}~" . ($distance ? $distance : null);
     }
 
     return $this;
@@ -280,17 +275,17 @@ class Builder
    * @param string $relation
    * @return bool
    */
-  protected function hasRelation($relation)
+  protected function hasRelation(string $relation)
   {
     return in_array(Str::singular($relation), $this->relations ?? []);
   }
 
   /**
    * @param null|array|boolean|integer|string|DateTimeInterface $value
-   * @param string $operator
-   * @return mixed
+   * @param string|null $operator
+   * @return array|bool|DateTimeInterface|int|string|string[]|null
    */
-  protected function escapeValue($value, $operator = null)
+  protected function escapeValue($value, string $operator = null)
   {
     if (is_string($value)) {
       if ($operator !== 'like') {
@@ -301,13 +296,11 @@ class Builder
     }
 
     if (is_bool($value)) {
-      $value = (int) $value;
+      $value = (int)$value;
     }
 
-    if (is_object($value)) {
-      if ($value instanceof DateTimeInterface) {
-        return $this->escapeValue($value->format('Y-m-d h:i:s'), $operator);
-      }
+    if ($value instanceof DateTimeInterface) {
+      return $this->escapeValue($value->format('Y-m-d H:i:s'), $operator);
     }
 
     return $value;
@@ -320,7 +313,7 @@ class Builder
    */
   protected function compileTermQuery(string $field, $value)
   {
-    return "${field}:$value";
+    return "{$field}:{$value}";
   }
 
   /**
@@ -334,10 +327,10 @@ class Builder
 
   /**
    * @param array $args
-   * @param string $operator
+   * @param string|null $operator
    * @return string
    */
-  protected function compileScopedQuery(array $args, string $operator = 'AND')
+  protected function compileScopedQuery(array $args, ?string $operator = 'AND')
   {
     $callback = count($args) === 1 ? array_pop($args) : function (self $scope) use ($args) {
       return $scope->where(...$args);
@@ -345,20 +338,15 @@ class Builder
 
     $builder = new static(false, []);
 
-    $scopedQuery  = (function ($builder, $callback) {
-      $callback($builder);
-      return $builder->getQuery(true);
-    })($builder, $callback);
+    $callback($builder);
+    $this->useScores = $this->useScores || $builder->useScores;
+    $query = $builder->compileQuery(true, $operator);
 
     $compiledQuery = $this->compileQuery(true);
 
-    if ($operator) {
-      $compiledQuery = $compiledQuery ? "($compiledQuery)" : $compiledQuery;
-      $scopedQuery = $compiledQuery ? "($scopedQuery)" : $scopedQuery;
-      $operator = ($compiledQuery && $scopedQuery && $operator) ? " $operator " : null;
-    }
-
-    return "{$compiledQuery}{$operator}$scopedQuery";
+    return $compiledQuery && $operator
+      ? "({$compiledQuery} {$operator} {$query})"
+      : $query;
   }
 
   /**
@@ -378,34 +366,35 @@ class Builder
 
   /**
    * @param string $field
-   * @param string $operator|
+   * @param string $operator
    * @param null|array|Collection|boolean|integer|QueryableModel|string|DateTimeInterface $value
    * @return string
    * @throws InvalidOperatorException If an invalid operator is passed
+   * @throws InvalidValueException
    */
-  protected function compileWhereQuery($field, $operator, $value)
+  protected function compileWhereQuery(string $field, string $operator, $value)
   {
     $field = $this->compileField($field);
 
-    if (is_object($value) && $value instanceof Collection) {
+    if ($value instanceof Collection) {
       /** @var Collection */
-      $value = $value;
       $value = $value->all();
     }
 
-    if (is_object($value) && $value instanceof QueryableModel) {
+    if ($value instanceof QueryableModel) {
       /** @var QueryableModel */
-      $value = $value;
       $value = $value->getKey();
     }
 
     if (is_object($value) && method_exists($value, '__toString')) {
       /** @var object */
-      $value = $value;
       $value = $value->__toString();
     }
 
-    if (!in_array(gettype($value), static::VALUE_TYPES) || (is_object($value) && !in_array(get_class($value), static::VALUE_TYPES))) {
+    if (
+      !in_array(gettype($value), static::VALUE_TYPES) ||
+      (is_object($value) && !in_array(get_class($value), static::VALUE_TYPES))
+    ) {
       throw new InvalidValueException($value);
     }
 
@@ -419,27 +408,37 @@ class Builder
         $queries[] = $this->compileWhereQuery($field, $operator, $item);
       }
 
-      return '(' . implode(' OR ', $queries) . ')';
+      return count($queries) > 1
+        ? '(' . implode(' OR ', $queries) . ')'
+        : array_pop($queries);
     }
 
     $value = $this->escapeValue($value, $operator);
+
+    if ($value === null && $operator === static::OP_NEQ) {
+      $value = $field;
+      $field = '_exists_';
+      $operator = static::OP_EQ;
+    }
+
     $term = $value === null ? $this->compileNullQuery($field) : $this->compileTermQuery($field, $value);
 
     switch ($operator) {
+      case static::OP_LIKE:
       case static::OP_EQ:
         return $term;
       case static::OP_NEQ:
-        return "NOT $term";
+        return "(NOT {$term})";
       case static::OP_GT:
         if ($value === null) {
           return null;
         }
 
         if (is_string($value)) {
-          return "($field:[$value TO *] AND (NOT $value))";
+          return "{$field}:{{$value} TO *}";
         }
 
-        return "$field:>$value";
+        return "{$field}:>{$value}";
       case static::OP_GTE:
         if ($value === null) {
           $this->query = [$this->compileWhereQuery($field, '!=', null)];
@@ -447,20 +446,20 @@ class Builder
         }
 
         if (is_string($value)) {
-          return "$field:[$value TO *]";
+          return "{$field}:[{$value} TO *]";
         }
 
-        return "$field:>=$value";
+        return "{$field}:>={$value}";
       case static::OP_LT:
         if ($value === null) {
           return null;
         }
 
         if (is_string($value)) {
-          return "($field:[* TO $value] AND (NOT $value))";
+          return "{$field}:{* TO {$value}}";
         }
 
-        return "$field:<$value";
+        return "{$field}:<{$value}";
       case static::OP_LTE:
         if ($value === null) {
           $this->query = [$this->compileWhereQuery($field, '=', null)];
@@ -468,12 +467,10 @@ class Builder
         }
 
         if (is_string($value)) {
-          return "$field:[* TO $value]";
+          return "{$field}:[* TO {$value}]";
         }
 
-        return "$field:<=$value";
-      case static::OP_LIKE:
-        return $term;
+        return "{$field}:<={$value}";
       default:
         throw new InvalidOperatorException($operator);
         break;
@@ -483,7 +480,7 @@ class Builder
   /**
    * Sets the debug flag of the query
    * Making the API reflect the compiled query in the output
-   * 
+   *
    * @return static
    */
   public function debug()
@@ -499,7 +496,7 @@ class Builder
    * @param bool $scoped Determines if the query shouls be compiled in a scoped context.
    * @return string
    */
-  public function getQuery($scoped = false)
+  public function getQuery(bool $scoped = false): string
   {
     return $this->compileQuery($scoped);
   }
@@ -508,10 +505,9 @@ class Builder
    * Compiles the query and retrieves the query string.
    * Used for debugging purposes.
    *
-   * @param bool $scoped Determines if the query shouls be compiled in a scoped context.
    * @return string
    */
-  public function getRequest()
+  public function getRequest(): string
   {
     return $this->compileRequest();
   }
@@ -536,7 +532,7 @@ class Builder
    * @return static
    * @throws InvalidSortingDirectionException If an invalid $direction is passed
    */
-  public function orderBy($field, $direction = Builder::DIR_DEFAULT)
+  public function orderBy(string $field, string $direction = Builder::DIR_DEFAULT)
   {
     $direction = $direction ?: static::DIR_DEFAULT;
     $this->orderBy[] = $this->compileField($field);
@@ -560,13 +556,17 @@ class Builder
    * @param string $direction
    * @return static
    * @throws InvalidSortingDirectionException If an invalid $direction is passed
-   * @throws InvalidSortingFieldException If no orderBy field has been set
+   * @throws NoSortableFieldToOrderByException If no orderBy field has been set
    * @deprecated 4.4.1 Use orderBy() with direction argument instead
    */
-  public function orderDirection($direction)
+  public function orderDirection(string $direction)
   {
     if (!in_array($direction, static::SORTING_DIRS)) {
       throw new InvalidSortingDirectionException($direction);
+    }
+
+    if (count($this->orderBy) === count($this->sortDir)) {
+      array_pop($this->sortDir);
     }
 
     $this->sortDir[] = $direction;
@@ -581,8 +581,8 @@ class Builder
   /**
    * Sets the relation for the query
    *
-   * @param string $relation
-   * @param int $relation_id
+   * @param string|null $relation
+   * @param int|null $relation_id
    * @return static
    */
   public function relation(?string $relation, ?int $relation_id = null)
@@ -631,9 +631,7 @@ class Builder
    */
   public function limit(int $limit)
   {
-    $limit = $limit > static::MAX_QUERY_SIZE ? static::MAX_QUERY_SIZE : $limit;
-    $limit = $limit < static::MIN_QUERY_SIZE ? static::MIN_QUERY_SIZE : $limit;
-    $this->size = $limit;
+    $this->size = max(min($limit, static::MAX_QUERY_SIZE), static::MIN_QUERY_SIZE);
     return $this;
   }
 
@@ -673,26 +671,97 @@ class Builder
 
   public function includeScores($includeScores = true)
   {
-    $this->useScores = true;
+    $this->useScores = $includeScores;
     return $this;
+  }
+
+  /**
+   * @param array $args compiledScopeQuery arguments
+   * @param string|null $prefix
+   * @param string $operator
+   * @param boolean $wrapInParentheses
+   * @return static
+   */
+  protected function prefixedScopedQuery(
+    array $args,
+    ?string $prefix = null,
+    string $operator = 'AND',
+    bool $wrapInParentheses = false
+  ) {
+    $builder = (new static(false, []));
+    $query = $builder->compileScopedQuery($args, $operator);
+    if ($query) {
+      $combinedQuery = implode(' ', array_filter([$prefix, $query]));
+
+      $this->query[] = $wrapInParentheses
+        ? "({$combinedQuery})"
+        : $combinedQuery;
+    }
+    $this->useScores = $this->useScores || $builder->useScores;
+    return $this;
+  }
+
+  /**
+   * Creates a nested query scope.
+   *
+   * @param callable|Closure $closure
+   * @param string $operator
+   * @return static
+   */
+  public function group($closure, string $operator = 'AND')
+  {
+    return $this->prefixedScopedQuery([$closure], null, $operator);
+  }
+
+  /**
+   * Creates a nested OR separated query scope.
+   *
+   * @param callable|Closure $closure
+   * @return static
+   */
+  public function or($closure)
+  {
+    return $this->group($closure, 'OR');
+  }
+
+  /**
+   * Creates a nested AND separated query scope.
+   *
+   * @param callable|Closure $closure
+   * @return static
+   */
+  public function and($closure)
+  {
+    return $this->group($closure, 'AND');
+  }
+
+  /**
+   * Creates a negated nested query scope.
+   *
+   * @param callable|Closure $closure
+   * @param string $operator
+   * @return static
+   */
+  public function not($closure, string $operator = 'AND')
+  {
+    return $this->prefixedScopedQuery([$closure], 'NOT', $operator, true);
   }
 
   /**
    * Performs a 'where' query
    *
-   * If a closure is passed as the only argument, a new query scope will be created.
    * If $value is omitted, $operator is used as the $value, and the $operator will be set to '='.
    *
-   * @param Closure|string $field
+   * @param string $field
    * @param string $operator
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
    */
   public function where(...$args)
   {
+    /** @deprecated use group() instead. */
     if (count($args) === 1) {
-      $this->query = [$this->compileScopedQuery([array_pop($args)])];
-      return $this;
+      return $this->group(array_pop($args));
     }
 
     $field = $args[0] ?? null;
@@ -727,14 +796,17 @@ class Builder
    * @param string $field
    * @param null|array|boolean|integer|string|DateTimeInterface $from
    * @param null|array|boolean|integer|string|DateTimeInterface $to
+   * @param bool $inclusive
    * @return static
    */
-  public function whereBetween(string $field, $from, $to)
+  public function whereBetween(string $field, $from, $to, bool $inclusive = true)
   {
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] =  "($field:[$from TO $to])";
+    $this->query[] = $inclusive
+      ? "{$field}:[{$from} TO {$to}]"
+      : "{$field}:{{$from} TO {$to}}";
     return $this;
   }
 
@@ -745,13 +817,15 @@ class Builder
    * @param null|array|boolean|integer|string|DateTimeInterface $from
    * @param null|array|boolean|integer|string|DateTimeInterface $to
    * @return static
+   *
+   * @deprecated 4.5.0 use whereBetween() inside a not() query
    */
   public function whereNotBetween(string $field, $from, $to)
   {
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] =  "(NOT ($field:[$from TO $to]))";
+    $this->query[] = "NOT {$field}:[{$from} TO {$to}]";
     return $this;
   }
 
@@ -765,12 +839,13 @@ class Builder
    * @param string $operator
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
+   *
+   * @deprecated 4.5.0 use where('field', '!=', 'value') or where() inside a not() query
    */
   public function whereNot(...$args)
   {
     if (count($args) === 1) {
-      $this->query =  ['NOT ' . $this->compileScopedQuery([array_pop($args)])];
-      return $this;
+      return $this->not(array_pop($args));
     }
 
     $field = $args[0] ?? null;
@@ -782,7 +857,19 @@ class Builder
       $operator = static::OP_EQ;
     }
 
-    $this->query[] = '(NOT ' . $this->compileWhereQuery($field, $operator, $value) . ')';
+    $prefix = 'NOT ';
+
+    if ($operator === static::OP_NEQ && $value !== null) {
+      $prefix = '';
+      $operator = static::OP_EQ;
+    }
+
+    if ($operator === static::OP_EQ && $value === null) {
+      $prefix = '';
+      $operator = static::OP_NEQ;
+    }
+
+    $this->query[] = $prefix . $this->compileWhereQuery($field, $operator, $value);
 
     return $this;
   }
@@ -798,6 +885,8 @@ class Builder
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
    * @throws InvalidAssignmentException If left hand side of query is not set
+   *
+   * @deprecated 4.5.0 use where() inside an or() query
    */
   public function orWhere(...$args)
   {
@@ -805,8 +894,7 @@ class Builder
       throw new InvalidAssignmentException('orWhere');
     }
 
-    $this->query = [$this->compileScopedQuery($args, 'OR')];
-    return $this;
+    return $this->prefixedScopedQuery($args, 'OR');
   }
 
   /**
@@ -820,6 +908,8 @@ class Builder
    * @param null|array|boolean|integer|string|DateTimeInterface $value
    * @return static
    * @throws InvalidAssignmentException If left hand side of query is not set
+   *
+   * @deprecated 4.5.0 use where() inside an and() query
    */
   public function andWhere(...$args)
   {
@@ -827,23 +917,22 @@ class Builder
       throw new InvalidAssignmentException('andWhere');
     }
 
-    $this->query = [$this->compileScopedQuery($args, 'AND')];
-    return $this;
+    return $this->prefixedScopedQuery($args, 'AND');
   }
 
   /**
    * Creates a paginated result
    *
    * @param int $size
-   * @param int $page
+   * @param int|null $page
    * @return PaginatedResult
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
-  public function paginate($size = 100, $page = 1)
+  public function paginate(int $size = 100, $page = 1)
   {
     $originalSize = $this->size;
     $this->size = $size;
-    $paginator =  PaginatedResult::fromBuilder($this, $page);
+    $paginator = PaginatedResult::fromBuilder($this, $page);
     $this->size = $originalSize;
     return $paginator;
   }
@@ -894,15 +983,15 @@ class Builder
 
       $error = json_decode($e->getResponse()->getBody());
 
-      throw new QueryException($this->getQuery(true), $error);
+      throw new QueryException($this->compileQuery(true), $error);
     }
   }
 
   /**
    * Retrieves the results of the query
    *
-   * @return \Illuminate\Support\Collection
-   * @throws QueryException
+   * @return Collection
+   * @throws QueryException|IndexNotFoundException
    */
   public function get()
   {
@@ -935,7 +1024,7 @@ class Builder
    * Retrieves the first result
    *
    * @return object|null
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function first()
   {
@@ -952,7 +1041,7 @@ class Builder
    *
    * @return object|null
    * @throws NotFoundException
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function firstOrFail()
   {
@@ -971,7 +1060,8 @@ class Builder
 
   /**
    * Retrives all results for the given query, ignoring the query limit
-   * @return LazyCollection
+   * @return LazyCollection|Collection
+   * @throws QueryException|IndexNotFoundException
    */
   public function all()
   {
@@ -1010,7 +1100,7 @@ class Builder
    * Returns random results for the given query
    * @param int|null $amount If not provided, will use the current query limit
    * @return Collection
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function random($amount = null)
   {
@@ -1065,6 +1155,7 @@ class Builder
    * Only applies to entry and page relations
    *
    * @return static
+   * @deprecated 4.5.0 use respectPublishingStatus(false) instead.
    */
   public function ignorePublishingStatus()
   {
@@ -1075,7 +1166,7 @@ class Builder
   /**
    * Only include published results
    * Only applies to entry and page relations
-   * 
+   *
    * @param bool
    *
    * @return static
@@ -1090,7 +1181,7 @@ class Builder
    * Get the count of items matching the current query
    *
    * @return int
-   * @throws QueryException
+   * @throws QueryException|IndexNotFoundException
    */
   public function count()
   {
@@ -1105,38 +1196,58 @@ class Builder
   /**
    * @param string|DateTimeInterface|null $date
    */
-  function publishedAt($date)
+  public function publishedAt($date)
   {
-    $date = Carbon::parse($date);
+    $date = Carbon::parse($date)->toDateTimeString();
 
     $this->respectPublishingStatus(false);
 
-    $this->query[] = $this->compileScopedQuery([function (Builder $query) use ($date) {
-      return $query->where('published', true)
-        ->andWhere(function (Builder $query) use ($date) {
-          return $query->where('use_time', false)
-            ->orWhere(function (Builder $query) use ($date) {
-              return $query->where('use_time', true)
-                ->where(function (Builder $query) use ($date) {
-                  return $query->where('start', '!=', null)
-                    ->where('stop', '!=', null)
-                    ->where('start', '<=', $date->toDateTimeString())
-                    ->where('stop', '>=', $date->toDateTimeString());
-                })->orWhere(function (Builder $query) use ($date) {
-                  return $query->where('start', '!=', null)
-                    ->where('stop', '=', null)
-                    ->where('start', '<=', $date->toDateTimeString());
-                })->orWhere(function (Builder $query) use ($date) {
-                  return $query->where('start',  '=', null)
-                    ->where('stop', '!=', null)
-                    ->where('stop', '>=', $date->toDateTimeString());
-                })->orWhere(function (Builder $query) {
-                  return $query->where('start', '=', null)
-                    ->where('stop', '=', null);
-                });
-            });
-        });
-    }]);
+    $builder = new static(false, []);
+
+    $query = $builder
+      ->and(fn(Builder $query) => (
+        $query
+          ->where('published', true)
+          ->or(fn(Builder $query) => (
+            $query
+              ->where('use_time', false)
+              ->and(fn(Builder $query) => (
+                $query
+                  ->where('use_time', true)
+                  ->or(fn(Builder $query) => (
+                    $query
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '!=', null)
+                          ->where('stop', '!=', null)
+                          ->where('start', '<=', $date)
+                          ->where('stop', '>=', $date)
+                      ))
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '!=', null)
+                          ->where('stop', '=', null)
+                          ->where('start', '<=', $date)
+                      ))
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '=', null)
+                          ->where('stop', '!=', null)
+                          ->where('stop', '>=', $date)
+                      ))
+                      ->and(fn(Builder $query) => (
+                        $query
+                          ->where('start', '=', null)
+                          ->where('stop', '=', null)
+                      ))
+                  ))
+              ))
+          ))
+      ))
+      ->score(0)
+      ->getQuery(true);
+
+    $this->query[] = $query;
 
     return $this;
   }
@@ -1145,25 +1256,40 @@ class Builder
    * @param bool $scoped
    * @return string
    */
-  protected function compileQuery($scoped = false)
+  protected function compileQuery(bool $scoped = false, ?string $operator = 'AND')
   {
+    $appends = $this->appends;
+    $this->appends = [];
+
+    foreach ($appends as $append) {
+      $append($this, $scoped);
+    }
+
     if (!$scoped && $this->respectPublishingStatus) {
       $this->publishedAt(Carbon::now());
     }
 
-    foreach ($this->appends as $append) {
-      $append($this, $scoped);
-    }
-
     if (!$scoped && $this->hasRelation('entry') && $this->relation_id) {
-      $this->where('directory_id', '=', $this->relation_id);
+      $this->where('directory_id', '=', $this->relation_id)->score(0);
     }
 
-    $compiledQuery =  implode(' AND ', array_filter(array_map(function ($term) {
-      return trim($term) === '()' ? null : $term;
-    }, $this->query)));
+    $compiledQuery = array_reduce(
+      array_filter($this->query, fn($term) => ($term !== '()')),
+      function ($query, $term) use ($operator) {
+        if (!$query) {
+          return $term;
+        }
 
-    return $compiledQuery;
+        // This logic is here to support `orWhere` and `andWhere`, and should be removed once they are.
+        $op = Str::startsWith($term, ['AND ', 'OR ']) ? '' : $operator;
+
+        return implode(' ', array_filter([$query, $op, $term]));
+      }
+    );
+
+    return count($this->query) > 1
+      ? "({$compiledQuery})"
+      : $compiledQuery;
   }
 
   /**
@@ -1171,6 +1297,8 @@ class Builder
    */
   protected function compileRequest($size = null, $page = null)
   {
+    $query = $this->compileQuery();
+
     $params = [
       'order' => urlencode(implode(',', $this->orderBy)),
       'dir' => urlencode(implode(',', $this->sortDir)),
@@ -1179,7 +1307,7 @@ class Builder
       'relation_id' => $this->relation_id,
       'size' => $size ?? $this->size,
       'page' => $page,
-      'q' => urlencode($this->compileQuery()),
+      'q' => urlencode($query),
       'scores' => $this->useScores ? 1 : false
     ];
 
@@ -1191,6 +1319,8 @@ class Builder
       if ($params[$key]) {
         return "{$key}={$params[$key]}";
       }
+
+      return false;
     }, array_keys($params)));
 
     $url = 'search?' . implode('&', $params);
@@ -1201,9 +1331,9 @@ class Builder
   /**
    * Conditional query
    *
-   * @param boolean|Closure $clause 
-   * @param Closure $then 
-   * @param null|Closure $else 
+   * @param boolean|Closure $clause
+   * @param Closure $then
+   * @param null|Closure $else
    * @return static
    */
   public function if($clause, Closure $then, ?Closure $else = null)
@@ -1231,7 +1361,7 @@ class Builder
     return $this->compileQuery();
   }
 
-  public function getSize()
+  public function getSize(): int
   {
     return $this->size;
   }
