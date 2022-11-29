@@ -601,12 +601,12 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
     public function isLocked(): bool
     {
-        return (bool)($this->data->_mutable ?? "0");
+        return (bool)($this->data->_mutable ?? "0") || (bool)($this->_data->_immutable ?? "0");
     }
 
     public function setLocked(bool $isLocked)
     {
-        $this->setOrderData('_mutable', $isLocked);
+        $this->setOrderData('_immutable', $isLocked);
     }
 
     /**
