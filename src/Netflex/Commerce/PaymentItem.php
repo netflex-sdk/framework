@@ -13,6 +13,13 @@ use Netflex\Support\ReactiveObject;
 
 /**
  *
+ * @property $amount float
+ * @property $payment_date string
+ * @property $card_type_name string
+ * @property $transaction_id string
+ * @property $status string
+ * @property $capture_status string
+ * @property $payment_method string
  * @property $data Properties
  */
 class PaymentItem extends ReactiveObject implements Payment
