@@ -83,10 +83,12 @@ interface Order extends Lockable
     public function isCartMutable(): bool;
 
     public function deletePayment(Payment $payment): ?Payment;
-
     public function updatePayment(Payment $payment): ?Payment;
 
     public function isCompletable(): bool;
     public function isCompleted(): bool;
+
+    public function canBeCompleted(): bool;
+    public function completeOrder();
 
 }

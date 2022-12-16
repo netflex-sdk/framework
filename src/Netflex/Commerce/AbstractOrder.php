@@ -2,14 +2,16 @@
 
 namespace Netflex\Commerce;
 
-use Apility\Ticketing\Models\Product;
+use Apility\Payment\Jobs\SendReceipt;
 use Carbon\Carbon;
 use DateTimeInterface;
 
 use Exception;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Netflex\Commerce\Contracts\CartItem;
 use Netflex\Commerce\Contracts\Order as OrderContract;
-
 use Netflex\Commerce\Exceptions\CartNotMutableException;
 use Netflex\Query\Traits\HasRelation;
 use Netflex\Query\Traits\ModelMapper;
@@ -17,13 +19,11 @@ use Netflex\Query\Traits\Queryable;
 use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\OrderAPI;
 use Netflex\Signups\Signup;
-
-use Netflex\Commerce\Contracts\Payment;;
-
+use Netflex\Commerce\Contracts\Payment;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
-use Netflex\API\Facades\API;
 use Netflex\Commerce\Contracts\Discount;
+use Throwable;
 use TypeError;
 
 /**
@@ -61,10 +61,12 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     use ModelMapper;
     use HasEvents;
 
+
+
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var Dispatcher
      */
     protected static $dispatcher;
 
@@ -137,9 +139,9 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @param mixed $value
+     * @param string|null $field
+     * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
     {
@@ -157,10 +159,10 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     /**
      * Retrieve the child model for a bound value.
      *
-     * @param  string  $childType
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @param string $childType
+     * @param mixed $value
+     * @param string|null $field
+     * @return Model|null
      */
     public function resolveChildRouteBinding($childType, $value, $field)
     {
@@ -179,7 +181,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
                 return new $class($attributes);
             else
                 return new static($attributes);
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             return new static($attributes);
         }
     }
@@ -195,7 +197,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function getCustomerIdAttribute($id)
     {
-        return $id ? (int) $id : $id;
+        return $id ? (int)$id : $id;
     }
 
     /**
@@ -204,7 +206,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function getOrderTaxAttribute($tax)
     {
-        return (float) $tax;
+        return (float)$tax;
     }
 
     /**
@@ -213,7 +215,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function getOrderCostAttribute($cost)
     {
-        return (float) $cost;
+        return (float)$cost;
     }
 
     /**
@@ -222,7 +224,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function getOrderTotalAttribute($total)
     {
-        return (float) $total;
+        return (float)$total;
     }
 
     /**
@@ -231,7 +233,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function getAbandonedAttribute($abandoned)
     {
-        return (bool) $abandoned;
+        return (bool)$abandoned;
     }
 
     /**
@@ -240,7 +242,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function getAbandonedReminderSentAttribute($sent)
     {
-        return (bool) $sent;
+        return (bool)$sent;
     }
 
     /**
@@ -393,17 +395,17 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
     public function getOrderTax(): float
     {
-        return (float) $this->order_tax;
+        return (float)$this->order_tax;
     }
 
     public function getOrderSubtotal(): float
     {
-        return (float) $this->order_cost;
+        return (float)$this->order_cost;
     }
 
     public function getOrderTotal(): float
     {
-        return (float) $this->order_total;
+        return (float)$this->order_total;
     }
 
     public function getOrderData(string $key)
@@ -439,7 +441,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function addOrderCartItem(CartItem $cartItem)
     {
-        if(!$this->isCartMutable()) {
+        if (!$this->isCartMutable()) {
             throw new CartNotMutableException();
         }
 
@@ -514,7 +516,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
     public function getTotalPaid(): float
     {
-        return (float) $this->payments->total;
+        return (float)$this->payments->total;
     }
 
     public function getPaymentMethod(): ?string
@@ -543,6 +545,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function registerPayment(Payment $payment): void
     {
+        $this->logPaymentChange('Creating', $payment);
         $this->addPayment([
             'payment_method' => $payment->getPaymentMethod(),
             'status' => $payment->getPaymentStatus(),
@@ -591,17 +594,18 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      * Checks if the cart is mutable by checking first if the order is mutable
      * and then checks payments for any payment that is considered reserved or captured.
      *
+     * @return bool Returns true if the cart is mutable
      */
     public function isCartMutable(): bool
     {
         return !$this->isLocked() && collect($this->getOrderPayments())
-            ->reject(fn(Payment $payment) => $payment->getIsPending())
-            ->count() === 0;
+                ->reject(fn(Payment $payment) => $payment->getIsPending())
+                ->count() === 0;
     }
 
     public function isLocked(): bool
     {
-        return (bool)($this->data->_mutable ?? "0") || (bool)($this->_data->_immutable ?? "0");
+        return ($this->data->_mutable ?? "0") || ($this->_data->_immutable ?? "0");
     }
 
     public function setLocked(bool $isLocked)
@@ -614,12 +618,12 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function updatePayment(Payment $payment): ?Payment
     {
+        $this->logPaymentChange('Updating', $payment);
         $updatePayment = collect($this->getOrderPayments())
             ->first(fn(Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
 
-        if($updatePayment) {
+        if ($updatePayment) {
             /** @var PaymentItem $updatePayment */
-            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $updatePayment->save([
                 'payment_method' => $payment->getPaymentMethod(),
                 'status' => $payment->getPaymentStatus(),
@@ -641,24 +645,65 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
      */
     public function deletePayment(Payment $payment): ?Payment
     {
+        $this->logPaymentChange('Deleting', $payment);
         $deletePayment = $this->getOrderPayments()
             ->first(fn(Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
 
-        if($deletePayment) {
+        if ($deletePayment) {
             /** @var PaymentItem $deletePayment */
-            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $deletePayment->delete();
         }
 
         return $deletePayment;
     }
 
-    public function isCompleted(): bool {
+    public function isCompleted(): bool
+    {
         return !!($this->register && $this->register->receipt_order_id);
     }
 
     public function isCompletable(): bool
     {
         return $this->cart->count_items > 0 && $this->getTotalPaid() >= $this->getOrderTotal();
+    }
+
+    /**
+     * @param Payment $payment
+     * @return void
+     * @throws Exception
+     */
+    public function logPaymentChange(string $eventType, Payment $payment): void
+    {
+        if (!config('app.debug', false)) {
+            return;
+        }
+
+        try {
+            /** @noinspection PhpComposerExtensionStubsInspection */
+            $encode = json_encode($payment, JSON_PRETTY_PRINT);
+        } catch (Throwable $t) {
+            $encode = "Unable to json serialize payment";
+        }
+        try {
+            $this->addLogInfo("[{$payment->getPaymentMethod()}] $eventType payment\r\n<br><pre>{$encode}<\pre>");
+        } catch (Throwable $t) {
+            Log::error('Failed to log: ' . $t, [
+                'secret' => $this->secret,
+                'error' => $t
+            ]);
+        }
+    }
+
+    public function canBeCompleted(): bool
+    {
+        return $this->isCompletable() && !$this->isCompleted() && !$this->isLocked();
+    }
+
+    public function completeOrder()
+    {
+        $this->checkoutOrder();
+        $this->registerOrder();
+        $this->lockOrder();
+        $this->refreshOrder();
     }
 }
