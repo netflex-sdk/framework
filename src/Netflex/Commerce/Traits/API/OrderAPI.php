@@ -214,9 +214,13 @@ trait OrderAPI
    * @return static
    * @throws Exception
    */
-  public static function create($order = [])
+  public static function create($attributes = [])
   {
-    return (new static)->newFromBuilder($order)->save();
+    $order = (new static)->newFromBuilder($attributes);
+    foreach ($attributes as $key => $value) {
+      $order->modified[] = $key;
+    }
+    return $order->save();
   }
 
   /**
