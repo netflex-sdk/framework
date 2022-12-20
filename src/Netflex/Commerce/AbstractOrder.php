@@ -451,7 +451,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
             'no_of_entries' => $cartItem->getCartItemQuantity(),
             'variant_id' => $cartItem->getCartItemVariantId(),
             'variant_name' => $cartItem->getCartItemVariantName(),
-            'entries_cost' => $cartItem->getCartItemTotal(),
+            'variant_cost' => $cartItem->getCartItemPrice(),
             'tax_percent' => $cartItem->getCartItemTaxRate(),
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
