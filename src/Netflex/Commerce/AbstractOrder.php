@@ -451,7 +451,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
             'no_of_entries' => $cartItem->getCartItemQuantity(),
             'variant_id' => $cartItem->getCartItemVariantId(),
             'variant_name' => $cartItem->getCartItemVariantName(),
-            'variant_cost' => $cartItem->getCartItemPrice(),
+            'entries_cost' => $cartItem->getCartItemTotal(),
             'tax_percent' => $cartItem->getCartItemTaxRate(),
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
@@ -522,9 +522,9 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     public function getPaymentMethod(): ?string
     {
         return collect($this->getOrderPayments())
-            ->reject(fn(Payment $p) => $p->getIsPending())
-            ->reject(fn(Payment $p) => $p->getPaymentAmount() == 0)
-            ->map(fn(Payment $p) => $p->getCardType())
+            ->reject(fn (Payment $p) => $p->getIsPending())
+            ->reject(fn (Payment $p) => $p->getPaymentAmount() == 0)
+            ->map(fn (Payment $p) => $p->getCardType())
             ->unique()
             ->filter()
             ->join(", ");
@@ -599,8 +599,8 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     public function isCartMutable(): bool
     {
         return !$this->isLocked() && collect($this->getOrderPayments())
-                ->reject(fn(Payment $payment) => $payment->getIsPending())
-                ->count() === 0;
+            ->reject(fn (Payment $payment) => $payment->getIsPending())
+            ->count() === 0;
     }
 
     public function isLocked(): bool
@@ -620,7 +620,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     {
         $this->logPaymentChange('Updating', $payment);
         $updatePayment = collect($this->getOrderPayments())
-            ->first(fn(Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
+            ->first(fn (Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
 
         if ($updatePayment) {
             /** @var PaymentItem $updatePayment */
@@ -647,7 +647,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     {
         $this->logPaymentChange('Deleting', $payment);
         $deletePayment = $this->getOrderPayments()
-            ->first(fn(Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
+            ->first(fn (Payment $existingPayment) => $existingPayment->getTransactionId() === $payment->getTransactionId());
 
         if ($deletePayment) {
             /** @var PaymentItem $deletePayment */
