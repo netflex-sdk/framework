@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Laravelium\Sitemap\Sitemap;
+use Netflex\Newsletters\Newsletter;
+use Netflex\Pages\AbstractPage;
 use Netflex\Pages\Contracts\CompilesException;
 use Netflex\Pages\Events\CacheCleared;
 use Netflex\Pages\Exceptions\InvalidControllerException;
@@ -147,9 +149,57 @@ class RouteServiceProvider extends ServiceProvider
       });
   }
 
-  public function beforeHandlePage(Page $page)
+  public function beforeHandlePage(AbstractPage $page)
   {
     // Not implemented
+  }
+
+  protected function renderPage(AbstractPage $page, Request $request) {
+    current_page($page);
+
+    $locale = null;
+
+    if ($page->lang) {
+      $locale = $page->lang;
+    } else {
+      $master = $page->master;
+      if ($master && $master->lang) {
+        $locale = $master->lang;
+      }
+    }
+
+    if ($locale) {
+      App::setLocale($locale);
+      Carbon::setLocale($locale);
+    }
+
+    $this->beforeHandlePage($page);
+
+    $controller = $page->template->controller ?? null;
+    $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
+    $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
+
+    if (!$class) {
+      $page->toResponse($request);
+    }
+
+    /** @var PageController $controller  */
+    $controller = App::make($class);
+    $previousPage = current_page();
+    current_page($page);
+
+    $route = collect($controller->getRoutes())
+      ->first(function ($route) {
+        return (in_array($route->url, ['/', '']) || $route->action === 'index') && in_array('GET', $route->methods);
+      });
+
+    current_page($previousPage);
+
+    if ($route && method_exists($controller, $route->action)) {
+      return $this->callWithInjectedDependencies($controller, $route->action);
+    }
+
+    return $controller->fallbackIndex();
   }
 
   protected function handlePage(Request $request, JwtPayload $payload)
@@ -159,51 +209,7 @@ class RouteServiceProvider extends ServiceProvider
         $page->loadRevision($payload->revision_id);
       }
 
-      current_page($page);
-
-      $locale = null;
-
-      if ($page->lang) {
-        $locale = $page->lang;
-      } else {
-        $master = $page->master;
-        if ($master && $master->lang) {
-          $locale = $master->lang;
-        }
-      }
-
-      if ($locale) {
-        App::setLocale($locale);
-        Carbon::setLocale($locale);
-      }
-
-      $this->beforeHandlePage($page);
-
-      $controller = $page->template->controller ?? null;
-      $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
-      $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
-
-      if (!$class) {
-        $page->toResponse($request);
-      }
-
-      /** @var PageController $controller  */
-      $controller = App::make($class);
-      $previousPage = current_page();
-      current_page($page);
-
-      $route = collect($controller->getRoutes())
-        ->first(function ($route) {
-          return (in_array($route->url, ['/', '']) || $route->action === 'index') && in_array('GET', $route->methods);
-        });
-
-      current_page($previousPage);
-
-      if ($route && method_exists($controller, $route->action)) {
-        return $this->callWithInjectedDependencies($controller, $route->action);
-      }
-
-      return $controller->fallbackIndex();
+      return $this->renderPage($page, $request);
     }
   }
 
@@ -249,6 +255,27 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     return abort(404);
+  }
+
+  protected function handleNewsletter(Request $request, JwtPayload $payload)
+  {
+    if($newsletter = Newsletter::find($payload->newsletter_id)) {
+      if ($page = $newsletter->page) {
+        
+        $page = $page->loadRevision($page->revision);
+        current_newsletter($newsletter);
+
+        if($payload->mode === 'preview') {
+          return $newsletter->renderPreview($payload->preview_type ?? 'html');
+        }
+
+        if($payload->mode === 'live') {
+          return $newsletter->renderAndSave();
+        }
+
+        return $this->renderPage($page, $request);
+      }
+    }
   }
 
   protected function callWithInjectedDependencies($controller, $method = 'index', $arguments = [])
@@ -310,12 +337,14 @@ class RouteServiceProvider extends ServiceProvider
             current_mode($payload->mode);
             editor_tools($payload->edit_tools);
             URL::forceRootUrl($payload->domain);
-
+            
             switch ($payload->relation) {
               case 'page':
                 return $this->handlePage($request, $payload);
               case 'entry':
                 return $this->handleEntry($request, $payload);
+              case 'newsletter':
+                  return $this->handleNewsletter($request, $payload);
               case 'extension':
                 return $this->handleExtension($request, $payload);
               default:

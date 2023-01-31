@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
+use Netflex\Newsletters\Newsletter;
+use Netflex\Pages\AbstractPage;
 use Netflex\Pages\ContentFile;
 use Netflex\Pages\ContentImage;
 use Netflex\Pages\Extension;
@@ -775,13 +777,46 @@ if (!function_exists('current_page')) {
 
     $value = array_shift($args) ?? null;
 
-    if ($value && !($value instanceof Page)) {
+    if ($value && !($value instanceof AbstractPage)) {
       $frame = debug_backtrace()[0];
       $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
-      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Pages\Page, ' . $type . ' given on line ' . $frame['line']);
+      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Pages\AbstractPage, ' . $type . ' given on line ' . $frame['line']);
     }
 
     App::bind('__current_page__', function () use ($value) {
+      return $value;
+    });
+
+    return $value;
+  }
+}
+
+if (!function_exists('current_newsletter')) {
+  /**
+   * Gets or sets the current newsletter
+   *
+   * @param Newsletter $value
+   * @return Newsletter|null|void
+   */
+  function current_newsletter(...$args)
+  {
+    if (!count($args)) {
+      if (App::has('__current_newsletter__')) {
+        return App::get('__current_newsletter__');
+      }
+
+      return null;
+    }
+
+    $value = array_shift($args) ?? null;
+
+    if ($value && !($value instanceof Newsletter)) {
+      $frame = debug_backtrace()[0];
+      $type = is_object($frame['args'][0]) ? get_class($frame['args'][0]) : gettype($frame['args'][0]);
+      throw new TypeError('Argument 1 passed to ' . $frame['function'] . '() must be an instance of Netflex\Newsletters\Newsletter, ' . $type . ' given on line ' . $frame['line']);
+    }
+
+    App::bind('__current_newsletter__', function () use ($value) {
       return $value;
     });
 

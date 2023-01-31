@@ -55,6 +55,14 @@ class Template extends ReactiveObject implements Responsable
     return $this->attributes['alias'] = $alias;
   }
 
+  public function getViewAttribute () {
+    if ($this->type === 'newsletter') {
+      return "newsletters.templates.{$this->alias}";
+    }
+
+    return "templates.{$this->alias}";
+  }
+
   /**
    * Create an HTTP response that represents the object.
    *
@@ -63,7 +71,7 @@ class Template extends ReactiveObject implements Responsable
    */
   public function toResponse($variables = [])
   {
-    return View::make("templates/{$this->alias}", $variables)
+    return View::make($this->view, $variables)
       ->render();
   }
 
