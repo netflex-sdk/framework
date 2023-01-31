@@ -329,7 +329,7 @@ abstract class Model extends QueryableModel
    * Mass import entries
    *
    * @param array|Collection $entries
-   * @param array[string|null $config
+   * @param  array|string|null $config
    * @return bool
    */
   public static function import($entries, $config = [])
@@ -338,7 +338,13 @@ abstract class Model extends QueryableModel
     $client = $instance->getConnection();
 
     if (is_string($config)) {
-      $config = ['notify_mail' => $config];
+      if (filter_var($config, FILTER_VALIDATE_EMAIL)) {
+        $config['notify_mail'] = $config;
+      }
+
+      if (filter_var($config, FILTER_VALIDATE_URL)) {
+        $config['notify_url'] = $config;
+      }
     }
 
     if (!($entries instanceof Collection)) {
