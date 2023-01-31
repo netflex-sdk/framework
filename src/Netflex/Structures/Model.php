@@ -358,7 +358,7 @@ abstract class Model extends QueryableModel
         }
         $entry['directory_id'] = $instance->relationId;
         $entry['revision_publish'] = true;
-        if (!isset($entry['name'])) {
+        if (!isset($entry['name']) && !isset($entry['id'])) {
           $entry['name'] =  Str::uuid();
         }
         return $entry;
