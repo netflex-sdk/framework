@@ -154,7 +154,7 @@ class RouteServiceProvider extends ServiceProvider
     // Not implemented
   }
 
-  protected function resolveControllerClass (Page $page): string
+  protected function resolveControllerClass (AbstractPage $page): string
   {
     $pageController = Config::get('pages.controller') ?? PageController::class;
     $controllerNotImplementedController = ControllerNotImplementedController::class;
@@ -172,50 +172,57 @@ class RouteServiceProvider extends ServiceProvider
         $page->loadRevision($payload->revision_id);
       }
 
-      current_page($page);
+      return $this->renderPage($page);
 
-      $locale = null;
-
-      if ($page->lang) {
-        $locale = $page->lang;
-      } else {
-        $master = $page->master;
-        if ($master && $master->lang) {
-          $locale = $master->lang;
-        }
-      }
-
-      if ($locale) {
-        App::setLocale($locale);
-        Carbon::setLocale($locale);
-      }
-
-      $this->beforeHandlePage($page);
-
-      $class = $this->resolveControllerClass($page);
-
-      if (!$class) {
-        $page->toResponse($request);
-      }
-
-      /** @var PageController $controller  */
-      $controller = App::make($class);
-      $previousPage = current_page();
-      current_page($page);
-
-      $route = collect($controller->getRoutes())
-        ->first(function ($route) {
-          return (in_array($route->url, ['/', '']) || $route->action === 'index') && in_array('GET', $route->methods);
-        });
-
-      current_page($previousPage);
-
-      if ($route && method_exists($controller, $route->action)) {
-        return $this->callWithInjectedDependencies($controller, $route->action);
-      }
-
-      return $controller->fallbackIndex();
     }
+  }
+
+  protected function renderPage(AbstractPage $page)
+  {
+    current_page($page);
+
+    $locale = null;
+    
+    if ($page->lang) {
+      $locale = $page->lang;
+    } else {
+      $master = $page->master;
+      if ($master && $master->lang) {
+        $locale = $master->lang;
+      }
+    }
+
+    if ($locale) {
+      App::setLocale($locale);
+      Carbon::setLocale($locale);
+    }
+
+    $this->beforeHandlePage($page);
+
+    $class = $this->resolveControllerClass($page);
+
+    if (!$class) {
+      $page->toResponse($request);
+    }
+
+    /** @var PageController $controller  */
+    $controller = App::make($class);
+    $previousPage = current_page();
+    current_page($page);
+
+    $route = collect($controller->getRoutes())
+      ->first(function ($route) {
+        return (in_array($route->url, ['/', '']) || $route->action === 'index') && in_array('GET', $route->methods);
+      });
+
+    current_page($previousPage);
+
+    if ($route && method_exists($controller, $route->action)) {
+      return $this->callWithInjectedDependencies($controller, $route->action);
+    }
+
+    return $controller->fallbackIndex();
+
   }
 
   protected function handleEntry(Request $request, JwtPayload $payload)
@@ -266,7 +273,7 @@ class RouteServiceProvider extends ServiceProvider
   {
     if($newsletter = Newsletter::find($payload->newsletter_id)) {
       if ($page = $newsletter->page) {
-        
+
         $page = $page->loadRevision($page->revision);
         current_newsletter($newsletter);
 
@@ -342,7 +349,7 @@ class RouteServiceProvider extends ServiceProvider
             current_mode($payload->mode);
             editor_tools($payload->edit_tools);
             URL::forceRootUrl($payload->domain);
-            
+
             switch ($payload->relation) {
               case 'page':
                 return $this->handlePage($request, $payload);
