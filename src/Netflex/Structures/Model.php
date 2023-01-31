@@ -326,6 +326,34 @@ abstract class Model extends QueryableModel
   }
 
   /**
+   * Mass import entries synchronously
+   *
+   * @param array|Collection $entries
+   * @param  array|string|null $config Config array, or notify email, or notify url
+   * @return bool
+   */
+  public static function importSync($entries, $config = [])
+  {
+    if (is_string($config)) {
+      if (filter_var($config, FILTER_VALIDATE_EMAIL)) {
+        $config = ['notify_mail' => $config];
+      }
+
+      if (filter_var($config, FILTER_VALIDATE_URL)) {
+        $config = ['webhook' => $config];
+      }
+    }
+
+    if (!is_array($config)) {
+      $config = [];
+    }
+
+    $config['sync'] = true;
+
+    return static::import($entries, $config);
+  }
+
+  /**
    * Mass import entries
    *
    * @param array|Collection $entries
@@ -339,12 +367,16 @@ abstract class Model extends QueryableModel
 
     if (is_string($config)) {
       if (filter_var($config, FILTER_VALIDATE_EMAIL)) {
-        $config['notify_mail'] = $config;
+        $config = ['notify_mail' => $config];
       }
 
       if (filter_var($config, FILTER_VALIDATE_URL)) {
-        $config['notify_url'] = $config;
+        $config = ['webhook' => $config];
       }
+    }
+
+    if (!is_array($config)) {
+      $config = [];
     }
 
     if (!($entries instanceof Collection)) {
