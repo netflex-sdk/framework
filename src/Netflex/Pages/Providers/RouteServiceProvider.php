@@ -2,7 +2,6 @@
 
 namespace Netflex\Pages\Providers;
 
-use Netflex\Pages\Controllers\ControllerNotImplementedController;
 use Throwable;
 use ReflectionClass;
 
@@ -29,6 +28,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Laravelium\Sitemap\Sitemap;
+use Netflex\Newsletters\Newsletter;
+use Netflex\Pages\AbstractPage;
 use Netflex\Pages\Contracts\CompilesException;
 use Netflex\Pages\Events\CacheCleared;
 use Netflex\Pages\Exceptions\InvalidControllerException;
@@ -148,7 +149,7 @@ class RouteServiceProvider extends ServiceProvider
       });
   }
 
-  public function beforeHandlePage(Page $page)
+  public function beforeHandlePage(AbstractPage $page)
   {
     // Not implemented
   }
@@ -261,6 +262,27 @@ class RouteServiceProvider extends ServiceProvider
     return abort(404);
   }
 
+  protected function handleNewsletter(Request $request, JwtPayload $payload)
+  {
+    if($newsletter = Newsletter::find($payload->newsletter_id)) {
+      if ($page = $newsletter->page) {
+        
+        $page = $page->loadRevision($page->revision);
+        current_newsletter($newsletter);
+
+        if($payload->mode === 'preview') {
+          return $newsletter->renderPreview($payload->preview_type ?? 'html');
+        }
+
+        if($payload->mode === 'live') {
+          return $newsletter->renderAndSave();
+        }
+
+        return $this->renderPage($page, $request);
+      }
+    }
+  }
+
   protected function callWithInjectedDependencies($controller, $method = 'index', $arguments = [])
   {
     return $controller->$method(...$this->injectDependencies($controller, $method, $arguments));
@@ -320,12 +342,14 @@ class RouteServiceProvider extends ServiceProvider
             current_mode($payload->mode);
             editor_tools($payload->edit_tools);
             URL::forceRootUrl($payload->domain);
-
+            
             switch ($payload->relation) {
               case 'page':
                 return $this->handlePage($request, $payload);
               case 'entry':
                 return $this->handleEntry($request, $payload);
+              case 'newsletter':
+                  return $this->handleNewsletter($request, $payload);
               case 'extension':
                 return $this->handleExtension($request, $payload);
               default:
@@ -356,7 +380,9 @@ class RouteServiceProvider extends ServiceProvider
         /** @var Page */
         $page = $page;
 
-        $class = $this->resolveControllerClass($page);
+        $controller = $page->template->controller ?? null;
+        $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
+        $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
 
         /** @var Controller|null */
         $controllerInstance = null;
@@ -416,23 +442,7 @@ class RouteServiceProvider extends ServiceProvider
             $names = collect([$pageRouteName, $routeName])->filter();
             $name = ($names->count() > 1) ? $names->join('.') : $pageRouteName ?? null;
 
-            $where = [];
-            $compiledWhere = '';
-
-            if (isset($routeDefintion->where)) {
-              $where = json_decode(json_encode($routeDefintion->where), true);
-            }
-
-            if (count($where)) {
-              $compiledWhere = '->where([';
-              foreach ($where as $key => $value) {
-                $compiledWhere .= '"' . $key . '" => "' . $value . '",';
-              }
-              $compiledWhere = rtrim($compiledWhere, ',');
-              $compiledWhere .= '])';
-            }
-
-            $compiledRoute = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")' . $compiledWhere . '->name("' . ($name ?? $page->id) . '")' . '),function(){return \\' . Page::class . '::model()::find(' . $page->id . ');});';
+            $compiledRoute = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\' . Page::class . '::model()::find(' . $page->id . ');});';
 
             if ($routeDefintion->index) {
               $compiledRoutes[] = $compiledRoute;
