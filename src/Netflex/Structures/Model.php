@@ -329,7 +329,7 @@ abstract class Model extends QueryableModel
    * Mass import entries
    *
    * @param array|Collection $entries
-   * @param  array|string|null $config
+   * @param  array|string|null $config Config array, or notify email, or notify url
    * @return bool
    */
   public static function import($entries, $config = [])
