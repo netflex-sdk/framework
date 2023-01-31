@@ -154,52 +154,15 @@ class RouteServiceProvider extends ServiceProvider
     // Not implemented
   }
 
-  protected function renderPage(AbstractPage $page, Request $request) {
-    current_page($page);
+  protected function resolveControllerClass (Page $page): string
+  {
+    $pageController = Config::get('pages.controller') ?? PageController::class;
+    $controllerNotImplementedController = ControllerNotImplementedController::class;
 
-    $locale = null;
+    $controllerName = $page->template->controller ?? null;
+    $controller = $controllerName ? "\\{$this->namespace}\\{$controllerName}" : $pageController;
 
-    if ($page->lang) {
-      $locale = $page->lang;
-    } else {
-      $master = $page->master;
-      if ($master && $master->lang) {
-        $locale = $master->lang;
-      }
-    }
-
-    if ($locale) {
-      App::setLocale($locale);
-      Carbon::setLocale($locale);
-    }
-
-    $this->beforeHandlePage($page);
-
-    $controller = $page->template->controller ?? null;
-    $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
-    $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
-
-    if (!$class) {
-      $page->toResponse($request);
-    }
-
-    /** @var PageController $controller  */
-    $controller = App::make($class);
-    $previousPage = current_page();
-    current_page($page);
-
-    $route = collect($controller->getRoutes())
-      ->first(function ($route) {
-        return (in_array($route->url, ['/', '']) || $route->action === 'index') && in_array('GET', $route->methods);
-      });
-
-    current_page($previousPage);
-
-    if ($route && method_exists($controller, $route->action)) {
-      return $this->callWithInjectedDependencies($controller, $route->action);
-    }
-
-    return $controller->fallbackIndex();
+    return trim(class_exists($controller) ? $controller : "\\{$controllerNotImplementedController}", '\\');
   }
 
   protected function handlePage(Request $request, JwtPayload $payload)
@@ -209,7 +172,49 @@ class RouteServiceProvider extends ServiceProvider
         $page->loadRevision($payload->revision_id);
       }
 
-      return $this->renderPage($page, $request);
+      current_page($page);
+
+      $locale = null;
+
+      if ($page->lang) {
+        $locale = $page->lang;
+      } else {
+        $master = $page->master;
+        if ($master && $master->lang) {
+          $locale = $master->lang;
+        }
+      }
+
+      if ($locale) {
+        App::setLocale($locale);
+        Carbon::setLocale($locale);
+      }
+
+      $this->beforeHandlePage($page);
+
+      $class = $this->resolveControllerClass($page);
+
+      if (!$class) {
+        $page->toResponse($request);
+      }
+
+      /** @var PageController $controller  */
+      $controller = App::make($class);
+      $previousPage = current_page();
+      current_page($page);
+
+      $route = collect($controller->getRoutes())
+        ->first(function ($route) {
+          return (in_array($route->url, ['/', '']) || $route->action === 'index') && in_array('GET', $route->methods);
+        });
+
+      current_page($previousPage);
+
+      if ($route && method_exists($controller, $route->action)) {
+        return $this->callWithInjectedDependencies($controller, $route->action);
+      }
+
+      return $controller->fallbackIndex();
     }
   }
 

@@ -2,6 +2,8 @@
 
 namespace Netflex\Http\Contracts;
 
+use Exception;
+
 interface HttpClient
 {
   /**
@@ -14,7 +16,7 @@ interface HttpClient
 
   /**
    * @param string $url
-   * @param array $payload = []
+   * @param array|null $payload = []
    * @param boolean $assoc = false
    * @return mixed
    * @throws Exception
@@ -23,7 +25,7 @@ interface HttpClient
 
   /**
    * @param string $url
-   * @param array $payload = []
+   * @param array|null $payload = []
    * @param boolean $assoc = false
    * @return mixed
    * @throws Exception
@@ -32,8 +34,9 @@ interface HttpClient
 
   /**
    * @param string $url
+   * @param array|null $payload = null
    * @return mixed
    * @throws Exception
    */
-  public function delete($url, $assoc = false);
+  public function delete($url, $payload = null, $assoc = false);
 }

@@ -43,4 +43,13 @@ trait CartItemAPI
       $rootParent->forgetInCache();
     }
   }
+
+  public function addDiscount($item)
+  {
+    if (!isset($item['scope_key'])) {
+      $item['scope_key'] = $this->id;
+    }
+
+    API::post(Order::basePath() . $this->order_id . '/discount', $item);
+  }
 }

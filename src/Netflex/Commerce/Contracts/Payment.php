@@ -4,7 +4,7 @@ namespace Netflex\Commerce\Contracts;
 
 use DateTimeInterface;
 
-interface Payment
+interface Payment extends Lockable
 {
     public function getPaymentMethod(): string;
     public function getPaymentStatus(): string;
@@ -15,4 +15,5 @@ interface Payment
     public function getCardExpiry(): ?DateTimeInterface;
     public function getPaymentAmount(): float;
     public function getPaymentDate(): DateTimeInterface;
+    public function getIsPending(): bool;
 }

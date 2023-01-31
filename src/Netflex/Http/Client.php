@@ -29,7 +29,11 @@ class Client implements HttpClient
 
   protected function buildPayload($payload)
   {
-    return ['json' => $payload];
+    if ($payload !== null) {
+      return ['json' => $payload];
+    }
+
+    return [];
   }
 
   /**
@@ -133,7 +137,7 @@ class Client implements HttpClient
    */
   public function postRawAsync($url, $payload)
   {
-    return $this->client->postAsync($url);
+    return $this->client->postAsync($url, $this->buildPayload($payload));
   }
 
   /**
@@ -162,40 +166,44 @@ class Client implements HttpClient
 
   /**
    * @param string $url
+   * @param array|null $payload = null
    * @return ResponseInterface
    */
-  public function deleteRaw($url)
+  public function deleteRaw($url, $payload = null)
   {
-    return $this->client->delete($url);
+    return $this->client->delete($url, $this->buildPayload($payload));
   }
 
   /**
    * @param string $url
+   * @param array|null $payload = null
    * @return PromiseInterface
    */
-  public function deleteRawAsync($url)
+  public function deleteRawAsync($url, $payload = null)
   {
-    return $this->client->deleteAsync($url);
+    return $this->client->deleteAsync($url, $this->buildPayload($payload));
   }
 
   /**
    * @param string $url
+   * @param array|null $payload = null
    * @return mixed
    * @throws Exception
    */
-  public function delete($url, $assoc = false)
+  public function delete($url, $payload = null, $assoc = false)
   {
-    return $this->parseResponse($this->deleteRaw($url), $assoc);
+    return $this->parseResponse($this->deleteRaw($url, $payload), $assoc);
   }
 
   /**
    * @param string $url
+   * @param array|null $payload = null
    * @param boolean $assoc = false
    * @return PromiseInterface
    */
-  public function deleteAsync($url, $assoc = false)
+  public function deleteAsync($url, $payload = null, $assoc = false)
   {
-    return $this->deleteRawAsync($url)
+    return $this->deleteRawAsync($url, $payload)
       ->then(fn ($response) => $this->parseResponse($response, $assoc));
   }
 }
