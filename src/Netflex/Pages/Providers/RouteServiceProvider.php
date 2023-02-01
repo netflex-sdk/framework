@@ -449,7 +449,23 @@ class RouteServiceProvider extends ServiceProvider
             $names = collect([$pageRouteName, $routeName])->filter();
             $name = ($names->count() > 1) ? $names->join('.') : $pageRouteName ?? null;
 
-            $compiledRoute = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")->name("' . ($name ?? $page->id) . '")' . '),function(){return \\' . Page::class . '::model()::find(' . $page->id . ');});';
+            $where = [];
+            $compiledWhere = '';
+
+            if (isset($routeDefintion->where)) {
+              $where = json_decode(json_encode($routeDefintion->where), true);
+            }
+
+            if (count($where)) {
+              $compiledWhere = '->where([';
+              foreach ($where as $key => $value) {
+                $compiledWhere .= '"' . $key . '" => "' . $value . '",';
+              }
+              $compiledWhere = rtrim($compiledWhere, ',');
+              $compiledWhere .= '])';
+            }
+
+            $compiledRoute = '\\Illuminate\Support\Facades\App::bind(route_hash(' . '\\Illuminate\\Support\\Facades\\' . ($domain ? ('Route::domain("' . $domain . '")->match(') : ('Route::match(')) . json_encode($routeDefintion->methods) . ',"' . $url . '","' . $action . '")' . $compiledWhere . '->name("' . ($name ?? $page->id) . '")' . '),function(){return \\' . Page::class . '::model()::find(' . $page->id . ');});';
 
             if ($routeDefintion->index) {
               $compiledRoutes[] = $compiledRoute;
