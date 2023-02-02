@@ -873,7 +873,15 @@ if (!function_exists('cdn_url')) {
       $path = $path->getPathAttribute();
     }
 
-    return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
+    $options = [];
+
+    if (config('media.compressor')) {
+      $options['compressor'] = config('media.compressor');
+    }
+
+    $query = count($options) ? ('?' . http_build_query($options)) : null;
+
+    return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/') . $query), '/');
   }
 }
 
