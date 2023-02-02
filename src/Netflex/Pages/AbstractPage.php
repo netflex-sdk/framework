@@ -15,6 +15,7 @@ use Netflex\Pages\Traits\CastsDefaultFields;
 use Netflex\Pages\Traits\HidesDefaultFields;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Cache;
@@ -78,6 +79,9 @@ abstract class AbstractPage extends QueryableModel implements Responsable
    * @var string A regular page
    */
   const TYPE_PAGE = 'page';
+
+  /** @var string Newsletter content page */
+  const TYPE_NEWSLETTER = 'newsletter';
 
   /**
    * Holds all page objects
