@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Netflex\Newsletters;
 
 use Netflex\Pages\AbstractPage;
@@ -11,11 +11,12 @@ class NewsletterPage extends AbstractPage
     {
         $builder = parent::makeQueryBuilder($appends);
 
-        return $builder->where('type', 'newsletter');
+        return $builder->where('type', static::TYPE_NEWSLETTER);
     }
 
-    public static function all() {
+    public static function all()
+    {
         return parent::all()
-            ->filter(fn ($page) => $page->type === 'newsletter');
+            ->where('type', static::TYPE_NEWSLETTER);
     }
 }

@@ -80,6 +80,11 @@ abstract class AbstractPage extends QueryableModel implements Responsable
   const TYPE_PAGE = 'page';
 
   /**
+   * @var string A newsletter page
+   */
+  const TYPE_NEWSLETTER = 'newsletter';
+
+  /**
    * Holds all page objects
    * Avoids recursive resolution of pages
    *

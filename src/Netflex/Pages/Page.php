@@ -1,19 +1,36 @@
 <?php
 namespace Netflex\Pages;
 
-use Netflex\Pages\AbstractPage;
-
 class Page extends AbstractPage
 {
     protected static function makeQueryBuilder($appends = [])
     {
+        $pagetypes = [
+            null,
+            static::TYPE_DOMAIN,
+            static::TYPE_EXTERNAL,
+            static::TYPE_INTERNAL,
+            static::TYPE_FOLDER,
+            static::TYPE_PAGE
+        ];
+
         $builder = parent::makeQueryBuilder($appends);
 
-        return $builder->where('type', 'page');
+        return $builder->whereIn('type', $pagetypes);
     }
 
-    public static function all() {
+    public static function all ()
+    {
+        $pagetypes = [
+            null,
+            static::TYPE_DOMAIN,
+            static::TYPE_EXTERNAL,
+            static::TYPE_INTERNAL,
+            static::TYPE_FOLDER,
+            static::TYPE_PAGE
+        ];
+
         return parent::all()
-            ->filter(fn ($page) => $page->type === null || $page->type === 'page');
+            ->whereIn('type', $pagetypes);
     }
 }
