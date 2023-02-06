@@ -334,6 +334,8 @@ abstract class Model extends QueryableModel
    */
   public static function importSync($entries, $config = [])
   {
+    $instance = new static;
+
     if (is_string($config)) {
       if (filter_var($config, FILTER_VALIDATE_EMAIL)) {
         $config = ['notify_mail' => $config];
@@ -346,6 +348,11 @@ abstract class Model extends QueryableModel
 
     if (!is_array($config)) {
       $config = [];
+    }
+
+    if (method_exists($instance, 'getConnectionName') && $instance->getConnectionName() !== 'default') {
+      $prefix = $instance->getConnectionName();
+      $config['prefix'] = $prefix;
     }
 
     $config['sync'] = true;
