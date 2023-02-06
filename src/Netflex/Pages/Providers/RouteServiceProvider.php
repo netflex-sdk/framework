@@ -154,7 +154,7 @@ class RouteServiceProvider extends ServiceProvider
     // Not implemented
   }
 
-  protected function resolveControllerClass (AbstractPage $page): string
+  protected function resolveControllerClass(AbstractPage $page): string
   {
     $pageController = Config::get('pages.controller') ?? PageController::class;
     $controllerNotImplementedController = ControllerNotImplementedController::class;
@@ -172,17 +172,16 @@ class RouteServiceProvider extends ServiceProvider
         $page->loadRevision($payload->revision_id);
       }
 
-      return $this->renderPage($page);
-
+      return $this->renderPage($page, $request);
     }
   }
 
-  protected function renderPage(AbstractPage $page)
+  protected function renderPage(AbstractPage $page, Request $request)
   {
     current_page($page);
 
     $locale = null;
-    
+
     if ($page->lang) {
       $locale = $page->lang;
     } else {
@@ -222,7 +221,6 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     return $controller->fallbackIndex();
-
   }
 
   protected function handleEntry(Request $request, JwtPayload $payload)
@@ -241,9 +239,9 @@ class RouteServiceProvider extends ServiceProvider
       abort(400, 'previewController setting missing or misformed in structure config.');
     }
 
-    if(isset($payload->controller) && $payload->controller) {
+    if (isset($payload->controller) && $payload->controller) {
       list($controller, $action) = explode('@', $payload->controller);
-    } elseif(isset($structure->config->previewController)) {
+    } elseif (isset($structure->config->previewController)) {
       list($controller, $action) = explode('@', $structure->config->previewController->value);
     }
 
@@ -271,17 +269,17 @@ class RouteServiceProvider extends ServiceProvider
 
   protected function handleNewsletter(Request $request, JwtPayload $payload)
   {
-    if($newsletter = Newsletter::find($payload->newsletter_id)) {
+    if ($newsletter = Newsletter::find($payload->newsletter_id)) {
       if ($page = $newsletter->page) {
 
         $page = $page->loadRevision($page->revision);
         current_newsletter($newsletter);
 
-        if($payload->mode === 'preview') {
+        if ($payload->mode === 'preview') {
           return $newsletter->renderPreview($payload->preview_type ?? 'html');
         }
 
-        if($payload->mode === 'live') {
+        if ($payload->mode === 'live') {
           return $newsletter->renderAndSave();
         }
 
@@ -321,25 +319,49 @@ class RouteServiceProvider extends ServiceProvider
   protected function mapNetflexWellKnownRoutes()
   {
     Route::get('.well-known/netflex/CacheStore', function (Request $request) {
-      if ($key = $request->get('key')) {
-        if ($key === 'pages') {
-          clear_route_cache();
-        }
+      $keys = $request->get('keys', []);
 
-        if ($key === 'redirects') {
-          clear_route_cache();
-        }
-
-        if (Cache::has($key)) {
-          Cache::forget($key);
-          CacheCleared::dispatch($key);
-          return ['success' => true, 'message' => 'Key deleted'];
-        }
-
-        return ['success' => false, 'message' => 'Key does not exist'];
+      if (is_string($keys)) {
+        $keys = array_values(array_filter(explode(',', $keys)));
       }
 
-      return ['success' => false, 'message' => 'Key is missing'];
+      if ($key = $request->get('key')) {
+        $keys[] = $key;
+      }
+
+      $keys = array_unique($keys);
+
+      $success = false;
+
+      if (!count($keys)) {
+        return ['success' => false, 'message' => 'Key is missing'];
+      }
+
+      foreach ($keys as $key) {
+        $key = trim($key);
+
+        if ($key = $request->get('key')) {
+          if ($key === 'pages') {
+            clear_route_cache();
+          }
+
+          if ($key === 'redirects') {
+            clear_route_cache();
+          }
+
+          if (Cache::has($key)) {
+            Cache::forget($key);
+            CacheCleared::dispatch($key);
+            $success = true;
+          }
+        }
+
+        if ($success) {
+          return ['success' => true, 'message' => 'Key(s) deleted'];
+        } else {
+          return ['success' => false, 'message' => 'Some Key(s) does not exist'];
+        }
+      }
     });
 
     Route::middleware(['web', 'jwt_proxy'])
@@ -356,7 +378,7 @@ class RouteServiceProvider extends ServiceProvider
               case 'entry':
                 return $this->handleEntry($request, $payload);
               case 'newsletter':
-                  return $this->handleNewsletter($request, $payload);
+                return $this->handleNewsletter($request, $payload);
               case 'extension':
                 return $this->handleExtension($request, $payload);
               default:
