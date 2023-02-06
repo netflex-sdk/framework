@@ -69,7 +69,7 @@ abstract class ImageRenderer extends Renderer
     /**
      * Viewport height. Default 1080
      *
-     * @param integer $width
+     * @param integer $height
      * @return static
      */
     public function height(int $height = 1080)

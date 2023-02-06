@@ -368,8 +368,10 @@ class PDF extends Renderer
      * @param integer $width
      * @return static
      */
-    public function width(int $width)
+    public function width(int $width, $unit = PDF::UNIT_PX)
     {
+        $width = static::appendUnit($width, $unit);
+
         if ($this->getOption('format')) {
             $this->setOption('format', null);
 
@@ -387,8 +389,10 @@ class PDF extends Renderer
      * @param integer $width
      * @return static
      */
-    public function height(int $height)
+    public function height(int $height, $unit = PDF::UNIT_PX)
     {
+        $height = static::appendUnit($height, $unit);
+
         if ($this->getOption('format')) {
             $this->setOption('format', null);
 
