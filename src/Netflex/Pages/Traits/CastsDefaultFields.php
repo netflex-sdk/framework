@@ -65,7 +65,7 @@ trait CastsDefaultFields
    */
   public function getTypeAttribute()
   {
-    if ($this->attributes['type'] === 'newsletter') {
+    if (($this->attributes['type'] ?? null) === 'newsletter') {
       return NewsletterPage::TYPE_NEWSLETTER;
     }
 
