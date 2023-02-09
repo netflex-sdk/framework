@@ -295,6 +295,12 @@ abstract class Model extends QueryableModel
 
     /** @var static */
     if ($model = $query->first()) {
+      if ($field !== 'url') {
+        if ($model->{$field} != $rawValue) {
+          throw new NotFoundException;
+        }
+      }
+
       return static::resolvedRouteBinding($model);
     }
 
