@@ -245,7 +245,7 @@ trait OrderAPI
 
     /**
      * If no session exist, it creates a new empty order object WITHOUT id or secret.
-     * But; It makes shure session is set when order is saved.
+     * But; It makes sure session is set when order is saved.
      *
      * @param string|null $key
      * @return static
@@ -253,10 +253,6 @@ trait OrderAPI
      */
     public static function retrieveBySession($key = null)
     {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-
         if ($key) {
             static::$sessionKey = $key;
         }
