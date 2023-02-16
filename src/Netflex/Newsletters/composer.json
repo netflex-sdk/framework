@@ -1,6 +1,6 @@
 {
-    "name": "netflex/signups",
-    "description": "Netflex Signups library",
+    "name": "netflex/newsletters",
+    "description": "Netflex Newsletters library",
     "type": "library",
     "license": "MIT",
     "config": {
@@ -8,15 +8,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Netflex\\Signups\\": ""
+            "Netflex\\Newsletters\\": ""
         }
     },
     "replace": {
-        "netflex/signups": "*"
+        "netflex/newsletters": "*"
     },
     "require": {
-        "netflex/structures": "^4.24",
-        "netflex/customers": "^4.24",
+        "netflex/pages": "^4.24",
+        "netflex/api": "^4.24",
         "netflex/query-builder": "^4.24",
         "netflex/support": "^4.24",
         "php": "^7.4|^8.0"
@@ -24,6 +24,11 @@
     "extra": {
         "branch-alias": {
             "dev-master": "4.16.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Netflex\\Newsletters\\Providers\\NewslettersServiceProvider"
+            ]
         }
     }
 }
