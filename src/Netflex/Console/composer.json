@@ -27,15 +27,15 @@
     },
     "require": {
         "laravel/framework": "^8.0",
-        "netflex/api": "^4.24",
-        "netflex/foundation": "^4.24",
-        "netflex/pages": "^4.24",
+        "netflex/api": "^4.25",
+        "netflex/foundation": "^4.25",
+        "netflex/pages": "^4.25",
         "apility/laravel-ngrok": "^3.0",
         "php": "^7.4|^8.0"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.16.x-dev"
+            "dev-master": "4.25.x-dev"
         }
     }
 }
