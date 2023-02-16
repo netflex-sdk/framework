@@ -35,6 +35,11 @@ if (!function_exists('sms')) {
     function sms($to, string $message, $from = null, array $data = [])
     {
         $notifiable = AnonymousUser::fromPhone($to);
+
+        if (!array_key_exists('notifiable', $data)) {
+            $data['notifiable'] = $notifiable;
+        }
+
         $notification = new GenericSmsNotification($message, $from, $data);
         $notifiable->notify($notification);
     }
@@ -55,6 +60,10 @@ if (!function_exists('notificaiton')) {
     {
         $notifiable = AnonymousUser::fromMail($to);
         $subject = $subject ? mustache($subject, $data) : null;
+
+        if (!array_key_exists('notifiable', $data)) {
+            $data['notifiable'] = $notifiable;
+        }
 
         if ($message instanceof View) {
             /** @var View $view */
