@@ -4,6 +4,7 @@ namespace Netflex\Notifications;
 
 use Netflex\Customers\Customer;
 use Illuminate\Notifications\Notifiable;
+use ReflectionClass;
 
 /**
  * @property-read string $email
@@ -27,6 +28,13 @@ final class AnonymousUser extends Customer
     {
         if (is_object($to) && in_array(Notifiable::class, class_uses_recursive($to))) {
             return $to;
+        }
+
+        if ($to instanceof Customer) {
+            $reflection = new ReflectionClass($to);
+            $property = $reflection->getProperty('attributes');
+            $property->setAccessible(true);
+            return new static($property->getValue($to));
         }
 
         return new static;
