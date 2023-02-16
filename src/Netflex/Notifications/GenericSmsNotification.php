@@ -2,7 +2,9 @@
 
 namespace Netflex\Notifications;
 
-final class GenericSmsNotifiation
+use Illuminate\Notifications\Notification;
+
+final class GenericSmsNotification extends Notification
 {
     protected string $message;
     protected ?string $from;

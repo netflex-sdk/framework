@@ -56,7 +56,7 @@ class Notification extends Mailable
   public function build(...$args)
   {
     return $this->html(
-        mustache($this->template->body, $this->viewData)
+      mustache($this->template->body, $this->viewData)
     );
   }
 }
