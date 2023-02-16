@@ -57,7 +57,7 @@ class Template extends ReactiveObject implements Responsable
 
   public function getViewAttribute () {
     if ($this->type === 'newsletter') {
-      return "newsletters.templates.{$this->alias}";
+      return "newsletters.{$this->alias}";
     }
 
     return "templates.{$this->alias}";
