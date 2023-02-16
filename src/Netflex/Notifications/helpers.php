@@ -46,14 +46,15 @@ if (!function_exists('notificaiton')) {
      *
      * @param mixed $to Either a phone number or a class that uses the Notifiable trait
      * @param string|View $message
+     * @param string|null $subject
      * @param string|null $from
      * @param array $data Optional data for template replacements
      * @return void
      */
-    function notification($to, string $subject, $message, array $data = [])
+    function notification($to, $message, ?string $subject = null, array $data = [])
     {
         $notifiable = AnonymousUser::fromMail($to);
-        $subject = mustache($subject, $data);
+        $subject = $subject ? mustache($subject, $data) : null;
 
         if ($message instanceof View) {
             /** @var View $view */
