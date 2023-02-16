@@ -34,7 +34,8 @@ final class AnonymousUser extends Customer
             $reflection = new ReflectionClass($to);
             $property = $reflection->getProperty('attributes');
             $property->setAccessible(true);
-            return new static($property->getValue($to));
+            $notifiable = new static;
+            return $notifiable->newFromBuilder($property->getValue($to));
         }
 
         return new static;
