@@ -61,6 +61,97 @@ abstract class ItemCollection extends BaseCollection implements JsonSerializable
   }
 
   /**
+   * Get and remove the last N items from the collection.
+   *
+   * @param int $count
+   * @return mixed
+   */
+  public function pop($count = 1)
+  {
+    $modifies = true;
+
+    if ($this->isEmpty()) {
+      $modifies = false;
+    }
+
+    $result = parent::pop($count);
+
+    if ($modifies) {
+      $this->performHook('modified');
+    }
+
+    return $result;
+  }
+
+  /**
+   * Push an item onto the beginning of the collection.
+   *
+   * @param mixed $value
+   * @param mixed $key
+   * @return $this
+   */
+  public function prepend($value, $key = null)
+  {
+    return parent::prepend($value, $key);
+    $this->performHook('modified');
+    return $this;
+  }
+
+  /**
+   * Push one or more items onto the end of the collection.
+   *
+   * @param mixed $values
+   * @return $this
+   */
+  public function push(...$values)
+  {
+    parent::push(...$values);
+    $this->performHook('modified');
+    return $this;
+  }
+
+  /**
+   * Splice a portion of the underlying collection array.
+   *
+   * @param int $offset
+   * @param int|null $length
+   * @param mixed $replacement
+   * @return static
+   */
+  public function splice($offset, $length = null, $replacement = [])
+  {
+    parent::splice($offset, $length, $replacement);
+    $this->performHook('modified');
+    return $this;
+  }
+
+  /**
+   * Transform each item in the collection using a callback.
+   *
+   * @param callable $callback
+   * @return $this
+   */
+  public function transform(callable $callback)
+  {
+    parent::transform($callback);
+    $this->performHook('modified');
+    return $this;
+  }
+
+  /**
+   * Add an item to the collection.
+   *
+   * @param mixed $item
+   * @return $this
+   */
+  public function add($item)
+  {
+    parent::add($item);
+    $this->performHook('modified');
+    return $this;
+  }
+
+  /**
    * Set the item at a given offset.
    *
    * @param string|int $offset
