@@ -64,6 +64,10 @@ jobs:
                         path: src/Netflex/MessageChannel
                     },
                     {
+                        package: newsletters,
+                        path: src/Netflex/Newsletters
+                    },
+                    {
                         package: notifications,
                         path: src/Netflex/Notifications
                     },
