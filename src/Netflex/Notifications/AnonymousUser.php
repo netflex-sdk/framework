@@ -45,7 +45,7 @@ final class AnonymousUser extends Customer
     {
         $user = static::make($to);
 
-        if ($user !== $to) {
+        if (is_string($to)) {
             $user->mail = $to;
         }
 
@@ -56,7 +56,7 @@ final class AnonymousUser extends Customer
     {
         $user = static::make($to);
 
-        if ($user !== $to) {
+        if (is_string($to)) {
             $user->phone = $to;
         }
 
