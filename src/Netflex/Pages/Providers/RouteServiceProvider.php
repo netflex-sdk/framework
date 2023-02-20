@@ -7,7 +7,6 @@ use ReflectionClass;
 
 use Netflex\API\Facades\API;
 use Carbon\Carbon;
-use Exception;
 use Netflex\Pages\Page;
 use Netflex\Pages\Middleware\BindPage;
 use Netflex\Pages\Middleware\GroupAuthentication;
@@ -17,6 +16,7 @@ use Netflex\Pages\Middleware\JwtProxy;
 use Netflex\Foundation\Redirect;
 use Netflex\Pages\JwtPayload;
 use Netflex\Pages\PreviewRequest;
+use Netflex\Pages\Controllers\ControllerNotImplementedController;
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
@@ -406,14 +406,10 @@ class RouteServiceProvider extends ServiceProvider
       });
 
       foreach ($pages as $page) {
-        /** @var Page */
-        $page = $page;
+        /** @var Page $page */
+        $class = $this->resolveControllerClass($page);
 
-        $controller = $page->template->controller ?? null;
-        $pageController = Config::get('pages.controller', PageController::class) ?? PageController::class;
-        $class = trim($controller ? ("\\{$this->namespace}\\{$controller}") : "\\{$pageController}", '\\');
-
-        /** @var Controller|null */
+        /** @var Controller|null $controllerInstance */
         $controllerInstance = null;
 
         try {
