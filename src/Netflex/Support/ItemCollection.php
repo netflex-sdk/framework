@@ -191,14 +191,107 @@ abstract class ItemCollection extends BaseCollection implements JsonSerializable
   }
 
   /**
+   * Get the items in the collection that are not present in the given items.
+   *
+   * @param  mixed  $items
+   * @return BaseCollection
+   */
+  public function diff($items)
+  {
+    return $this->toBase()->diff($items);
+  }
+
+  /**
+   * Get the items in the collection that are not present in the given items, using the callback.
+   *
+   * @param  mixed  $items
+   * @param  callable  $callback
+   * @return BaseCollection
+   */
+  public function diffUsing($items, callable $callback)
+  {
+    return $this->toBase()->diffUsing($items, $callback);
+  }
+
+  /**
+   * Run a filter over each of the items.
+   *
+   * @param  callable|null  $callback
+   * @return BaseCollection
+   */
+  public function filter(callable $callback = null)
+  {
+    return $this->toBase()->filter($callback);
+  }
+
+  /**
+   * Flip the items in the collection.
+   *
+   * @return BaseCollection
+   */
+  public function flip()
+  {
+    return $this->toBase()->flip();
+  }
+
+  /**
+   * Intersect the collection with the given items.
+   *
+   * @param  mixed  $items
+   * @return BaseCollection
+   */
+  public function intersect($items)
+  {
+    return $this->toBase()->intersect($items);
+  }
+
+  /**
+   * Get the values of a given key.
+   *
+   * @param  string|array|int|null  $value
+   * @param  string|null  $key
+   * @return BaseCollection
+   */
+  public function pluck($value, $key = null)
+  {
+    return $this->toBase()->pluck($value, $key);
+  }
+
+  /**
    * Run a map over each of the items.
    *
    * @param callable $callback
-   * @return Illuminate\Support\Collection
+   * @return BaseCollection
    */
   public function map(callable $callback)
   {
-    return new BaseCollection(parent::map($callback));
+    return $this->toBase()->map($callback);
+  }
+
+  /**
+   * Run a dictionary map over the items.
+   *
+   * The callback should return an associative array with a single key/value pair.
+   *
+   * @param  callable  $callback
+   * @return BaseCollection
+   */
+  public function mapToDictionary(callable $callback)
+  {
+    return new BaseCollection(parent::mapToDictionary($callback));
+  }
+
+  /**
+   * Run an associative map over each of the items.
+   *
+   * The callback should return an associative array with a single key/value pair.
+   *
+   * @param  callable  $callback
+   * @return BaseCollection
+   */
+  public function mapWithKeys(callable $callback)
+  {
+    return new BaseCollection(parent::mapWithKeys($callback));
   }
 
   /**
