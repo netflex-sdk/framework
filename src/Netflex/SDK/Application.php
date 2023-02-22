@@ -15,17 +15,6 @@ use Netflex\Cache\Providers\CacheServiceProvider;
 class Application extends BaseApplication
 {
   /**
-   * Get the path to the bootstrap directory.
-   *
-   * @param  string  $path Optionally, a path to append to the bootstrap path
-   * @return string
-   */
-  public function bootstrapPath($path = '')
-  {
-    return $this->basePath . DIRECTORY_SEPARATOR . 'storage/sdk' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
-  }
-
-  /**
    * Determine if the application is in the local environment.
    *
    * @return bool
