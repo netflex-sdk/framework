@@ -1048,10 +1048,6 @@ if (!function_exists('page_route')) {
 if (!function_exists('clear_route_cache')) {
   function clear_route_cache()
   {
-    $key = RouteServiceProvider::ROUTE_CACHE;
-    if (file_exists(storage_path($key . '.php'))) {
-      unlink(storage_path($key . '.php'));
-      return true;
-    }
+    return Cache::forget(RouteServiceProvider::ROUTE_CACHE);
   }
 }
