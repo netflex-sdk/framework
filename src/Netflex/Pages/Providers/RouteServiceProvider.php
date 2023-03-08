@@ -228,7 +228,7 @@ class RouteServiceProvider extends ServiceProvider
   {
     if ($payload->structure_id) {
       $structure = Cache::rememberForever('structure/' . $payload->structure_id, function () use ($payload) {
-        return API::get('builder/structures/' . $payload->structure_id);
+        return API::get('builder/structures/' . $payload->structure_id . '/basic');
       });
     }
 
