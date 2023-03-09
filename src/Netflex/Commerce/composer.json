@@ -15,9 +15,9 @@
         }
     },
     "require": {
-        "netflex/api": "^4.25",
-        "netflex/support": "^4.25",
-        "netflex/query-builder": "^4.25",
+        "netflex/api": "v4.26.0",
+        "netflex/support": "v4.26.0",
+        "netflex/query-builder": "v4.26.0",
         "illuminate/support": "^8.0",
         "php": "^7.4|^8.0"
     },
