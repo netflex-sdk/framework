@@ -188,7 +188,7 @@ if (!function_exists('static_content')) {
 if (!function_exists('navigation_data')) {
   /**
    * Resolves navigation data
-   * 
+   *
    * @param int $parent
    * @param string $type
    * @param string $root
@@ -860,7 +860,7 @@ if (!function_exists('current_mode')) {
 if (!function_exists('cdn_url')) {
   /**
    * Generates a CDN url with optional path appended
-   * 
+   *
    * @param MediaUrlResolvable|string|null $path
    * @return string
    */
@@ -873,15 +873,7 @@ if (!function_exists('cdn_url')) {
       $path = $path->getPathAttribute();
     }
 
-    $options = [];
-
-    if (config('media.compressor')) {
-      $options['compressor'] = config('media.compressor');
-    }
-
-    $query = count($options) ? ('?' . http_build_query($options)) : null;
-
-    return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/') . $query), '/');
+    return trim((rtrim("$schema://$cdn", '/') . '/' . trim($path, '/')), '/');
   }
 }
 
@@ -894,9 +886,17 @@ if (!function_exists('media_url')) {
    * @param string $type
    * @param array|string|int $color
    * @param string|null $direction
+   * @param array $query
    * @return string
    */
-  function media_url($file, $presetOrSize = null, $type = 'rc', $color = '255,255,255,1', $direction = null)
+  function media_url(
+    $file,
+    $presetOrSize = null,
+    $type = 'rc',
+    $color = '255,255,255,1',
+    $direction = null,
+    array $query = []
+  )
   {
     if ($file instanceof MediaUrlResolvable) {
       $file = $file->getPathAttribute();
@@ -908,8 +908,9 @@ if (!function_exists('media_url')) {
     }
 
     $size = $presetOrSize;
-    $preset = ($presetOrSize instanceof MediaPreset) ? $presetOrSize : null;
-    $preset = !$preset ? MediaPreset::find($presetOrSize) : null;
+    $preset = ($presetOrSize instanceof MediaPreset)
+      ? $presetOrSize
+      : MediaPreset::find($presetOrSize);
 
     if ($preset) {
       $size = $preset->size ?? null;
@@ -963,7 +964,15 @@ if (!function_exists('media_url')) {
 
     $size = $type === 'o' ?  null : "$size/";
 
-    return cdn_url("/media/$type/{$size}{$options}{$file}");
+    $defaultPreset = MediaPreset::getDefaultPreset();
+
+    if ($defaultPreset->compressor) {
+      $query['compressor'] = $defaultPreset->compressor;
+    }
+
+    $queryString = count($query) > 0 ? ('?' . http_build_query($query)) : '';
+
+    return cdn_url("/media/{$type}/{$size}{$options}{$file}{$queryString}");
   }
 }
 
@@ -971,7 +980,7 @@ if (!function_exists('in_production')) {
   /**
    * Check if the application is running in a production environment
    *
-   * @return bool 
+   * @return bool
    */
   function in_production()
   {
@@ -983,7 +992,7 @@ if (!function_exists('in_development')) {
   /**
    * Check if the application is running in a development environment
    *
-   * @return bool 
+   * @return bool
    */
   function in_development()
   {
@@ -995,7 +1004,7 @@ if (!function_exists('edit_mode')) {
   /**
    * Check if the current mode is edit
    *
-   * @return bool 
+   * @return bool
    */
   function edit_mode()
   {
@@ -1007,7 +1016,7 @@ if (!function_exists('preview_mode')) {
   /**
    * Check if the current mode is preview
    *
-   * @return bool 
+   * @return bool
    */
   function preview_mode()
   {
@@ -1019,7 +1028,7 @@ if (!function_exists('live_mode')) {
   /**
    * Check if the current mode is live
    *
-   * @return bool 
+   * @return bool
    */
   function live_mode()
   {
