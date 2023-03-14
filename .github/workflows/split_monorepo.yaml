@@ -108,7 +108,7 @@ jobs:
         steps:
             -   uses: actions/checkout@v3
             -   name: "Fix directory permissions"
-                run: "git config --global --add safe.directory /tmp/monorepo_split/build_directory"
+                run: chown root:root .
             # no tag
             -
                 if: "!startsWith(github.ref, 'refs/tags/')"
