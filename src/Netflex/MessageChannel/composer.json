@@ -10,7 +10,7 @@
     },
     "require": {
         "illuminate/support": "^8.0",
-        "netflex/api": "v4.26.0",
+        "netflex/api": "^4.27",
         "illuminate/broadcasting": "^8.0",
         "php": "^7.4|^8.0"
     },
