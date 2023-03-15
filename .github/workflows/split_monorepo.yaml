@@ -107,14 +107,12 @@ jobs:
 
         steps:
             -   uses: actions/checkout@v3
-            -   name: "Fix directory permissions"
-                run: git config --global --add safe.directory "$GITHUB_WORKSPACE" && git config --global --add safe.directory /tmp/monorepo_split/build_directory
             # no tag
             -
                 if: "!startsWith(github.ref, 'refs/tags/')"
                 # Uses an action in the root directory
                 name: Monorepo Split of ${{ matrix.packages.package }}
-                uses: symplify/github-action-monorepo-split@2.1
+                uses: symplify/github-action-monorepo-split@2.3
                 env:
                     GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
                 with:
