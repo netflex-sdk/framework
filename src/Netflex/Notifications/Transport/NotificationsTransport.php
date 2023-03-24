@@ -2,13 +2,18 @@
 
 namespace Netflex\Notifications\Transport;
 
+use Exception;
+use ReflectionClass;
+
 use Swift_Attachment;
 use Swift_Mime_SimpleMessage;
+use Swift_ByteStream_FileByteStream;
 
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Variable;
 
 use Illuminate\Mail\Transport\Transport;
+use Illuminate\Support\Str;
 
 class NotificationsTransport extends Transport
 {
@@ -20,7 +25,7 @@ class NotificationsTransport extends Transport
     $this->beforeSendPerformed($message);
 
     $replyTo = null;
-    
+
     /** @var array|string|null */
     $replyToHeader = $message->getReplyTo();
 
@@ -28,9 +33,9 @@ class NotificationsTransport extends Transport
       $address = array_key_first($replyToHeader);
       $name = $replyToHeader[$address];
 
-      $replyTo = $name ? "{$name} <{$address}>" : $address;      
+      $replyTo = $name ? "{$name} <{$address}>" : $address;
     }
-    
+
     if (is_string($replyToHeader)) {
       $replyTo = $replyToHeader;
     }
@@ -40,9 +45,30 @@ class NotificationsTransport extends Transport
         return $child instanceof Swift_Attachment;
       })
       ->map(function (Swift_Attachment $attachment) {
+        $filename = $attachment->getFilename();
+        $contentType = $attachment->getContentType();
+        $content = null;
+
+        try {
+          $reflectionClass = (new ReflectionClass($attachment))->getParentClass()->getParentClass();
+          $reflectionProperty = $reflectionClass->getProperty('body');
+          $reflectionProperty->setAccessible(true);
+
+          /** @var Swift_ByteStream_FileByteStream $body */
+          $path = $reflectionProperty->getValue($attachment)->getPath();
+
+          if (Str::startsWith($path, ['http://', 'https://'])) {
+            $content = $path;
+          } else {
+            $content = 'data://' . $contentType . ';base64,' . base64_encode(file_get_contents($path));
+          }
+        } catch (Exception $e) {
+          $content = 'data://' . $contentType . ';base64,' . base64_encode($attachment->getBody());
+        }
+
         return [
-          'filename' => $attachment->getFilename(),
-          'link' => 'data://' . $attachment->getContentType() . ';base64,' . base64_encode($attachment->getBody())
+          'filename' => $filename,
+          'link' => $content
         ];
       })
       ->values()
