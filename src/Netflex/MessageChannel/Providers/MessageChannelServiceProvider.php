@@ -19,8 +19,8 @@ class MessageChannelServiceProvider extends ServiceProvider
   public function register()
   {
     $this->app->singleton(MessageChannel::class, function () {
-      $publicKey = $this->app['config']['api.publicKey'] ?? null;
-      $privateKey = $this->app['config']['api.privateKey'] ?? null;
+      $publicKey = $this->app['config']['api.connections.default.publicKey'] ?? $this->app['config']['api.publicKey'] ?? null;
+      $privateKey = $this->app['config']['api.connections.default.privateKey'] ?? $this->app['config']['api.privateKey'] ?? null;
       $handler = null;
 
       if ($endpoint = $this->app['config']['message-channel.handler.endpoint']) {
