@@ -5,8 +5,8 @@
     "license": "MIT",
     "require": {
         "illuminate/translation": "^8.0",
-        "netflex/api": "^4.29.2",
-        "netflex/support": "^4.29.2"
+        "netflex/api": "^4.30",
+        "netflex/support": "^4.30"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +26,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.29.x-dev"
+            "dev-master": "4.30.x-dev"
         },
         "laravel": {
             "providers": [
