@@ -161,7 +161,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
   protected function registerQueueListenCommand()
   {
     $this->app->singleton('command.queue.listen', function ($app) {
-      return new ListenCommand($app['queue.worker']);
+      return new ListenCommand($app['queue.listener']);
     });
   }
 
