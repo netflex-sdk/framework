@@ -13,6 +13,7 @@ use Netflex\Newsletters\Traits\CastsDefaultFields;
 use Netflex\Newsletters\Traits\HidesDefaultFields;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\HtmlString;
 use voku\CssToInlineStyles\CssToInlineStyles;
 
@@ -272,17 +273,18 @@ class Newsletter extends QueryableModel
   }
 
   /**
-   * Reunders html of newsletter
+   * Renders html of newsletter
    *
    * @return HtmlString
    */
   public function render(): HtmlString {
-      if ($page = $this->page) {
-          return new HtmlString($page->toResponse(request()));
-      }
+    if ($page = $this->page) {
+        App::setLocale($page->lang ?? App::getLocale());
+        return new HtmlString($page->toResponse(request()));
+    }
 
-      return new HtmlString;
-  }
+    return new HtmlString;
+}
 
   /**
    * Reunders preview of newsletter in html or text
@@ -308,7 +310,7 @@ class Newsletter extends QueryableModel
    *
    * @return null
    */
-  public function renderAndSave() 
+  public function renderAndSave()
   {
       $content = $this->render()->toHtml();
       $this->output = (new CssToInlineStyles($content))->convert();
