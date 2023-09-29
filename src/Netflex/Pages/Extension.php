@@ -23,7 +23,12 @@ abstract class Extension implements Renderable, Responsable
   public function __construct(array $data)
   {
     $this->data = $data;
-    $this->view = $data['view'] ?? null;
+    $view = $data['view'] ?? null;
+
+    if (!$this->view && $view) {
+      $this->view = $view;
+    }
+
     $this->name = $data['name'] ?? null;
   }
 
