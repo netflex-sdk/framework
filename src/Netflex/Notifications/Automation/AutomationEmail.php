@@ -32,7 +32,7 @@ class AutomationEmail extends QueryableModel
 
     public static function findOrFail($id)
     {
-        if ($newsletter = static::find($id)) {
+        if ($newsletter = static::where('id', $id)->first()) {
             return $newsletter;
         }
 
