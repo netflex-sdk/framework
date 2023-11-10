@@ -40,7 +40,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
         'cache' => true,
         'options' => [
             'dpi' => 1,
-            'timeout' => 30000
+            'timeout' => 5 * 60 * 60,
         ]
     ];
 
