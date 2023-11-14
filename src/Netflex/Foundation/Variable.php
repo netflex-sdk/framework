@@ -53,12 +53,14 @@ class Variable extends ReactiveObject
    */
   public static function all()
   {
-    $templates = app('cache')->rememberForever('variables', function () {
-      return app('api.client')->get('foundation/variables');
-    });
+    return once(function () {
+      $templates = app('cache')->rememberForever('variables', function () {
+        return app('api.client')->get('foundation/variables');
+      });
 
-    return collect($templates)->map(function ($content) {
-      return new static($content);
+      return collect($templates)->map(function ($content) {
+        return new static($content);
+      });
     });
   }
 
