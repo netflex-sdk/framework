@@ -400,18 +400,24 @@ abstract class AbstractPage extends QueryableModel implements Responsable
       ->values();
   }
 
-  private static function getPages(): Collection {
+  private static function getPages(): Collection
+  {
     if (!static::$allItems) {
       /** @var Collection */
-      static::$allItems = collect(Cache::rememberForever('pages', function () {
-        return API::get('builder/pages/content', true);
-      }))->sortBy('sorting')->map(function ($attributes) {
+      $data = Cache::rememberForever('pages', function () {
+        return collect(API::get('builder/pages/content', true))
+          ->sortBy('sorting')
+          ->keyBy('id');
+      });
+
+      static::$allItems = $data->map(function ($attributes) {
         return (new static)->newFromBuilder($attributes);
-      })->keyBy(fn(AbstractPage $page) => $page->getKey());
+      });
     }
 
     return static::$allItems;
   }
+
   /**
    * Retrieves all instances
    *
