@@ -23,10 +23,10 @@ use Illuminate\Support\Facades\Cache;
 class GlobalContent extends ReactiveObject
 {
   /**
-   * @param array $content
+   * @param array $globals
    * @return Collection
    */
-  public function getGlobalsAttribute($globals = [])
+  public function getGlobalsAttribute($globals = []): Collection
   {
     return collect($globals);
   }
