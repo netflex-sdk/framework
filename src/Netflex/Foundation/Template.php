@@ -85,7 +85,7 @@ class Template extends ReactiveObject implements Responsable
       static::$templates = Cache::rememberForever('templates', function () {
         $data = API::get('foundation/templates');
 
-        return static::$templates = collect($data)->map(function ($template) {
+        return collect($data)->map(function ($template) {
           return new static($template);
         })->keyBy('id');
       });
