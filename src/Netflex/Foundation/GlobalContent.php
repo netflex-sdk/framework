@@ -36,12 +36,14 @@ class GlobalContent extends ReactiveObject
    */
   public static function all()
   {
-    $content = Cache::rememberForever('statics', function () {
-      return API::get('foundation/globals');
-    });
+    return once(function () {
+      $content = Cache::rememberForever('statics', function () {
+        return API::get('foundation/globals');
+      });
 
-    return collect($content)->map(function ($content) {
-      return new static($content);
+      return collect($content)->map(function ($content) {
+        return new static($content);
+      });
     });
   }
 
