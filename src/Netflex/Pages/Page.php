@@ -23,8 +23,7 @@ class Page extends AbstractPage
           static::TYPE_FOLDER,
           static::TYPE_INTERNAL,
           static::TYPE_PAGE,
-        ])
-        ->values();
+        ]);
     });
   }
 }
