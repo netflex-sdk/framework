@@ -65,6 +65,8 @@ class Variable extends ReactiveObject
   }
 
 
+
+  static $data = null;
   /**
    * @param string $alias
    * @return static|void
@@ -76,9 +78,8 @@ class Variable extends ReactiveObject
 
     if ($services_uncached) {
       $loaded = true;
-      return static::all()->first(function ($content) use ($alias) {
-        return $content->alias === $alias;
-      });
+      static::$data ??= static::all()->keyBy('alias');
+      return static::$data[$alias] ?? null;
     }
 
     return new static(['alias' => $alias, 'value' => '#' . $alias . '#']);
