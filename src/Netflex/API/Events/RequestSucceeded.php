@@ -3,11 +3,16 @@
 namespace Netflex\API\Events;
 
 use GuzzleHttp\Promise\FulfilledPromise;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class RequestSucceeded
 {
+  use Dispatchable, InteractsWithSockets, SerializesModels;
+
   public RequestInterface $request;
   public ?ResponseInterface $response = null;
 
