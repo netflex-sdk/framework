@@ -23,10 +23,10 @@ use Illuminate\Support\Facades\Cache;
 class GlobalContent extends ReactiveObject
 {
   /**
-   * @param array $content
+   * @param array $globals
    * @return Collection
    */
-  public function getGlobalsAttribute($globals = [])
+  public function getGlobalsAttribute($globals = []): Collection
   {
     return collect($globals);
   }
@@ -36,12 +36,14 @@ class GlobalContent extends ReactiveObject
    */
   public static function all()
   {
-    $content = Cache::rememberForever('statics', function () {
-      return API::get('foundation/globals');
-    });
+    return once(function () {
+      $content = Cache::rememberForever('statics', function () {
+        return API::get('foundation/globals');
+      });
 
-    return collect($content)->map(function ($content) {
-      return new static($content);
+      return collect($content)->map(function ($content) {
+        return new static($content);
+      });
     });
   }
 
