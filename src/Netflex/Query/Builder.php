@@ -6,6 +6,7 @@ use Closure;
 use DateTimeInterface;
 
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Carbon;
 use Netflex\API\Contracts\APIClient;
 use Netflex\API\Facades\APIClientConnectionResolver;
@@ -24,6 +25,7 @@ use Netflex\Structure\Structure;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\Macroable;
@@ -900,8 +902,19 @@ class Builder
   {
     try {
       $fetch = function () use ($size, $page) {
-        return $this->getConnection()
-          ->get($this->compileRequest($size, $page), $this->assoc);
+        $time = microtime(true);
+        $compiled = $this->compileRequest($size, $page);
+        $result = $this->getConnection()
+          ->get($compiled, $this->assoc);
+
+        Event::dispatch(new QueryExecuted(
+          $compiled,
+          [],
+          (microtime(true) - $time) * 1000,
+          $this->getConnection()
+        ));
+
+        return $result;
       };
 
       if ($this->shouldCache) {
