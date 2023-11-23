@@ -67,7 +67,7 @@ trait HasRelation
     }
 
     $cacheKey = array_filter([$prefix, $relation, $relationId]);
-    
+
     return implode('/', $cacheKey);
   }
 }

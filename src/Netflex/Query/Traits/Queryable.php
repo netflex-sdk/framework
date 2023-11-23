@@ -66,7 +66,7 @@ trait Queryable
     $builder->setModel(static::class);
 
     if ($queryable instanceof QueryableModel) {
-      $builder->setConnectionName($queryable->getConnectionName());
+      $builder->setName($queryable->getConnectionName());
     }
 
     if ($size) {

@@ -40,7 +40,7 @@ class MockClient implements APIClient
   /**
    * @return string|null
    */
-  public function getConnectionName ()
+  public function getName()
   {
     return $this->connection;
   }
@@ -49,7 +49,7 @@ class MockClient implements APIClient
    * @param string|null $connection
    * @return static
    */
-  public function setConnectionName ($connection)
+  public function setName($connection)
   {
     $this->connection = $connection;
     return $this;

@@ -61,7 +61,7 @@ class Structure
   public static function isModelRegistered(string $model)
   {
     $instance = new $model([], false);
-    
+
     if ($instance instanceof Model) {
       return App::bound('structure.' . $instance->getRelationId());
     }
@@ -124,7 +124,7 @@ class Structure
   public static function retrieve($id, $client = null)
   {
     $client = $client ?? API::connection();
-    $prefix = $client->getConnectionName();
+    $prefix = $client->getName();
     $prefix = $prefix !== 'default' ? $prefix : null;
     $key = implode('/', array_filter([$prefix, 'structures', $id]));
 

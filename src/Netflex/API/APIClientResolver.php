@@ -41,6 +41,6 @@ class APIClientResolver implements ClientResolver
             ]
         ];
 
-        return (new Client($options))->setConnectionName($connection);
+        return (new Client($options))->setName($connection);
     }
 }
