@@ -2,39 +2,38 @@
 
 namespace Netflex\Pages\Providers;
 
-use Throwable;
-use ReflectionClass;
 
-use Netflex\API\Facades\API;
 use Carbon\Carbon;
 use Exception;
-use Netflex\Pages\Page;
-use Netflex\Pages\Middleware\BindPage;
-use Netflex\Pages\Middleware\GroupAuthentication;
-use Netflex\Pages\Controllers\PageController;
-use Netflex\Pages\Controllers\Controller;
-use Netflex\Pages\Middleware\JwtProxy;
-use Netflex\Foundation\Redirect;
-use Netflex\Pages\JwtPayload;
-use Netflex\Pages\PreviewRequest;
-use Netflex\Pages\Controllers\ControllerNotImplementedController;
-
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Laravelium\Sitemap\Sitemap;
+use Netflex\API\Facades\API;
+use Netflex\Foundation\Redirect;
 use Netflex\Newsletters\Newsletter;
 use Netflex\Pages\AbstractPage;
 use Netflex\Pages\Contracts\CompilesException;
+use Netflex\Pages\Controllers\Controller;
+use Netflex\Pages\Controllers\ControllerNotImplementedController;
+use Netflex\Pages\Controllers\PageController;
 use Netflex\Pages\Events\CacheCleared;
 use Netflex\Pages\Exceptions\InvalidControllerException;
 use Netflex\Pages\Exceptions\InvalidRouteDefintionException;
+use Netflex\Pages\JwtPayload;
+use Netflex\Pages\Middleware\BindPage;
+use Netflex\Pages\Middleware\GroupAuthentication;
+use Netflex\Pages\Middleware\JwtProxy;
+use Netflex\Pages\Page;
+use Netflex\Pages\PreviewRequest;
+use ReflectionClass;
+use Throwable;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -205,7 +204,7 @@ class RouteServiceProvider extends ServiceProvider
       $page->toResponse($request);
     }
 
-    /** @var PageController $controller  */
+    /** @var PageController $controller */
     $controller = App::make($class);
     $previousPage = current_page();
     current_page($page);
@@ -346,36 +345,35 @@ class RouteServiceProvider extends ServiceProvider
 
       $keys = array_unique($keys);
 
-      $success = false;
-
       if (!count($keys)) {
         return ['success' => false, 'message' => 'Key is missing'];
       }
 
+      $missingKeys = [];
       foreach ($keys as $key) {
         $key = trim($key);
 
-        if ($key = $request->get('key')) {
-          if ($key === 'pages') {
-            clear_route_cache();
-          }
-
-          if ($key === 'redirects') {
-            clear_route_cache();
-          }
-
-          if (Cache::has($key)) {
-            Cache::forget($key);
-            CacheCleared::dispatch($key);
-            $success = true;
-          }
+        if ($key === 'pages') {
+          clear_route_cache();
         }
 
-        if ($success) {
-          return ['success' => true, 'message' => 'Key(s) deleted'];
-        } else {
-          return ['success' => false, 'message' => 'Some Key(s) does not exist'];
+        if ($key === 'redirects') {
+          clear_route_cache();
         }
+
+        if (!Cache::has($key)) {
+          $missingKeys[] = $key;
+        }
+
+        Cache::forget($key);
+        CacheCleared::dispatch($key);
+
+      }
+
+      if (sizeof($missingKeys) === 0) {
+        return ['success' => true, 'message' => 'All keys deleted'];
+      } else {
+        return ['success' => false, 'message' => 'One or more keys were missing', 'missing' => $missingKeys];
       }
     });
 
@@ -538,7 +536,7 @@ class RouteServiceProvider extends ServiceProvider
       ]);
 
       $routeCache = $routeSource;
-      Cache::rememberForever(static::ROUTE_CACHE, fn () => $routeCache);
+      Cache::rememberForever(static::ROUTE_CACHE, fn() => $routeCache);
     }
 
     Route::middleware('netflex')
