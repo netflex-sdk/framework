@@ -351,6 +351,10 @@ class RouteServiceProvider extends ServiceProvider
 
       $missingKeys = [];
       foreach ($keys as $key) {
+        if ($request->header('X-KEY-ENCODING', 'none') === 'base64') {
+          $key = base64_decode($key);
+        }
+
         $key = trim($key);
 
         if ($key === 'pages') {
