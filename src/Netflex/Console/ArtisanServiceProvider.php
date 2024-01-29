@@ -4,9 +4,9 @@ namespace Netflex\Console;
 
 use Netflex\Console\Commands\CacheClearCommand;
 use Netflex\Console\Commands\ModelMakeCommand;
-use Netflex\Console\Commands\ServeCommand;
 use Netflex\Console\Commands\NetflexSetupCommand;
 use Netflex\Console\Commands\MailMakeCommand;
+use Netflex\Console\Commands\ProxyCommand;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -43,6 +43,7 @@ use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
+use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
@@ -110,6 +111,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     'ResourceMake' => 'command.resource.make',
     'RuleMake' => 'command.rule.make',
     'Serve' => 'command.serve',
+    'Proxy' => 'command.serve',
     'NetflexSetup' => 'command.netflex.setup',
     'VendorPublish' => 'command.vendor.publish',
     'MailMake' => 'command.mail.make',
@@ -628,6 +630,19 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
       return new ServeCommand;
     });
   }
+
+  /**
+   * Register the command.
+   *
+   * @return void
+   */
+  protected function registerProxyCommand()
+  {
+    $this->app->singleton('command.proxy', function () {
+      return new ProxyCommand;
+    });
+  }
+
 
   /**
    * Register the command.
