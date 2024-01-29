@@ -225,7 +225,7 @@ class ProxyCommand extends Command
             }
 
             if (!file_exists($this->php)) {
-                $this->error('PHP 8.2 is not installed');
+                $this->error('PHP 8.2 is not installed in Herd.');
                 return 3;
             }
 
@@ -243,6 +243,7 @@ class ProxyCommand extends Command
             pcntl_signal(SIGTERM, [$this, 'shutdown']); // Call $this->shutdown() on SIGTERM
 
             $process = new Process([$this->herd, 'share'], base_path(), ['PHP_EXECUTABLE' => $this->php, 'PATH' => "{$this->path}:" . getenv('PATH')]);
+            $process->setTimeout(null);
 
             $publicHttps = null;
 
