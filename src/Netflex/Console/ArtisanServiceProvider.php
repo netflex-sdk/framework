@@ -111,7 +111,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     'ResourceMake' => 'command.resource.make',
     'RuleMake' => 'command.rule.make',
     'Serve' => 'command.serve',
-    'Proxy' => 'command.serve',
+    'Proxy' => 'command.proxy',
     'NetflexSetup' => 'command.netflex.setup',
     'VendorPublish' => 'command.vendor.publish',
     'MailMake' => 'command.mail.make',
