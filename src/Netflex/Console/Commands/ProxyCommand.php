@@ -67,6 +67,16 @@ class ProxyCommand extends Command
     protected ?string $tmpdir;
     protected ?string $path;
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return PHP_OS_FAMILY !== 'Darwin';
+    }
+
     protected function client()
     {
         if (!$this->userClient) {
@@ -212,8 +222,8 @@ class ProxyCommand extends Command
             $this->tmpdir = sys_get_temp_dir();
             $this->path = "{$this->tmpdir}/herd/bin";
 
-            if (PHP_OS_FAMILY === 'Windows') {
-                $this->error('Windows is not supported');
+            if (PHP_OS_FAMILY !== 'Darwin') {
+                $this->error(PHP_OS_FAMILY . ' is not currently supported');
                 return 1;
             }
 
