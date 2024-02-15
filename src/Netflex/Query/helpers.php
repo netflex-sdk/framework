@@ -41,3 +41,16 @@ if (!function_exists('uuid')) {
       return md5_to_uuid(md5($md5));
   }
 }
+
+if(!function_exists('redo_on_index_error')) {
+  function redo_on_index_error(\Closure $closure, int $attempts = 3, int $current = 1) {
+    try {
+      return $closure();
+    } catch (\Netflex\Query\Exceptions\IndexNotFoundException $exception) {
+      if($current >= $attempts) {
+        throw $exception;
+      }
+      return redo_on_index_error($closure, $attempts, $current + 1);
+    }
+  }
+}

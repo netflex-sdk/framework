@@ -4,31 +4,27 @@ namespace Netflex\Query;
 
 use Closure;
 use DateTimeInterface;
-
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Support\Carbon;
-use Netflex\API\Contracts\APIClient;
-use Netflex\API\Facades\APIClientConnectionResolver;
-
-use Netflex\Query\Exceptions\QueryException;
-use Netflex\Query\Exceptions\IndexNotFoundException;
-use Netflex\Query\Exceptions\InvalidAssignmentException;
-use Netflex\Query\Exceptions\InvalidOperatorException;
-use Netflex\Query\Exceptions\InvalidSortingDirectionException;
-use Netflex\Query\Exceptions\InvalidValueException;
-use Netflex\Query\Exceptions\NotFoundException;
-
-use Netflex\Structure\Model;
-use Netflex\Structure\Structure;
-
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Netflex\API\Contracts\APIClient;
+use Netflex\API\Facades\APIClientConnectionResolver;
+use Netflex\Query\Exceptions\IndexNotFoundException;
 use Netflex\Query\Exceptions\InvalidArrayValueException;
+use Netflex\Query\Exceptions\InvalidAssignmentException;
+use Netflex\Query\Exceptions\InvalidOperatorException;
+use Netflex\Query\Exceptions\InvalidSortingDirectionException;
+use Netflex\Query\Exceptions\InvalidValueException;
 use Netflex\Query\Exceptions\NoSortableFieldToOrderByException;
+use Netflex\Query\Exceptions\NotFoundException;
+use Netflex\Query\Exceptions\QueryException;
+use Netflex\Structure\Model;
+use Netflex\Structure\Structure;
 
 class Builder
 {
@@ -314,7 +310,7 @@ class Builder
     }
 
     if (is_bool($value)) {
-      $value = (int) $value;
+      $value = (int)$value;
     }
 
     if (is_object($value)) {
@@ -362,7 +358,7 @@ class Builder
 
     $builder = new static(false, []);
 
-    $scopedQuery  = (function ($builder, $callback) {
+    $scopedQuery = (function ($builder, $callback) {
       $callback($builder);
       return $builder->getQuery(true);
     })($builder, $callback);
@@ -388,7 +384,7 @@ class Builder
   {
     // Handle Stringable objects in a way that is backwards compatible with PHP 7.x
     if (is_object($field) && method_exists($field, '__toString')) {
-      $field = (string) $field;
+      $field = (string)$field;
     }
 
     foreach (static::REPLACEMENT_ENTITIES as $entity => $replacement) {
@@ -400,7 +396,7 @@ class Builder
 
   /**
    * @param string $field
-   * @param string $operator|
+   * @param string $operator |
    * @param null|array|Collection|boolean|integer|QueryableModel|string|DateTimeInterface $value
    * @return string
    * @throws InvalidOperatorException If an invalid operator is passed
@@ -511,7 +507,7 @@ class Builder
   /**
    * Sets the debug flag of the query
    * Making the API reflect the compiled query in the output
-   * 
+   *
    * @return static
    */
   public function debug()
@@ -762,7 +758,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] =  "($field:[$from TO $to])";
+    $this->query[] = "($field:[$from TO $to])";
     return $this;
   }
 
@@ -779,7 +775,7 @@ class Builder
     $field = $this->compileField($field);
     $from = $this->escapeValue($from, '=');
     $to = $this->escapeValue($to, '=');
-    $this->query[] =  "(NOT ($field:[$from TO $to]))";
+    $this->query[] = "(NOT ($field:[$from TO $to]))";
     return $this;
   }
 
@@ -797,7 +793,7 @@ class Builder
   public function whereNot(...$args)
   {
     if (count($args) === 1) {
-      $this->query =  ['NOT ' . $this->compileScopedQuery([array_pop($args)])];
+      $this->query = ['NOT ' . $this->compileScopedQuery([array_pop($args)])];
       return $this;
     }
 
@@ -871,7 +867,7 @@ class Builder
   {
     $originalSize = $this->size;
     $this->size = $size;
-    $paginator =  PaginatedResult::fromBuilder($this, $page);
+    $paginator = PaginatedResult::fromBuilder($this, $page);
     $this->size = $originalSize;
     return $paginator;
   }
@@ -929,12 +925,13 @@ class Builder
   /**
    * Retrieves the results of the query
    *
-   * @return \Illuminate\Support\Collection
+   * @return Collection
    * @throws QueryException
+   * @throws IndexNotFoundException
    */
-  public function get()
+  public function get(int $attempts = 1)
   {
-    $result = $this->fetch();
+    $result = redo_on_index_error(fn() => $this->fetch(), $attempts);
     $hits = new Collection(($this->assoc ? $result['data'] : $result->data) ?? []);
 
     if ($this->mapper) {
@@ -1103,7 +1100,7 @@ class Builder
   /**
    * Only include published results
    * Only applies to entry and page relations
-   * 
+   *
    * @param bool
    *
    * @return static
@@ -1155,7 +1152,7 @@ class Builder
                     ->where('stop', '=', null)
                     ->where('start', '<=', $date->toDateTimeString());
                 })->orWhere(function (Builder $query) use ($date) {
-                  return $query->where('start',  '=', null)
+                  return $query->where('start', '=', null)
                     ->where('stop', '!=', null)
                     ->where('stop', '>=', $date->toDateTimeString());
                 })->orWhere(function (Builder $query) {
@@ -1187,7 +1184,7 @@ class Builder
       $this->where('directory_id', '=', $this->relation_id);
     }
 
-    $compiledQuery =  implode(' AND ', array_filter(array_map(function ($term) {
+    $compiledQuery = implode(' AND ', array_filter(array_map(function ($term) {
       return trim($term) === '()' ? null : $term;
     }, $this->query)));
 
@@ -1229,9 +1226,9 @@ class Builder
   /**
    * Conditional query
    *
-   * @param boolean|Closure $clause 
-   * @param Closure $then 
-   * @param null|Closure $else 
+   * @param boolean|Closure $clause
+   * @param Closure $then
+   * @param null|Closure $else
    * @return static
    */
   public function if($clause, Closure $then, ?Closure $else = null)
