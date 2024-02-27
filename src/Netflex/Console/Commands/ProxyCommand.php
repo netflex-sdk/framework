@@ -247,6 +247,31 @@ class ProxyCommand extends Command
                 symlink($this->php, "{$this->path}/php");
             }
 
+            $exposeConfigFile = $_SERVER['HOME'] . '/.expose/config.php';
+
+            if (file_exists($exposeConfigFile)) {
+                $exposeConfig = require($_SERVER['HOME'] . '/.expose/config.php');
+                $memoryLimit = $exposeConfig['memory_limit'] ?? '128M';
+                $limit = (int) $memoryLimit;
+
+                if ($limit > 0 && $limit <= 128) {
+                    $this->error('Exposing your local development environment requires more memory (currently: ' . $memoryLimit . ')');
+                    $this->warn('Consider increasing the memory limit in ~/.expose/config.php');
+                    $this->warn('If you still experience issues, you can set the memory limit to -1 (unlimited)');
+                    $this->newLine();
+                    $this->warn('Example: ');
+                    $this->newLine();
+                    $this->info('return [');
+                    $this->info('    "memory_limit" => "-1",  // Unlimited');
+                    $this->info('];');
+                    $this->newLine();
+                    return 4;
+                }
+            } else {
+                throw new Exception('Expose is not installed or configuration file is missing (~/expose/config.php)');
+            }
+
+
             declare(ticks=1); // Handle async signals PHP 7.1
             pcntl_async_signals(true); // Handle async signals PHP ^7.1
             pcntl_signal(SIGINT, [$this, 'shutdown']); // Call $this->shutdown() on SIGINT
