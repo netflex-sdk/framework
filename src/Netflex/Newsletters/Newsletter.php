@@ -15,7 +15,7 @@ use Netflex\Newsletters\Traits\HidesDefaultFields;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\HtmlString;
-use voku\CssToInlineStyles\CssToInlineStyles;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 /**
  * @property int $id
@@ -295,7 +295,7 @@ class Newsletter extends QueryableModel
   public function renderPreview($type = 'html')
   {
     $content = $this->render()->toHtml();
-    $output = (new CssToInlineStyles($content))->convert();
+    $output = (new CssToInlineStyles())->convert($content);
     $outputText = (new Html2Text($content))->getText();
     switch($type) {
       case 'text':
@@ -313,7 +313,7 @@ class Newsletter extends QueryableModel
   public function renderAndSave()
   {
       $content = $this->render()->toHtml();
-      $this->output = mb_convert_entities((new CssToInlineStyles($content))->convert());
+      $this->output = mb_convert_entities((new CssToInlineStyles())->convert($content));
       $this->outputText = mb_convert_entities((new Html2Text($content))->getText());
       $this->save();
   }
