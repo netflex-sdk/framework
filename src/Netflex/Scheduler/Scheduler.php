@@ -119,10 +119,15 @@ class Scheduler implements Queue
 
     $name = $payload['name'] ?? $payload['displayName'] . ' (' . $payload['uuid'] . ')';
 
+    $url = route('netflex.queue.worker');
+    if ($baseUri = Config::get(implode('.', ['queue', 'connections', $this->getConnectionName(), 'base_uri']))) {
+      $url = rtrim($baseUri, "/") . route('netflex.queue.worker', null, false);
+    }
+
     return API::post('scheduler/jobs', [
       'method' => 'post',
       'name' => $name,
-      'url' => route('netflex.queue.worker'),
+      'url' => $url,
       'payload' => ['task' => $token],
       'start' => $options['start'] ?? Carbon::now()->toDateTimeString(),
       'enabled' => true
@@ -183,7 +188,7 @@ class Scheduler implements Queue
    * @param \Closure|string|object $job
    * @param string $queue
    * @param mixed $data
-   * @return string
+   * @return array
    *
    * @throws \Illuminate\Queue\InvalidPayloadException
    */
@@ -431,7 +436,7 @@ class Scheduler implements Queue
 
           /** @var QueueManager $queue */
           $queue = app('queue.worker');
-          $queue->runNextJob($scheduler->getConnectionName(), $scheduler->getQueue(), (new WorkerOptions()));
+          $queue->runNextJob($scheduler->getConnectionName(), $scheduler->getQueue(), (new WorkerOptions('default', 0, 512, 3600)));
 
           return [
             'uuid' => $jwt->uuid,
