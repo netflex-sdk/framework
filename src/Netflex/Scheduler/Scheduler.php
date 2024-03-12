@@ -53,7 +53,7 @@ class Scheduler implements Queue
    *
    *
    * @param Request $request
-   * @return array
+   * @return string
    */
   public static function validateRequest(Request $request): string
   {
@@ -69,6 +69,8 @@ class Scheduler implements Queue
     $processedAt = $request->header('X-NF-JOB-PROCESSED-AT');
     $digest = $request->header('X-NF-DIGEST');
 
+    abort_if(cache()->has("scheduler-idempotency/$jobId:$processedAt"), 400, 'This request has already been received');
+    cache()->put("scheduler-idempotency/$jobId:$processedAt", true, 3600);
     $valid = false;
     $hashContent = "$jobId:$processedAt:" . $payload;
     foreach ($privateKeys as $key) {
@@ -80,6 +82,7 @@ class Scheduler implements Queue
     }
     abort_unless($valid, 400, 'Digest does not match critical components');
     abort_unless(Carbon::parse($processedAt)->diffInMinutes() <= 5, 400, 'This request is too old, we won\'t process it');
+
     return $payload;
   }
 
