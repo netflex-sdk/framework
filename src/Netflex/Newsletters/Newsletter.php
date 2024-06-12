@@ -278,6 +278,9 @@ class Newsletter extends QueryableModel
    * @return HtmlString
    */
   public function render(): HtmlString {
+    if(!current_newsletter()) {
+      current_newsletter($this);
+    }
     if ($page = $this->page) {
         App::setLocale($page->lang ?? App::getLocale());
         return new HtmlString($page->toResponse(request()));
