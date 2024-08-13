@@ -5,7 +5,9 @@ namespace Netflex\Newsletters\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\ServiceProvider;
+use Netflex\Newsletters\AutomationMailChannel;
 use Netflex\Pages\Controllers\Controller;
 
 class NewslettersServiceProvider extends ServiceProvider
@@ -21,6 +23,7 @@ class NewslettersServiceProvider extends ServiceProvider
 
   public function boot()
   {
+    Notification::extend('automation-mail', fn($app) => new AutomationMailChannel());
 
     $this->publishes([
       __DIR__ . '/../config/newsletters.php' => $this->app->configPath('newsletters.php')
@@ -53,6 +56,6 @@ class NewslettersServiceProvider extends ServiceProvider
 
   protected function registerDirectives()
   {
-    
+
   }
 }

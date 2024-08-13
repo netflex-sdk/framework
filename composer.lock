@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "009ab79b6d2eb96a14ba760e74a8273f",
+    "content-hash": "e087278c893826c2eca5c1c82cceff4f",
     "packages": [
         {
             "name": "apility/laravel-ngrok",
@@ -3975,6 +3975,63 @@
                 }
             ],
             "time": "2021-09-25T23:10:38+00:00"
+        },
+        {
+            "name": "salesforce/handlebars-php",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/salesforce/handlebars-php.git",
+                "reference": "d3a0552d85472249617ef6b56197c844d62d2ac3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/salesforce/handlebars-php/zipball/d3a0552d85472249617ef6b56197c844d62d2ac3",
+                "reference": "d3a0552d85472249617ef6b56197c844d62d2ac3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Handlebars": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "fzerorubigd",
+                    "email": "fzerorubigd@gmail.com"
+                },
+                {
+                    "name": "Behrooz Shabani (everplays)",
+                    "email": "everplays@gmail.com"
+                },
+                {
+                    "name": "Mardix",
+                    "homepage": "https://github.com/mardix"
+                }
+            ],
+            "description": "Handlebars processor for php",
+            "homepage": "http://www.github.com/salesforce/handlebars-php",
+            "keywords": [
+                "handlebars",
+                "mustache",
+                "templating"
+            ],
+            "support": {
+                "issues": "https://github.com/salesforce/handlebars-php/issues",
+                "source": "https://github.com/salesforce/handlebars-php/tree/3.0.1"
+            },
+            "time": "2023-01-12T16:24:23+00:00"
         },
         {
             "name": "spatie/once",
@@ -9386,5 +9443,5 @@
         "php": "^7.4|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
