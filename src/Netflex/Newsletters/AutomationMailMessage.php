@@ -86,6 +86,7 @@ class AutomationMailMessage implements \Stringable
       'loader' => new StringLoader(),
       'helpers' => new Helpers(),
     ]);
+
     return $handlebars->render($this->subject ?: $this->getNewsletter()->subject ?? '', $this->replacementTags);
   }
 

@@ -16,8 +16,8 @@ class AutomationMailChannel
 
     API::post('relations/notifications', array_filter([
       'subject' => $message->getSubject(),
-      'to' => $notifiable->mail,
-      'from' => $message->getFrom() ?? variable('mail_sender_mail'),
+      'to' => [$notifiable->mail],
+      'from' => $message->getFrom() ?? variable('mail_sender_mail') ?: null,
       'reply_to' => $message->getReplyTo(),
       'body' => base64_encode($body),
       'newsletter_id' => $message->getNewsletterId(),
