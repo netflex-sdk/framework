@@ -1,7 +1,9 @@
 <?php
+
 namespace Netflex\Newsletters;
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 use Netflex\API\Facades\API;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
@@ -14,16 +16,25 @@ class AutomationMailChannel
 
     $body = $this->inlineCss((string)$message);
 
-    API::post('relations/notifications', array_filter([
+    $to = [[
+      'mail' => $notifiable->mail,
+      'name' => $notifiable->name ?: $notifiable->mail
+    ]];
+
+    $id = API::post('relations/notifications', array_filter([
       'subject' => $message->getSubject(),
-      'to' => [$notifiable->mail],
-      'from' => $message->getFrom() ?? variable('mail_sender_mail') ?: null,
-      'reply_to' => $message->getReplyTo(),
+      'to' => $to,
+      'from' => $message->getFrom(),
+      //'reply_to' => $replyTo,
       'body' => base64_encode($body),
-      'newsletter_id' => $message->getNewsletterId(),
       'use_blank_template' => true,
+      'newsletter_id' => $message->getNewsletter()->id,
       //'attachments' => $attachments
     ]));
+
+    $type = get_class($notification);
+    $id = data_get($id, 'notification_id', 'unknown');
+    Log::debug("Sending Automation Email of type $type to $notifiable->mail. Notification id = $id");
   }
 
   private function inlineCss(string $content, $tags = ['src', 'href']): string

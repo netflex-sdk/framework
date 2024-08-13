@@ -20,7 +20,7 @@ class AutomationMailMessage implements \Stringable
   private array $replacementTags = [];
   private ?string $subject = null;
 
-  private ?string $from = null;
+  private ?array $from = null;
   private ?string $replyTo = null;
 
   public function withTemplate(int $id): self
@@ -47,9 +47,12 @@ class AutomationMailMessage implements \Stringable
     return $this;
   }
 
-  public function withFromAddress(string $address)
+  public function withFromAddress(?string $address = null, ?string $name = null)
   {
-    $this->from = $address;
+    $this->from = [
+      'name' => $name ?: $address ?: variable('mail_sender_name'),
+      'mail' => $address ?: variable('mail_sender_mail')
+    ];
     return $this;
   }
 
@@ -77,9 +80,11 @@ class AutomationMailMessage implements \Stringable
     return static::$cache[$this->mailId] ?? null;
   }
 
-  public function getNewsletterId(): ?int {
+  public function getNewsletterId(): ?int
+  {
     return $this->mailId;
   }
+
   public function getSubject()
   {
     $handlebars = new Handlebars([
@@ -95,9 +100,12 @@ class AutomationMailMessage implements \Stringable
     return $this->replyTo;
   }
 
-  public function getFrom(): ?string
+  public function getFrom(): array
   {
-    return $this->from;
+    return $this->from ?: [
+      'name' => variable('mail_sender_name'),
+      'mail' => variable('mail_sender_mail')
+    ];
   }
 
   public function __toString()
