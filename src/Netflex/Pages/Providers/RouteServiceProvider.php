@@ -271,6 +271,14 @@ class RouteServiceProvider extends ServiceProvider
 
   protected function handleNewsletter(Request $request, JwtPayload $payload)
   {
+    if(app()->has("automation-mail.$payload->newsletter_id")) {
+      $automationMail = app()->get("automation-mail.$payload->newsletter_id");
+      $class = get_class($automationMail);
+      
+      return $automationMail
+        ->toAutomationMail($class::automationNotifiable($automationMail));
+    }
+
     if ($newsletter = Newsletter::where('id', $payload->newsletter_id)->first()) {
 
       $automationMail = null;
