@@ -5,6 +5,7 @@ namespace Netflex\Newsletters;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Netflex\API\Facades\API;
+use Netflex\Newsletters\Contracts\IsConsentConstrained;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class AutomationMailChannel
@@ -13,6 +14,13 @@ class AutomationMailChannel
   {
     /** @var \Netflex\Newsletters\AutomationMailMessage|\Netflex\Newsletters\Contracts\AutomationMailNotification $message */
     $message = $notification->toAutomationMail($notifiable);
+
+    if ($notification instanceof IsConsentConstrained) {
+      $acceptedConsents = collect($notification->requiredConsents());
+      if ($acceptedConsents->count() > 0 && $acceptedConsents->filter(fn($id) => $notifiable->hasConsent($id))->count() === 0) {
+        return;
+      }
+    }
 
     $body = $this->inlineCss((string)$message);
 
