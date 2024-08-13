@@ -283,6 +283,7 @@ class Customer extends Model implements Authenticatable
             return $attributes['consent']['id'] == (($consent instanceof Consent) ? $consent->id : $consent);
           }
         }
+        return true;
       })
       ->values()
       ->map(function ($consent) {
@@ -301,7 +302,7 @@ class Customer extends Model implements Authenticatable
 
   /**
    * Determines if the customer has a currently active consent assignment for the given consent
-   * 
+   *
    * @param Consent|int $consent
    * @return boolean
    */
@@ -358,7 +359,7 @@ class Customer extends Model implements Authenticatable
 
   /**
    * Assign consent to customer
-   * 
+   *
    * @param Consent|int $consent
    * @param string $source
    * @param array $options
