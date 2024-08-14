@@ -2,9 +2,11 @@
 
 namespace Netflex\Newsletters;
 
+use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Netflex\API\Facades\API;
+use Netflex\Customers\Customer;
 use Netflex\Newsletters\Contracts\IsConsentConstrained;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
@@ -37,12 +39,13 @@ class AutomationMailChannel
       'body' => base64_encode($body),
       'use_blank_template' => true,
       'newsletter_id' => $message->getNewsletter()->id,
+      'customer_id' => $notifiable instanceof Customer ? $notifiable->id : null,
       //'attachments' => $attachments
     ]));
 
     $type = get_class($notification);
-    $id = data_get($id, 'notification_id', 'unknown');
-    Log::debug("Sending Automation Email of type $type to $notifiable->mail. Notification id = $id");
+    $id = data_get($id, 'notification_id');
+    return $id;
   }
 
   private function inlineCss(string $content, $tags = ['src', 'href']): string
