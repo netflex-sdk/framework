@@ -5,14 +5,20 @@ namespace Netflex\Newsletters;
 use Illuminate\Notifications\Notification;
 use Netflex\API\Facades\API;
 use Netflex\Customers\Customer;
+use Netflex\Newsletters\Contracts\AutomationMailNotification;
 use Netflex\Newsletters\Contracts\IsConsentConstrained;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class AutomationMailChannel
 {
+  /**
+   * @param object $notifiable
+   * @param Notification|AutomationMailNotification $notification
+   * @return array|mixed|null
+   */
   public function send(object $notifiable, Notification $notification)
   {
-    /** @var \Netflex\Newsletters\AutomationMailMessage|\Netflex\Newsletters\Contracts\AutomationMailNotification $message */
+    /** @var \Netflex\Newsletters\AutomationMailMessage $message */
     $message = $notification->toAutomationMail($notifiable);
 
     if ($notification instanceof IsConsentConstrained) {
@@ -39,9 +45,10 @@ class AutomationMailChannel
       'newsletter_id' => $message->getNewsletter()->id,
       'customer_id' => $notifiable instanceof Customer ? $notifiable->id : null,
       'track_links' => 'HtmlOnly',
+      'track_opens' => true,
       //'attachments' => $attachments
     ]));
-    
+
     $id = data_get($id, 'notification_id');
     return $id;
   }
