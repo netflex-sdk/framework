@@ -16,7 +16,7 @@ class AutomationMailMessage implements \Stringable
   private static array $cache = [];
 
   private ?int $mailId = null;
-  private array $payload = [];
+  private array $data = [];
   private array $replacementTags = [];
   private ?string $subject = null;
 
@@ -41,9 +41,16 @@ class AutomationMailMessage implements \Stringable
     return $this;
   }
 
-  public function withVariables(array $payload)
+  /**
+   * Server side variables that will be passed to the template as variables.
+   * Just like when using view('view', $variables);
+   *
+   * @param array $variables
+   * @return $this
+   */
+  public function withData(array $variables)
   {
-    $this->payload = $payload;
+    $this->data = $variables;
     return $this;
   }
 
@@ -62,7 +69,14 @@ class AutomationMailMessage implements \Stringable
     return $this;
   }
 
-  public function withData(array $replacementTags)
+  /**
+   * Replacement tags that will be replaced using handlebars.
+   * This is to allow the user to add certain fields into their manually edited text.
+   *
+   * @param array $replacementTags
+   * @return $this
+   */
+  public function withReplacementTags(array $replacementTags)
   {
     $this->replacementTags['data'] = $replacementTags;
     return $this;
@@ -128,7 +142,8 @@ class AutomationMailMessage implements \Stringable
       'loader' => new StringLoader(),
       'helpers' => new Helpers(),
     ]);
-    $response = $template->toResponse($this->payload);
+
+    $response = $template->toResponse($this->data);
     if (current_mode() === 'live') {
       return $handlebars->render($response, $this->replacementTags);
     }

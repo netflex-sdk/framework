@@ -2,6 +2,7 @@
 
 namespace Netflex\Newsletters;
 
+use Html2Text\Html2Text;
 use Illuminate\Notifications\Notification;
 use Netflex\API\Facades\API;
 use Netflex\Customers\Customer;
@@ -41,6 +42,7 @@ class AutomationMailChannel
       'from' => $message->getFrom(),
       'reply_to' => $message->getReplyTo(),
       'body' => base64_encode($body),
+      'text_body' => base64_encode((new Html2Text($body))->getText()),
       'use_blank_template' => true,
       'newsletter_id' => $message->getNewsletter()->id,
       'customer_id' => $notifiable instanceof Customer ? $notifiable->id : null,
