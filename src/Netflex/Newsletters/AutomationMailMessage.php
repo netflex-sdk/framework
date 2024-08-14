@@ -56,9 +56,9 @@ class AutomationMailMessage implements \Stringable
     return $this;
   }
 
-  public function withReplyTo(string $replyTo)
+  public function withReplyTo(string $address, ?string $name = null)
   {
-    $this->replyTo = $replyTo;
+    $this->replyTo = $name ? "$name <$address>" : $address;
     return $this;
   }
 

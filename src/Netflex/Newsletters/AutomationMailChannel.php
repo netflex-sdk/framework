@@ -2,9 +2,7 @@
 
 namespace Netflex\Newsletters;
 
-use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Log;
 use Netflex\API\Facades\API;
 use Netflex\Customers\Customer;
 use Netflex\Newsletters\Contracts\IsConsentConstrained;
@@ -20,7 +18,7 @@ class AutomationMailChannel
     if ($notification instanceof IsConsentConstrained) {
       $acceptedConsents = collect($notification->requiredConsents());
       if ($acceptedConsents->count() > 0 && $acceptedConsents->filter(fn($id) => $notifiable->hasConsent($id))->count() === 0) {
-        return;
+        return null;
       }
     }
 
@@ -35,15 +33,15 @@ class AutomationMailChannel
       'subject' => $message->getSubject(),
       'to' => $to,
       'from' => $message->getFrom(),
-      //'reply_to' => $replyTo,
+      'reply_to' => $message->getReplyTo(),
       'body' => base64_encode($body),
       'use_blank_template' => true,
       'newsletter_id' => $message->getNewsletter()->id,
       'customer_id' => $notifiable instanceof Customer ? $notifiable->id : null,
+      'track_links' => 'HtmlOnly',
       //'attachments' => $attachments
     ]));
-
-    $type = get_class($notification);
+    
     $id = data_get($id, 'notification_id');
     return $id;
   }
