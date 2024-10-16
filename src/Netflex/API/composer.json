@@ -10,12 +10,12 @@
         }
     ],
     "require": {
-        "illuminate/support": "^8.0|^9.0|^10.0",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
         "netflex/http": "^4.33",
         "php": "^7.4|^8.0"
     },
     "require-dev": {
-        "illuminate/container": "^8.0|^9.0|^10.0"
+        "illuminate/container": "^8.0|^9.0|^10.0|^11.0"
     },
     "autoload": {
         "psr-4": {
