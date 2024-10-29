@@ -184,7 +184,7 @@ class Newsletter extends QueryableModel
    * @param mixed $key
    * @return array|null
    */
-  protected function performRetrieveRequest(?int $relationId = null, $key)
+  protected function performRetrieveRequest(?int $relationId = null, mixed $key = null)
   {
     return $this->getConnection()
       ->get('relations/newsletters/' . $key, true);
@@ -213,7 +213,7 @@ class Newsletter extends QueryableModel
    * @param array $attributes
    * @return void
    */
-  protected function performUpdateRequest(?int $relationId = null, $key, $attributes = [])
+  protected function performUpdateRequest(?int $relationId = null, mixed $key = null, array $attributes = [])
   {
     return $this->getConnection()
       ->put('relations/newsletters/' . $key, $attributes);
@@ -226,7 +226,7 @@ class Newsletter extends QueryableModel
    * @param mixed $key
    * @return bool
    */
-  protected function performDeleteRequest(?int $relationId = null, $key)
+  protected function performDeleteRequest(?int $relationId = null, mixed $key = null)
   {
     try {
       $this->getConnection()
