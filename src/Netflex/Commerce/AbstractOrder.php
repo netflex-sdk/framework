@@ -709,12 +709,14 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
     public function __serialize(): array
     {
-        return ['id' => $this->id];
+        return ['attributes' => [
+            'id' => $this->id,
+        ]];
     }
 
     public function __unserialize(array $data)
     {
-        $this->id = $data['id'];
+        $this->attributes = $data;
         $this->refresh();
     }
 }
