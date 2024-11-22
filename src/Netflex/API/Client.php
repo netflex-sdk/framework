@@ -52,14 +52,9 @@ class Client extends HttpClient implements APIClient
 
   /**
    * @param array $options
+   * @throws MissingCredentialsException
    */
   public function __construct(array $options = [])
-  {
-    parent::__construct($options);
-    $this->setCredentials($options);
-  }
-
-  public function setCredentials(array $options = [])
   {
     $options['base_uri'] = $options['base_uri'] ?? static::BASE_URI;
     $options['auth'] = $options['auth'] ?? null;
@@ -68,7 +63,17 @@ class Client extends HttpClient implements APIClient
       throw new MissingCredentialsException;
     }
 
-    $this->client = new GuzzleClient($options);
+    parent::__construct($options);
+  }
+
+  /**
+   * @param array $options
+   * @return GuzzleClient
+   * @throws MissingCredentialsException
+   */
+  public function setCredentials(array $options = []): GuzzleClient
+  {
+    $this->client = (new static($options))->client;
 
     return $this->client;
   }

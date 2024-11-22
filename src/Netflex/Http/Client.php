@@ -2,6 +2,10 @@
 
 namespace Netflex\Http;
 
+use GuzzleHttp\BodySummarizer;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Utils;
 use Netflex\Http\Contracts\HttpClient;
 use Psr\Http\Message\ResponseInterface;
 
@@ -24,7 +28,22 @@ class Client implements HttpClient
    */
   public function __construct(array $options = [])
   {
-    $this->client = new GuzzleClient($options);
+    // Increases the guzzle error message limit before truncation.
+    // Ref: https://github.com/guzzle/guzzle/issues/2185#issuecomment-800293420,
+    // https://stackoverflow.com/a/78401816
+    $stack = new HandlerStack(Utils::chooseHandler());
+    $stack->push(
+      Middleware::httpErrors(new BodySummarizer(1000000)),
+      'http_errors',
+    );
+    $stack->push(Middleware::redirect(), 'allow_redirects');
+    $stack->push(Middleware::cookies(), 'cookies');
+    $stack->push(Middleware::prepareBody(), 'prepare_body');
+
+    $this->client = new GuzzleClient(array_merge(
+      ['handler' => $stack],
+      $options,
+    ));
   }
 
   protected function buildPayload($payload)
