@@ -2,14 +2,12 @@
 
 namespace Netflex\API;
 
-use Netflex\Http\Client as HttpClient;
-
+use GuzzleHttp\Client as GuzzleClient;
+use Illuminate\Support\Traits\Macroable;
 use Netflex\API\Contracts\APIClient;
 use Netflex\API\Exceptions\MissingCredentialsException;
 use Netflex\API\Facades\APIClientConnectionResolver;
-
-use GuzzleHttp\Client as GuzzleClient;
-use Illuminate\Support\Traits\Macroable;
+use Netflex\Http\Client as HttpClient;
 
 class Client extends HttpClient implements APIClient
 {
@@ -63,6 +61,7 @@ class Client extends HttpClient implements APIClient
   {
     $options['base_uri'] = $options['base_uri'] ?? static::BASE_URI;
     $options['auth'] = $options['auth'] ?? null;
+    $options = $this->setHandler($options);
 
     if (!$options['auth']) {
       throw new MissingCredentialsException;

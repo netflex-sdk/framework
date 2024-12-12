@@ -2,15 +2,17 @@
 
 namespace Netflex\Http;
 
-use Netflex\Http\Contracts\HttpClient;
-use Psr\Http\Message\ResponseInterface;
-
-use Netflex\Http\Concerns\ParsesResponse;
-
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Exception\GuzzleException as Exception;
+use GuzzleHttp\Handler\CurlHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Promise\PromiseInterface;
+use Netflex\Http\Concerns\ParsesResponse;
+use Netflex\Http\Contracts\HttpClient;
+use Netflex\Http\Events\RequestSending;
+use Netflex\Http\Events\ResponseReceived;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class Client implements HttpClient
 {
@@ -24,6 +26,7 @@ class Client implements HttpClient
    */
   public function __construct(array $options = [])
   {
+    $options = $this->setHandler($options);
     $this->client = new GuzzleClient($options);
   }
 
@@ -73,7 +76,7 @@ class Client implements HttpClient
   public function getAsync($url, $assoc = false)
   {
     return $this->getRawAsync($url)
-      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+      ->then(fn($response) => $this->parseResponse($response, $assoc));
   }
 
   /**
@@ -117,7 +120,7 @@ class Client implements HttpClient
   public function putAsync($url, $payload = [], $assoc = false)
   {
     return $this->putRawAsync($url, $payload)
-      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+      ->then(fn($response) => $this->parseResponse($response, $assoc));
   }
 
   /**
@@ -161,7 +164,7 @@ class Client implements HttpClient
   public function postAsync($url, $payload = [], $assoc = false)
   {
     return $this->postRawAsync($url, $payload)
-      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+      ->then(fn($response) => $this->parseResponse($response, $assoc));
   }
 
   /**
@@ -204,6 +207,36 @@ class Client implements HttpClient
   public function deleteAsync($url, $payload = null, $assoc = false)
   {
     return $this->deleteRawAsync($url, $payload)
-      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+      ->then(fn($response) => $this->parseResponse($response, $assoc));
+  }
+
+
+  function emit_events()
+  {
+    return function (callable $handler) {
+      return function (
+        RequestInterface $request,
+        array            $options
+      ) use ($handler) {
+        event(new RequestSending($request));
+
+        $time = microtime(true);
+        $x = $handler($request, $options);
+        $x->then(function (ResponseInterface $response) use ($request, $time) {
+          event(new ResponseReceived($request, $response, (microtime(true) - $time) * 100));
+        });
+
+        return $x;
+      };
+    };
+  }
+
+  protected function setHandler(array $options): array
+  {
+    $stack = new HandlerStack();
+    $stack->setHandler(new CurlHandler());
+    $stack->push($this->emit_events());
+    $options['handler'] = $stack;
+    return $options;
   }
 }
