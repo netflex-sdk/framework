@@ -18,15 +18,17 @@ class QueryBuilderSearchException extends QueryBuilderException
   {
     $body = json_decode($response->getBody());
 
-    $message = "{$body->status} {$body->message}: {$body->reason}";
+    $status = $body->status ?? -1;
+    $message = $body->message ?? 'No message';
+    $reason = $body->reason ?? 'No reason';
 
-    parent::__construct($message, $body->status, $previous);
+    parent::__construct("{$status} {$message}: {$reason}", $status, $previous);
 
     $this->body = $body;
-    $this->status = $body->status;
-    $this->originalMessage = $body->message;
-    $this->reason = $body->reason;
-    $this->phase = $body->phase;
-    $this->stack = $body->stack;
+    $this->status = $status;
+    $this->originalMessage = $message;
+    $this->reason = $reason;
+    $this->phase = $body->phase ?? null;
+    $this->stack = $body->stack ?? [];
   }
 }
