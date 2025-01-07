@@ -2,41 +2,34 @@
 
 namespace Netflex\Query;
 
-use Exception;
 use ArrayAccess;
-use JsonSerializable;
-
-use Netflex\Query\Traits\Queryable;
-use Netflex\Query\Traits\ModelMapper;
-use Netflex\Query\Traits\HasRelation;
-use Netflex\Query\Traits\Resolvable;
-
-use Netflex\Query\Exceptions\MassAssignmentException;
-use Netflex\Query\Exceptions\JsonEncodingException;
-
 use GuzzleHttp\Exception\GuzzleException;
-
-use Illuminate\Support\Arr;
-
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Concerns\HasEvents;
-use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
-use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
-use Illuminate\Database\Eloquent\Concerns\HasAttributes;
-use Illuminate\Database\Eloquent\Concerns\GuardsAttributes;
-
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Netflex\Query\Exceptions\NotFoundException;
-use Netflex\Query\Exceptions\ResolutionFailedException;
+use Illuminate\Database\Eloquent\Concerns\GuardsAttributes;
+use Illuminate\Database\Eloquent\Concerns\HasAttributes;
+use Illuminate\Database\Eloquent\Concerns\HasEvents;
+use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
+use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use JsonSerializable;
 use Netflex\API\Contracts\APIClient;
 use Netflex\API\Facades\APIClientConnectionResolver;
 use Netflex\Files\File;
 use Netflex\Pages\Components\Image;
+use Netflex\Query\Exceptions\JsonEncodingException;
+use Netflex\Query\Exceptions\MassAssignmentException;
+use Netflex\Query\Exceptions\NotFoundException;
+use Netflex\Query\Exceptions\ResolutionFailedException;
+use Netflex\Query\Traits\HasRelation;
+use Netflex\Query\Traits\ModelMapper;
+use Netflex\Query\Traits\Queryable;
+use Netflex\Query\Traits\Resolvable;
 use Netflex\Structure\File as StructureFile;
 
 abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, UrlRoutable
@@ -249,7 +242,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Set the connection associated with the model.
    *
-   * @param  string|null  $name
+   * @param string|null $name
    * @return $this
    */
   public function setConnection($name)
@@ -274,9 +267,9 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Inserts a new record, and returns its id
    *
-   * @property ?int $relationId
-   * @property array $attributes
    * @return mixed
+   * @property array $attributes
+   * @property ?int $relationId
    */
   protected function performInsertRequest(?int $relationId = null, array $attributes = [])
   {
@@ -343,7 +336,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   {
     $model = $this->newInstance([], true);
 
-    $model->setRawAttributes((array) $attributes, true);
+    $model->setRawAttributes((array)$attributes, true);
 
     $model->fireModelEvent('retrieved', false);
 
@@ -378,13 +371,13 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Create a new instance of the given model.
    *
-   * @param  array  $attributes
-   * @param  bool  $exists
+   * @param array $attributes
+   * @param bool $exists
    * @return static
    */
   public function newInstance($attributes = [], $exists = false)
   {
-    $model = new static((array) $attributes);
+    $model = new static((array)$attributes);
 
     $model->exists = $exists;
 
@@ -468,7 +461,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
         $dirty = $this->getDirty();
 
         if (count($dirty) > 0) {
-          $dirty['revision_publish'] = true;
+          $dirty['revision_publish'] = $dirty['revision_publish'] ?? true;
           $this->performUpdateRequest($this->getRelationId(), $this->getKey(), $dirty);
         }
 
@@ -557,7 +550,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Perform any actions that are necessary after the model is saved.
    *
-   * @param  array  $options
+   * @param array $options
    * @return void
    */
   protected function finishSave()
@@ -656,7 +649,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Clone the model into a new, non-existing instance.
    *
-   * @param  array|null $except
+   * @param array|null $except
    * @return static
    */
   public function replicate(array $except = null)
@@ -734,7 +727,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Fill the model with an array of attributes.
    *
-   * @param  array  $attributes
+   * @param array $attributes
    * @return $this
    *
    * @throws MassAssignmentException
@@ -780,7 +773,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Convert the model instance to JSON.
    *
-   * @param  int  $options
+   * @param int $options
    * @return string
    *
    * @throws JsonEncodingException
@@ -819,8 +812,8 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Retrieve the model for a bound value.
    *
-   * @param  mixed  $rawValue
-   * @param  string|null $field
+   * @param mixed $rawValue
+   * @param string|null $field
    * @return \Illuminate\Database\Eloquent\Model|null
    * @throws NotFoundException
    */
@@ -851,7 +844,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
    * Resolves an instance
    *
    * @param mixed $resolveBy
-   * @param  string|null $field
+   * @param string|null $field
    * @return static|Collection|null
    * @throws NotQueryableException If object not queryable
    * @throws QueryException On invalid query
@@ -871,9 +864,9 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Retrieve the child model for a bound value.
    *
-   * @param  string   $childType
-   * @param  mixed   $value
-   * @param  string|null  $field
+   * @param string $childType
+   * @param mixed $value
+   * @param string|null $field
    * @return \Illuminate\Database\Eloquent\Model|null
    */
   public function resolveChildRouteBinding($childType, $value, $field)
@@ -983,7 +976,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Dynamically retrieve attributes on the model.
    *
-   * @param  string  $key
+   * @param string $key
    * @return mixed
    */
   public function __get($key)
@@ -994,8 +987,8 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Dynamically set attributes on the model.
    *
-   * @param  string  $key
-   * @param  mixed  $value
+   * @param string $key
+   * @param mixed $value
    * @return void
    */
   public function __set($key, $value)
@@ -1038,7 +1031,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Set the primary key for the model.
    *
-   * @param  string  $key
+   * @param string $key
    * @return $this
    */
   public function setKeyName($key)
@@ -1061,7 +1054,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Set the data type for the primary key.
    *
-   * @param  string  $type
+   * @param string $type
    * @return $this
    */
   public function setKeyType($type)
@@ -1084,8 +1077,8 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Handle dynamic static method calls into the method.
    *
-   * @param  string  $method
-   * @param  array  $parameters
+   * @param string $method
+   * @param array $parameters
    * @return mixed
    */
   public static function __callStatic($method, $parameters)
@@ -1116,7 +1109,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Register a booting model event with the dispatcher.
    *
-   * @param  \Closure|string  $callback
+   * @param \Closure|string $callback
    * @return void
    */
   protected static function booting($callback)
@@ -1129,7 +1122,7 @@ abstract class QueryableModel implements Arrayable, ArrayAccess, Jsonable, JsonS
   /**
    * Register a booted model event with the dispatcher.
    *
-   * @param  \Closure|string  $callback
+   * @param \Closure|string $callback
    * @return void
    */
   protected static function booted($callback)
