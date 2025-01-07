@@ -511,7 +511,7 @@ class Builder
   /**
    * Sets the debug flag of the query
    * Making the API reflect the compiled query in the output
-   * 
+   *
    * @return static
    */
   public function debug()
@@ -1103,7 +1103,7 @@ class Builder
   /**
    * Only include published results
    * Only applies to entry and page relations
-   * 
+   *
    * @param bool
    *
    * @return static
@@ -1229,9 +1229,9 @@ class Builder
   /**
    * Conditional query
    *
-   * @param boolean|Closure $clause 
-   * @param Closure $then 
-   * @param null|Closure $else 
+   * @param boolean|Closure $clause
+   * @param Closure $then
+   * @param null|Closure $else
    * @return static
    */
   public function if($clause, Closure $then, ?Closure $else = null)
@@ -1249,6 +1249,26 @@ class Builder
     }
 
     return $this;
+  }
+
+  /**
+   *
+   * Returns a Lazy Collection for the given query regardless of if model uses chunking or not
+   *
+   * @return LazyCollection
+   */
+  public function stream(): LazyCollection
+  {
+    return LazyCollection::make(function () {
+      $id = 1;
+      do {
+        $results = $this->paginate($this->size, $id);
+        $id = $results->currentPage() + 1;
+        foreach ($results as $result) {
+          yield $result;
+        }
+      } while ($results->hasMorePages());
+    });
   }
 
   /**

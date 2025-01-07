@@ -3,17 +3,13 @@
 namespace Netflex\Query\Traits;
 
 use Closure;
-
-use Illuminate\Support\Facades\Cache;
-
-use Netflex\Query\Builder;
-use Netflex\Query\QueryableModel;
-
-use Netflex\Query\Traits\HasRelation;
-
-use Netflex\Query\Exceptions\QueryException;
-use Netflex\Query\Exceptions\NotQueryableException;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\LazyCollection;
+use Netflex\Query\Builder;
+use Netflex\Query\Exceptions\NotQueryableException;
+use Netflex\Query\Exceptions\QueryException;
+use Netflex\Query\QueryableModel;
 
 trait Queryable
 {
@@ -108,7 +104,7 @@ trait Queryable
 
   /**
    * Override the publishing status for the model
-   * 
+   *
    * @param bool $disregarding
    * @return Builder
    */
@@ -361,7 +357,7 @@ trait Queryable
 
   /**
    * Picks random items
-   * 
+   *
    * @param int $amount
    * @return static|Collection
    */
@@ -373,9 +369,9 @@ trait Queryable
   }
 
   /**
-   * @param string $query 
-   * @return Builder 
-   * @throws NotQueryableException 
+   * @param string $query
+   * @return Builder
+   * @throws NotQueryableException
    */
   public static function query($query = '*')
   {
@@ -393,5 +389,10 @@ trait Queryable
   public static function if(...$args)
   {
     return static::makeQueryBuilder()->if(...$args);
+  }
+
+  public static function stream(): LazyCollection
+  {
+    return static::makeQueryBuilder()->stream();
   }
 }
