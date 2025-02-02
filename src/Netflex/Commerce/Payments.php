@@ -2,6 +2,8 @@
 
 namespace Netflex\Commerce;
 
+use Illuminate\Support\Collection;
+use Netflex\Commerce\Traits\Reactivity\HasReactiveChildrenProperties;
 use Netflex\Support\ReactiveObject;
 
 /**
@@ -10,6 +12,8 @@ use Netflex\Support\ReactiveObject;
  */
 class Payments extends ReactiveObject
 {
+  use HasReactiveChildrenProperties;
+
   protected $defaults = [
     'total' => 0,
     'items' => []
@@ -20,15 +24,21 @@ class Payments extends ReactiveObject
     'items'
   ];
 
-  /**
-   * @param array|null $items
-   * @return PaymentItemCollection
-   */
-  public function getItemsAttribute($items = [])
+  protected ?PaymentItemCollection $itemsInstance;
+
+  public function setItemsAttribute(Collection|array|null $items): void
   {
-    return PaymentItemCollection::factory($items, $this)
-      ->addHook('modified', function ($items) {
-        $this->__set('items', $items->jsonSerialize());
-      });
+    $this->setItemCollection($items, 'items', 'itemsInstance');
+  }
+
+  public function getItemsAttribute(
+    array|null $items = null,
+  ): PaymentItemCollection {
+    return $this->getItemCollection(
+      $items,
+      PaymentItemCollection::class,
+      'items',
+      'itemsInstance',
+    );
   }
 }

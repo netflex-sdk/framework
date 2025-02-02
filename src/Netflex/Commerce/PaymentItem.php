@@ -99,8 +99,10 @@ class PaymentItem extends ReactiveObject implements Payment
     public function getDataAttribute($data)
     {
         return Properties::factory($data, $this)
-            ->addHook('modified', function ($data) {
-                $this->__set('data', $data->jsonSerialize());
+            ->addHook('modified', function () {
+                $this->modified[] = 'data';
+                $this->modified = array_unique($this->modified);
+                $this->performHook('modified');
             });
     }
 

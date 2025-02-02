@@ -9,10 +9,12 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Netflex\Commerce\Contracts\CartItem;
 use Netflex\Commerce\Contracts\Order as OrderContract;
 use Netflex\Commerce\Exceptions\CartNotMutableException;
+use Netflex\Commerce\Traits\Reactivity\HasReactiveChildrenProperties;
 use Netflex\Query\Traits\HasRelation;
 use Netflex\Query\Traits\ModelMapper;
 use Netflex\Query\Traits\Queryable;
@@ -41,17 +43,17 @@ use TypeError;
  * @property boolean $abandoned
  * @property boolean $abandoned_reminder_sent
  * @property string $abandoned_reminder_mail
- * @property-read Register $register
  * @property string $status
  * @property string $type
  * @property string $ip
  * @property string $user_agent
- * @property-read Cart $cart
- * @property-read Payments $payments
- * @property-read Data $data
- * @property-read LogItemCollection $log
- * @property-read Checkout $checkout
- * @property-read DiscountItemCollection $discounts
+ * @property Register $register
+ * @property Cart $cart
+ * @property Payments $payments
+ * @property Data $data
+ * @property LogItemCollection $log
+ * @property Checkout $checkout
+ * @property DiscountItemCollection $discounts
  */
 class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 {
@@ -60,8 +62,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     use HasRelation;
     use ModelMapper;
     use HasEvents;
-
-
+    use HasReactiveChildrenProperties;
 
     /**
      * The event dispatcher instance.
@@ -245,85 +246,131 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         return (bool)$sent;
     }
 
-    /**
-     * @param object|array|null $register
-     * @return Register
-     */
-    public function getRegisterAttribute($register)
+
+    protected ?Register $registerInstance;
+
+    public function setRegisterAttribute(object|array|null $register): void
     {
-        return Register::factory($register, $this);
+        $this->setReactiveObject($register, 'register', 'registerInstance');
     }
 
-    /**
-     * @param object|array|null $cart
-     * @return Cart
-     */
-    public function getCartAttribute($cart = [])
+    public function getRegisterAttribute(object|array|null $register = null): Register
     {
-        return Cart::factory($cart, $this)
-            ->addHook('modified', function (Cart $cart) {
-                $this->__set('cart', $cart->jsonSerialize());
-            });
+        return $this->getReactiveObject(
+            $register,
+            Register::class,
+            'register',
+            'registerInstance',
+        );
     }
 
-    /**
-     * @param object|array|null $data
-     * @return Data
-     */
-    public function getDataAttribute($data = [])
+    protected ?Cart $cartInstance;
+
+    public function setCartAttribute(object|array|null $cart): void
     {
-        return Data::factory($data, $this)
-            ->addHook('modified', function (Data $data) {
-                $this->__set('data', $data->jsonSerialize());
-            });
+        $this->setReactiveObject($cart, 'cart', 'cartInstance');
+    }
+
+    public function getCartAttribute(object|array|null $cart = null): Cart
+    {
+        return $this->getReactiveObject($cart, Cart::class, 'cart', 'cartInstance');
+    }
+
+    protected ?Data $dataInstance;
+
+    public function setDataAttribute(object|array|null $data): void
+    {
+        $this->setReactiveObject($data, 'data', 'dataInstance');
+    }
+
+    public function getDataAttribute(object|array|null $data = null): Data
+    {
+        return $this->getReactiveObject(
+            $data,
+            Data::class,
+            'data',
+            'dataInstance',
+        );
+    }
+
+    protected ?Payments $paymentsInstanc;
+
+    public function setPaymentsAttribute(object|array|null $payments): void
+    {
+        $this->setReactiveObject($payments, 'payments', 'paymentsInstance');
     }
 
     /**
      * @param object|array|null $payments
      * @return Payments
      */
-    public function getPaymentsAttribute($payments = null)
-    {
-        return Payments::factory($payments, $this)
-            ->addHook('modified', function (Payments $payments) {
-                $this->__set('payments', $payments->jsonSerialize());
-            });
+    public function getPaymentsAttribute(
+        object|array|null $payments = null,
+    ): Payments {
+        return $this->getReactiveObject(
+            $payments,
+            Payments::class,
+            'payments',
+            'paymentsInstance',
+        );
     }
 
-    /**
-     * @param object|array|null $checkout
-     * @return Checkout
-     */
-    public function getCheckoutAttribute($checkout = null)
+    protected ?Checkout $checkoutInstance;
+
+    public function setCheckoutAttribute(object|array|null $checkout): void
     {
-        return Checkout::factory($checkout, $this)
-            ->addHook('modified', function (Checkout $checkout) {
-                $this->__set('checkout', $checkout->jsonSerialize());
-            });
+        $this->setReactiveObject($checkout, 'checkout', 'checkoutInstance');
     }
 
-    /**
-     * @param array|null $discounts
-     * @return DiscountItemCollection
-     */
-    public function getDiscountsAttribute($discounts = [])
+    public function getCheckoutAttribute(
+        object|array|null $checkout = null,
+    ): Checkout {
+        return $this->getReactiveObject(
+            $checkout,
+            Checkout::class,
+            'checkout',
+            'checkoutInstance',
+        );
+    }
+
+    protected ?DiscountItemCollection $discountsInstance;
+
+    public function setDiscountsAttribute(
+        Collection|array|null $discounts,
+    ): void {
+        $this->setItemCollection($discounts, 'discounts', 'discountsInstance');
+    }
+
+    public function getDiscountsAttribute(
+        array|null $discounts = null,
+    ): DiscountItemCollection {
+        return $this->getItemCollection(
+            $discounts,
+            DiscountItemCollection::class,
+            'discounts',
+            'discountsInstance',
+        );
+    }
+
+    protected ?LogItemCollection $logInstance;
+
+    public function setLogAttribute(Collection|array|null $log): void
     {
-        return DiscountItemCollection::factory($discounts, $this)
-            ->addHook('modified', function (DiscountItemCollection $discounts) {
-                $this->__set('discounts', $discounts->jsonSerialize());
-            });
+        $this->setItemCollection($log, 'log', 'logInstance');
     }
 
     /**
      * @param array|null $log
      * @return LogItemCollection
      */
-    public function getLogAttribute($log = [])
+    public function getLogAttribute(array|null $log = []): LogItemCollection
     {
-        return LogItemCollection::factory($log, $this)
-            ->addHook('modified', function (LogItemCollection $log) {
-                $this->__set('log', $log->jsonSerialize());
-            });
+        return $this->getItemCollection(
+            $log,
+            LogItemCollection::class,
+            'log',
+            'logInstance',
+        );
     }
 
     /**

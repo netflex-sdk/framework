@@ -158,8 +158,10 @@ class CartItem extends ReactiveObject implements CartItemContract
   public function getPropertiesAttribute($properties)
   {
     return Properties::factory($properties, $this)
-      ->addHook('modified', function ($properties) {
-        $this->__set('properties', $properties->jsonSerialize());
+      ->addHook('modified', function () {
+        $this->modified[] = 'properties';
+        $this->modified = array_unique($this->modified);
+        $this->performHook('modified');
       });
   }
 
@@ -175,7 +177,7 @@ class CartItem extends ReactiveObject implements CartItemContract
   /**
    * @return array
    */
-  #[\ReturnTypeWillChange] 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize()
   {
     $json = parent::jsonSerialize();
