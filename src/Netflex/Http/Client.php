@@ -15,6 +15,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Exception\GuzzleException as Exception;
+use Psr\Http\Message\UriInterface;
 
 class Client implements HttpClient
 {
@@ -224,5 +225,42 @@ class Client implements HttpClient
   {
     return $this->deleteRawAsync($url, $payload)
       ->then(fn ($response) => $this->parseResponse($response, $assoc));
+  }
+
+  /**
+   * @param string $method
+   * @param UriInterface|string $uri
+   * @param array $options
+   * @param bool $assoc
+   * @return mixed
+   * @throws Exception
+   */
+  public function request(
+    string $method,
+    UriInterface|string $uri = '',
+    array $options = [],
+    bool $assoc = false,
+  ): mixed {
+    return $this->parseResponse(
+      $this->client->request($method, $uri, $options),
+      $assoc,
+    );
+  }
+
+  /**
+   * @param string $method
+   * @param UriInterface|string $uri
+   * @param array $options
+   * @param bool $assoc
+   * @return PromiseInterface
+   */
+  public function requestAsync(
+    string $method,
+    UriInterface|string $uri = '',
+    array $options = [],
+    bool $assoc = false,
+  ): PromiseInterface {
+    return $this->client->requestAsync($method, $uri, $options)
+      ->then(fn ($response) => ($this->parseResponse($response, $assoc)));
   }
 }

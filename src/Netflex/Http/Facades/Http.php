@@ -4,6 +4,7 @@ namespace Netflex\Http\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use GuzzleHttp\Promise\PromiseInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * @method static mixed get(string $url, bool $assoc = false)
@@ -13,7 +14,9 @@ use GuzzleHttp\Promise\PromiseInterface;
  * @method static mixed post(string $url, array|null  $payload = [], bool $assoc = false)
  * @method static PromiseInterface postAsync(string $url, array $payload = [], bool $assoc = false)
  * @method static mixed delete(string $url, array|null $payload = null, bool $assoc = false)
- * @method static PromiseInterface deleteAsync(string $url, bool $assoc = false)
+ * @method static PromiseInterface deleteAsync(string $url, array|null $payload = null, bool $assoc = false)
+ * @method static mixed request(string $method, UriInterface|string $uri, array|null $payload = [], bool $assoc = false)
+ * @method static PromiseInterface requestAsync(string $method, UriInterface|string $uri, array $options = [], bool $assoc = false)
  *
  * @see \Netflex\Http\Client
  */
