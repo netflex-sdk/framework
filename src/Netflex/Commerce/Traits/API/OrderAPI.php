@@ -67,9 +67,27 @@ trait OrderAPI
 
             // Put updates
             if (!empty($payload)) {
-                API::put(static::basePath() . $this->id, $payload);
+                $uri = static::basePath() . $this->id;
+                $response = API::request(
+                    'put',
+                    $uri,
+                    [
+                        'json' => $payload,
+                        'headers' => [
+                            'Prefer' => [
+                                'update-behavior=full',
+                            ],
+                        ]
+                    ],
+                    true,
+                );
 
-                $this->forgetInCache();
+                foreach ($response as $key => $value) {
+                    $this->offsetUnset($key);
+                    $this->attributes[$key] = $value;
+                }
+
+                $this->addToCache();
             }
 
             $this->fireModelEvent('updated', false);
