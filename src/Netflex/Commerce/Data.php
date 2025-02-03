@@ -11,10 +11,6 @@ class Data extends ReactiveObject
 
   public function toModifiedArray(): array
   {
-    if (!empty($this->modified)) {
-      return json_decode(json_encode($this->attributes), true);
-    }
-
-    return [];
+    return json_decode(json_encode($this->attributes), true);
   }
 }
