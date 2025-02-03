@@ -390,12 +390,12 @@ trait OrderAPI
             && static::$useCache
             && class_exists('Illuminate\Support\Facades\Cache')
         ) {
-            \Illuminate\Support\Facades\Cache::add(
+            \Illuminate\Support\Facades\Cache::put(
                 static::$cacheBaseKey . '/' . $this->id,
                 $this->attributes,
                 static::$cacheTTL
             );
-            \Illuminate\Support\Facades\Cache::add(
+            \Illuminate\Support\Facades\Cache::put(
                 static::$cacheBaseKey . '/' . $this->secret,
                 $this->attributes,
                 static::$cacheTTL
