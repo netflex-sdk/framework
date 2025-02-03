@@ -3,6 +3,7 @@
 namespace Netflex\Commerce;
 
 use Carbon\Carbon;
+use Netflex\Commerce\Traits\Reactivity\HasReactiveChildrenProperties;
 use Netflex\Support\ReactiveObject;
 use Netflex\Commerce\Traits\API\CartItemAPI;
 use Netflex\Structure\Traits\Localizable;
@@ -46,6 +47,7 @@ class CartItem extends ReactiveObject implements CartItemContract
 {
   use CartItemAPI;
   use Localizable;
+  use HasReactiveChildrenProperties;
 
   protected $readOnlyAttributes = [
     'id',
@@ -151,18 +153,22 @@ class CartItem extends ReactiveObject implements CartItemContract
     return (float) $value;
   }
 
-  /**
-   * @param mixed $properties
-   * @return Properties
-   */
-  public function getPropertiesAttribute($properties)
+  protected ?Properties $propertiesInstance;
+
+  public function setPropertiesAttribute(object|array|null $properties): void
   {
-    return Properties::factory($properties, $this)
-      ->addHook('modified', function () {
-        $this->modified[] = 'properties';
-        $this->modified = array_unique($this->modified);
-        $this->performHook('modified');
-      });
+    $this->setReactiveObject($properties, 'properties', 'propertiesInstance');
+  }
+
+  public function getPropertiesAttribute(
+    object|array|null $properties = null
+  ): Properties {
+    return $this->getReactiveObject(
+      $properties,
+      Properties::class,
+      'properties',
+      'propertiesInstance',
+    );
   }
 
   /**
