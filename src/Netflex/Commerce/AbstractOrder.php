@@ -753,4 +753,13 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         $this->lockOrder();
         $this->refreshOrder();
     }
+
+    public function toModifiedArray(): array
+    {
+      $modified = parent::toModifiedArray();
+
+      unset($modified['id']);
+
+      return $modified;
+    }
 }
