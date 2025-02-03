@@ -46,6 +46,10 @@ trait HasReactiveChildrenProperties
 
       unset($this->{$protectedReactiveObjectKey});
     }
+
+    $this->modified[] = $attributeKey;
+    $this->modified = array_unique($this->modified);
+    $this->performHook('modified');
   }
 
   /**
@@ -116,6 +120,10 @@ trait HasReactiveChildrenProperties
 
       unset($this->{$protectedItemCollectionKey});
     }
+
+    $this->modified[] = $attributeKey;
+    $this->modified = array_unique($this->modified);
+    $this->performHook('modified');
   }
 
   /**
