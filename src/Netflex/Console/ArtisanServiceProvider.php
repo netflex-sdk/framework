@@ -52,6 +52,7 @@ use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Console\ListenCommand;
 use Illuminate\Queue\Console\RetryCommand;
+use Illuminate\Queue\Console\RestartCommand;
 use Netflex\Console\Commands\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 
@@ -84,6 +85,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     'QueueWork' => 'command.queue.work',
     'QueueListen' => 'command.queue.listen',
     'QueueRetry' => 'command.queue.retry',
+    'QueueRestart' => 'command.queue.restart',
   ];
 
   /**
@@ -178,6 +180,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
   {
     $this->app->singleton('command.queue.retry', function ($app) {
       return new RetryCommand;
+    });
+  }
+
+  /**
+   * Register the command.
+   *
+   * @return void
+   */
+  protected function registerQueueRestartCommand()
+  {
+    $this->app->singleton('command.queue.restart', function ($app) {
+      return new RestartCommand($app['cache.store']);
     });
   }
 
