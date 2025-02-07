@@ -37,6 +37,8 @@ trait HasReactiveChildrenProperties
       $this->attributes[$attributeKey] = $object->jsonSerialize();
     } else {
       if (is_object($object) || is_array($object)) {
+        $this->attributes[$attributeKey] = [];
+
         foreach ($object as $property => $value) {
           $this->attributes[$attributeKey][$property] = $value;
         }
