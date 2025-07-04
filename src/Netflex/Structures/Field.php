@@ -139,9 +139,27 @@ class Field implements CastsAttributes
       case 'automation-email':
         return AutomationEmail::find($value);
       case 'file':
-        return StructureFile::cast($value);
+        // Some files and images are returned from Capi with a file_id attribute
+        // rather than file.
+        return StructureFile::cast(
+          $value !== null
+            ? array_merge(
+            ['file' => $value['file_id'] ?? null],
+            $value,
+          )
+            : null
+        );
       case 'image':
-        return Image::cast($value);
+        // Some files and images are returned from Capi with a file_id attribute
+        // rather than file.
+        return Image::cast(
+          $value !== null
+            ? array_merge(
+            ['file' => $value['file_id'] ?? null],
+            $value,
+          )
+            : null
+        );
       case 'editor-small':
       case 'editor-large':
         return $value ? new HtmlString($value) : null;
