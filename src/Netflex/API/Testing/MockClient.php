@@ -13,6 +13,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\RequestException;
 
 use Illuminate\Support\Traits\Macroable;
+use Psr\Http\Message\RequestInterface;
 
 class MockClient implements APIClient
 {
@@ -136,10 +137,21 @@ class MockClient implements APIClient
    * @return mixed
    * @throws Exception
    */
-  public function delete($url, $assoc = false)
+  public function delete($url, $payload = null, $assoc = false)
   {
     return $this->parseResponse(
       $this->client->delete($url),
+      $assoc
+    );
+  }
+
+  public function send(
+    RequestInterface $request,
+    array $options = [],
+    bool $assoc = false,
+  ) {
+    return $this->parseResponse(
+      $this->client->send($request, $options),
       $assoc
     );
   }

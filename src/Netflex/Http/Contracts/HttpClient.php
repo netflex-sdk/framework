@@ -3,6 +3,8 @@
 namespace Netflex\Http\Contracts;
 
 use Exception;
+use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\RequestInterface;
 
 interface HttpClient
 {
@@ -39,4 +41,18 @@ interface HttpClient
    * @throws Exception
    */
   public function delete($url, $payload = null, $assoc = false);
+
+  /**
+   * @param RequestInterface $request
+   * @param array $options Request options to apply to the given request and to
+   *                       the transfer. See \GuzzleHttp\RequestOptions.
+   * @param bool $assoc
+   *
+   * @throws GuzzleException
+   */
+  public function send(
+    RequestInterface $request,
+    array $options = [],
+    bool $assoc = false,
+  );
 }

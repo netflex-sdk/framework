@@ -7,13 +7,13 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Utils;
 use Netflex\Http\Contracts\HttpClient;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 use Netflex\Http\Concerns\ParsesResponse;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Exception\GuzzleException as Exception;
 use Psr\Http\Message\UriInterface;
 
@@ -224,6 +224,67 @@ class Client implements HttpClient
   public function deleteAsync($url, $payload = null, $assoc = false)
   {
     return $this->deleteRawAsync($url, $payload)
+      ->then(fn ($response) => $this->parseResponse($response, $assoc));
+  }
+
+  /**
+   * @param RequestInterface $request
+   * @param array $options Request options to apply to the given
+   *                       request and to the transfer. See \GuzzleHttp\RequestOptions.
+   *
+   * @throws GuzzleException
+   */
+  public function sendRaw(
+    RequestInterface $request,
+    array $options = [],
+  ) {
+    return $this->client->send($request, $options);
+  }
+
+  /**
+   * @param RequestInterface $request
+   * @param array $options Request options to apply to the given
+   *                       request and to the transfer. See \GuzzleHttp\RequestOptions.
+   *
+   * @throws GuzzleException
+   */
+  public function sendAsyncRaw(
+    RequestInterface $request,
+    array $options = [],
+  ) {
+    return $this->client->sendAsync($request, $options);
+  }
+
+  /**
+   * @param RequestInterface $request
+   * @param array $options Request options to apply to the given
+   *                       request and to the transfer. See \GuzzleHttp\RequestOptions.
+   * @param bool $assoc
+   *
+   * @throws GuzzleException
+   */
+  public function send(
+    RequestInterface $request,
+    array $options = [],
+    $assoc = false,
+  ) {
+    return $this->parseResponse($this->sendRaw($request, $options), $assoc);
+  }
+
+  /**
+   * @param RequestInterface $request
+   * @param array $options Request options to apply to the given
+   *                       request and to the transfer. See \GuzzleHttp\RequestOptions.
+   * @param bool $assoc
+   *
+   * @throws GuzzleException
+   */
+  public function sendAsync(
+    RequestInterface $request,
+    array $options = [],
+    $assoc = false,
+  ) {
+    return $this->sendAsyncRaw($request, $options)
       ->then(fn ($response) => $this->parseResponse($response, $assoc));
   }
 
