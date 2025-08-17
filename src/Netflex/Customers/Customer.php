@@ -402,4 +402,9 @@ class Customer extends Model implements Authenticatable
     $this->getConnection()->put("relations/customers/membership/{$this->id}/$id");
     return true;
   }
+
+  public function getAuthPasswordName(): string
+  {
+    return '';
+  }
 }

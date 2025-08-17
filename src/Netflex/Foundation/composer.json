@@ -4,9 +4,9 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "illuminate/translation": "^8.0",
-        "netflex/api": "^4.33",
-        "netflex/support": "^4.33"
+        "illuminate/translation": "^12.0",
+        "netflex/api": "^6.0",
+        "netflex/support": "^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -17,16 +17,16 @@
         ]
     },
     "require-dev": {
-        "illuminate/cache": "^8.0",
-        "illuminate/container": "^8.0",
-        "illuminate/filesystem": "^8.0",
+        "illuminate/cache": "^12.0",
+        "illuminate/container": "^12.0",
+        "illuminate/filesystem": "^12.0",
         "larapack/dd": "^1.1",
         "vlucas/phpdotenv": "^5.2",
-        "php": "^7.4|^8.0"
+        "php": "^8.2"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.33.x-dev"
+            "dev-master": "6.0.x-dev"
         },
         "laravel": {
             "providers": [

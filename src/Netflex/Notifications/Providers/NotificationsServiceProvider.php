@@ -8,7 +8,7 @@ use Illuminate\Notifications\ChannelManager;
 use Netflex\Notifications\Channels\SMS;
 use Netflex\Notifications\Transport\NotificationsTransport;
 
-class NotifcationsServiceProvider extends ServiceProvider
+class NotificationsServiceProvider extends ServiceProvider
 {
   public function boot()
   {

@@ -8,6 +8,9 @@
 
 
 This repository contains the full Netflex Framework. All packages are built from this repository, and split into separate read only subtrees.
+
+The 6.x version is meant to be used with Laravel 12. It has *not* been tested extensively, and there is no guarantee that all the Netflex framwork's features will work. 
+
 ## Documentation
 
 The full documentation for the framework and related packages is [located here](https://netflex-sdk.github.io/#/).

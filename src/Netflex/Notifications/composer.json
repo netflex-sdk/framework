@@ -7,13 +7,13 @@
         "sort-packages": true
     },
     "require": {
-        "illuminate/mail": "^8.0",
-        "illuminate/support": "^8.0",
+        "illuminate/mail": "^12.0",
+        "illuminate/support": "^12.0",
         "mustache/mustache": "^2.14.1",
-        "netflex/api": "^4.33",
-        "netflex/foundation": "^4.33",
-        "netflex/renderer": "^4.33",
-        "php": "^7.4|^8.0"
+        "netflex/api": "^6.0",
+        "netflex/foundation": "^6.0",
+        "netflex/renderer": "^6.0",
+        "php": "^8.2"
     },
     "autoload": {
         "psr-4": {
@@ -25,11 +25,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "4.33.x-dev"
+            "dev-master": "6.0.x-dev"
         },
         "laravel": {
             "providers": [
-                "Netflex\\Notifications\\Providers\\NotifcationsServiceProvider"
+                "Netflex\\Notifications\\Providers\\NotificationsServiceProvider"
             ]
         }
     }

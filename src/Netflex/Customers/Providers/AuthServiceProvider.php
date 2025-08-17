@@ -99,4 +99,11 @@ class AuthServiceProvider extends ServiceProvider implements UserProvider
   {
     return !!($this->model::authenticate($credentials));
   }
+
+  public function rehashPasswordIfRequired(
+    Authenticatable $user,
+    #[\SensitiveParameter] array $credentials,
+    bool $force = false
+  ) {
+  }
 }
