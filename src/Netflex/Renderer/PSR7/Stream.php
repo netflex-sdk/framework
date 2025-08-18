@@ -16,19 +16,19 @@ final class Stream implements StreamInterface
      * @param string $content
      * @return static
      */
-    public static function make(string $content)
+    public static function make(string $content): Stream
     {
-        $stream = new static;
+        $stream = new Stream();
         $stream->content = $content;
         return $stream;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getContents();
     }
 
-    public function close()
+    public function close(): void
     {
         throw new RuntimeException('Stream not closable');
     }
@@ -38,57 +38,59 @@ final class Stream implements StreamInterface
         return null;
     }
 
-    public function getSize()
+    public function getSize(): ?int
     {
         return strlen($this->content);
     }
 
-    public function tell()
+    public function tell(): int
     {
         return 0;
     }
 
-    public function eof()
+    public function eof(): bool
     {
         return false;
     }
 
-    public function isSeekable()
+    public function isSeekable(): bool
     {
         return false;
     }
 
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek($offset, $whence = SEEK_SET): void
     {
         throw new RuntimeException('Stream not seekable');
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         throw new RuntimeException('Stream not seekable');
     }
 
-    public function isWritable()
+    public function isWritable(): bool
     {
         return true;
     }
 
-    public function write($string)
+    public function write($string): int
     {
         $this->content = $string;
+
+        return strlen($string);
     }
 
-    public function isReadable()
+    public function isReadable(): bool
     {
         return true;
     }
 
-    public function read($length)
+    public function read($length): string
     {
         return substr($this->content, 0, $length);
     }
 
-    public function getContents()
+    public function getContents(): string
     {
         return $this->content;
     }
