@@ -2,134 +2,87 @@
 
 namespace Netflex\Notifications\Transport;
 
-use Exception;
-use ReflectionClass;
-
-use Swift_Attachment;
-use Swift_Mime_SimpleMessage;
-use Swift_ByteStream_FileByteStream;
-
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Variable;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\MessageConverter;
+use Symfony\Component\Mime\Part\DataPart;
 
-use Illuminate\Mail\Transport\Transport;
-use Illuminate\Support\Str;
-
-class NotificationsTransport extends Transport
+class NotificationsTransport extends AbstractTransport
 {
-  /**
-   * {@inheritdoc}
-   */
-  public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+  protected function doSend(SentMessage $message): void
   {
-    $this->beforeSendPerformed($message);
+    $email = MessageConverter::toEmail($message->getOriginalMessage());
 
     $replyTo = null;
-
-    /** @var array|string|null */
-    $replyToHeader = $message->getReplyTo();
-
-    if (is_array($replyToHeader)) {
-      $address = array_key_first($replyToHeader);
-      $name = $replyToHeader[$address];
-
-      $replyTo = $name ? "{$name} <{$address}>" : $address;
+    $replyToAddresses = $email->getReplyTo();
+    if (!empty($replyToAddresses)) {
+      $addr = $replyToAddresses[0];
+      $replyTo = $addr->getName()
+        ? sprintf('%s <%s>', $addr->getName(), $addr->getAddress())
+        : $addr->getAddress();
     }
 
-    if (is_string($replyToHeader)) {
-      $replyTo = $replyToHeader;
+    $attachments = [];
+    foreach ($email->getAttachments() as $part) {
+      if (!$part instanceof DataPart) {
+        continue;
+      }
+
+      $filename = $part->getFilename() ?? 'attachment';
+      $contentType = $part->getMediaType() . '/' . $part->getMediaSubtype();
+
+      $binary = $part->getBody();
+      $link = 'data://' . $contentType . ';base64,' . base64_encode($binary);
+
+      $attachments[] = [
+        'filename' => $filename,
+        'link' => $link,
+      ];
     }
 
-    $attachments = collect($message->getChildren())
-      ->filter(function ($child) {
-        return $child instanceof Swift_Attachment;
-      })
-      ->map(function (Swift_Attachment $attachment) {
-        $filename = $attachment->getFilename();
-        $contentType = $attachment->getContentType();
-        $content = null;
+    $body = $email->getHtmlBody() ?? $email->getTextBody() ?? '';
 
-        try {
-          $reflectionClass = (new ReflectionClass($attachment))->getParentClass()->getParentClass();
-          $reflectionProperty = $reflectionClass->getProperty('body');
-          $reflectionProperty->setAccessible(true);
-
-          /** @var Swift_ByteStream_FileByteStream $body */
-          $path = $reflectionProperty->getValue($attachment)->getPath();
-
-          if (Str::startsWith($path, ['http://', 'https://'])) {
-            $content = $path;
-          } else {
-            $content = 'data://' . $contentType . ';base64,' . base64_encode(file_get_contents($path));
-          }
-        } catch (Exception $e) {
-          $content = 'data://' . $contentType . ';base64,' . base64_encode($attachment->getBody());
-        }
-
-        return [
-          'filename' => $filename,
-          'link' => $content
-        ];
-      })
-      ->values()
-      ->toArray();
-
-    $response = API::post('relations/notifications', array_filter([
-      'subject' => $message->getSubject(),
-      'to' => $this->getTo($message),
-      'from' => $this->getFrom($message),
+    $payload = array_filter([
+      'subject' => $email->getSubject(),
+      'to' => $this->mapTo($email->getTo()),
+      'from' => $this->mapFrom($email->getFrom()),
       'reply_to' => $replyTo,
-      'body' => base64_encode($message->getBody()),
+      'body' => base64_encode($body),
       'use_blank_template' => true,
-      'attachments' => $attachments
-    ]));
+      'attachments' => $attachments,
+    ], static fn ($v) => $v !== null && $v !== []);
 
-    $message->getHeaders()->addTextHeader('X-Notification-ID', $response->notification_id);
+    $response = API::post('relations/notifications', $payload);
 
-    $this->sendPerformed($message);
-
-    return $this->numberOfRecipients($message);
+    $email->getHeaders()->addTextHeader('X-Notification-ID', (string) data_get($response, 'notification_id'));
   }
 
-  /**
-   * @param Swift_Mime_SimpleMessage $message
-   * @return array
-   */
-  public function getTo(Swift_Mime_SimpleMessage $message)
+  public function __toString(): string
   {
-    $recipients = $message->getTo();
-    return collect($recipients)
-      ->map(function ($display, $address) {
-        return [
-          'mail' => $address,
-          'name' => $display
-        ];
-      })->values()
-      ->toArray();
+    return 'netflex-notifications';
   }
 
-  /**
-   * @param Swift_Mime_SimpleMessage $message
-   * @return array
-   */
-  public function getFrom(Swift_Mime_SimpleMessage $message)
+  /** @param Address[] $addresses */
+  protected function mapTo(array $addresses): array
   {
-    $from = collect($message->getFrom())
-      ->slice(0, 1)
-      ->map(function ($display, $address) {
-        return [
-          'mail' => $address ?? Variable::get('mail_sender_mail'),
-          'name' => $display ?? Variable::get('mail_sender_name')
-        ];
-      })->first();
+    return collect($addresses)
+      ->map(fn (Address $a) => ['mail' => $a->getAddress(), 'name' => $a->getName()])
+      ->values()
+      ->all();
+  }
 
-    if ($from) {
-      return $from;
-    }
+  /** @param Address[] $addresses */
+  protected function mapFrom(array $addresses): array
+  {
+    /** @var Address|null $first */
+    $first = $addresses[0] ?? null;
 
     return [
-      'mail' => Variable::get('mail_sender_mail'),
-      'name' => Variable::get('mail_sender_name')
+      'mail' => $first?->getAddress() ?? (string) Variable::get('mail_sender_mail'),
+      'name' => $first?->getName() ?? (string) Variable::get('mail_sender_name'),
     ];
   }
 }
