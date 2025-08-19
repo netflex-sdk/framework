@@ -11,9 +11,6 @@
             "Netflex\\Newsletters\\": ""
         }
     },
-    "replace": {
-        "netflex/newsletters": "*"
-    },
     "require": {
         "netflex/api": "^6.0",
         "netflex/pages": "^6.0",
