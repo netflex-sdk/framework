@@ -9,7 +9,10 @@
     "autoload": {
         "psr-4": {
             "Netflex\\Newsletters\\": ""
-        }
+        },
+        "files": [
+            "helpers.php"
+        ]
     },
     "require": {
         "netflex/api": "^6.0",
