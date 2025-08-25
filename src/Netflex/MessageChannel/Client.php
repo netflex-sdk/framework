@@ -2,32 +2,42 @@
 
 namespace Netflex\MessageChannel;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Netflex\API\Client as API;
 use Illuminate\Broadcasting\Channel;
 
 use Illuminate\Support\Traits\Macroable;
-use Netflex\MessageChannel\Facades\MessageChannel;
+use Netflex\API\Exceptions\MissingCredentialsException;
 
 class Client
 {
   use Macroable;
 
   /** @var string */
-  public $channel;
+  public string $channel;
 
   /** @var API */
-  protected $client;
+  protected API $client;
 
-  /** @var IncomingMessageHandler|null */
-  protected $incomingMessageHandler;
+  /** @var Handler|null */
+  protected Handler|null $incomingMessageHandler;
 
   /**
    * @param string $publicKey
    * @param string $privateKey
-   * @param IncomingMessageHandler|null $incomingMessageHandler
+   * @param Handler|null $incomingMessageHandler
+   * @param string $baseURI
+   * @param bool $prefixWithChannel
+   * @throws MissingCredentialsException
+   * @throws GuzzleException
    */
-  public function __construct($publicKey, $privateKey, $incomingMessageHandler = null, $baseURI = 'broadcast.netflexapp.com', $prefixWithChannel = true)
-  {
+  public function __construct(
+    string $publicKey,
+    string $privateKey,
+    Handler|null $incomingMessageHandler = null,
+    string $baseURI = 'broadcast.netflexapp.com',
+    bool $prefixWithChannel = true,
+  ) {
     $this->channel = md5_to_uuid(md5($publicKey));
     $this->incomingMessageHandler = $incomingMessageHandler;
 
@@ -49,8 +59,8 @@ class Client
       'base_uri' => $baseURI,
       'auth' => [
         $publicKey,
-        $privateKey
-      ]
+        $privateKey,
+      ],
     ]);
 
     $this->register();
@@ -58,22 +68,24 @@ class Client
 
   /**
    * Retrieves the channel key
-   * 
+   *
    * @return string
    */
-  public function key()
+  public function key(): string
   {
     return $this->channel;
   }
 
   /**
    * Registers a Handler
-   * 
-   * @param Handler $handler = null
+   *
+   * @param Handler|null $handler = null
+   * @return bool
+   * @throws GuzzleException
    */
-  public function register(Handler $handler = null)
+  public function register(Handler|null $handler = null): bool
   {
-    $this->incomingMessageHandler = $handler ? $handler : $this->incomingMessageHandler;
+    $this->incomingMessageHandler = $handler ?: $this->incomingMessageHandler;
 
     if ($this->incomingMessageHandler) {
       $this->client->post('register', $this->incomingMessageHandler);
@@ -85,17 +97,23 @@ class Client
 
   /**
    * Broadcasts the message to the given topic
-   * 
+   *
    * @param mixed $message
-   * @param Channel|string $topic
+   * @param string $topic
    * @return mixed
+   * @throws GuzzleException
    */
-  public function broadcast($message, $topic = 'public')
+  public function broadcast(mixed $message, string $topic = 'public'): mixed
   {
     $topic = $topic instanceof Channel ? $topic->name : $topic;
     $response = $this->client->post("broadcast/$topic", ['data' => $message]);
 
-    if (!$response->handler || $response->handler->endpoint !== $this->incomingMessageHandler->endpoint) {
+    if (
+      !$response->handler
+      || (
+        $response->handler->endpoint !== $this->incomingMessageHandler->endpoint
+      )
+    ) {
       $this->register();
     }
 
