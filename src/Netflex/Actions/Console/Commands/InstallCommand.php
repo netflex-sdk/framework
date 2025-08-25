@@ -3,8 +3,6 @@
 namespace Netflex\Actions\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use Netflex\API\Facades\API;
 use Netflex\Foundation\Variable;
 

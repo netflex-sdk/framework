@@ -2,12 +2,12 @@
 
 namespace Netflex\Actions\Providers;
 
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\ServiceProvider;
 use Netflex\Actions\Console\Commands\InstallCommand;
 use Netflex\Actions\Console\Commands\InstallServiceProvider;
 use Netflex\Actions\Console\Commands\ScaffoldOrdersRefunds;
 
-class CommandProvider extends \Illuminate\Support\ServiceProvider
+class CommandProvider extends ServiceProvider
 {
     public function register()
     {
