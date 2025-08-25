@@ -37,7 +37,7 @@ use Netflex\Query\QueryableModel as Model;
  * @property bool $has_error
  * @property bool $password_reset
  * @property SegmentData[] $segmentData
- * @property GroupCollection[] $groups
+ * @property array[] $groups
  * @property ConsentAssignment[] $consents
  * @property-read array $channels
  **/
@@ -63,7 +63,7 @@ class Customer extends Model implements Authenticatable
   /**
    * @var string|null Defines which (if any) field should be used to perform token based authentication
    * */
-  protected $tokenField = null;
+  protected ?string $tokenField = null;
 
   /**
    * Retrieves a record by key
@@ -72,21 +72,27 @@ class Customer extends Model implements Authenticatable
    * @param mixed $key
    * @return array|null
    */
-  protected function performRetrieveRequest(?int $relationId = null, mixed $key = null)
-  {
-    return $this->getConnection()->get('relations/customers/customer/' . $key, true);
+  protected function performRetrieveRequest(
+    ?int $relationId = null,
+    mixed $key = null,
+  ) {
+    return $this->getConnection()
+      ->get('relations/customers/customer/' . $key, true);
   }
 
   /**
    * Inserts a new record, and returns its id
    *
-   * @property int|null $relationId
-   * @property array $attributes
    * @return mixed
+   * @property array $attributes
+   * @property int|null $relationId
    */
-  protected function performInsertRequest(?int $relationId = null, array $attributes = [])
-  {
-    $response = $this->getConnection()->post('relations/customers/customer', $attributes);
+  protected function performInsertRequest(
+    ?int $relationId = null,
+    array $attributes = [],
+  ) {
+    $response = $this->getConnection()
+      ->post('relations/customers/customer', $attributes);
 
     return $response->customer_id;
   }
@@ -99,9 +105,13 @@ class Customer extends Model implements Authenticatable
    * @param array $attributes
    * @return void
    */
-  protected function performUpdateRequest(?int $relationId = null, mixed $key = null, array $attributes = [])
-  {
-    return $this->getConnection()->put('relations/customers/customer/' . $key, $attributes);
+  protected function performUpdateRequest(
+    ?int $relationId = null,
+    mixed $key = null,
+    array $attributes = [],
+  ) {
+    return $this->getConnection()
+      ->put('relations/customers/customer/' . $key, $attributes);
   }
 
   /**
@@ -111,8 +121,10 @@ class Customer extends Model implements Authenticatable
    * @param mixed $key
    * @return bool
    */
-  protected function performDeleteRequest(?int $relationId = null, mixed $key = null)
-  {
+  protected function performDeleteRequest(
+    ?int $relationId = null,
+    mixed $key = null,
+  ) {
     return false;
   }
 
@@ -153,12 +165,13 @@ class Customer extends Model implements Authenticatable
   public function setAuthPassword($password)
   {
     try {
-      $this->getConnection()->put("relations/customers/auth/force/{$this->id}", [
-        'password' => $password
-      ]);
+      $this->getConnection()->put(
+        "relations/customers/auth/force/{$this->id}",
+        ['password' => $password],
+      );
 
       return true;
-    } catch (Exception $e) {
+    } catch (Exception) {
       return false;
     }
   }
@@ -176,7 +189,7 @@ class Customer extends Model implements Authenticatable
   /**
    * Set the token value for the "remember me" session.
    *
-   * @param  string  $value
+   * @param string $value
    * @return void
    */
   public function setRememberToken($value)
@@ -204,7 +217,7 @@ class Customer extends Model implements Authenticatable
   public static function authenticate($credentials)
   {
     if (count($credentials) && array_key_exists('api_token', $credentials)) {
-      $tokenField = with(new static)->tokenField;
+      $tokenField = with(new static())->tokenField;
 
       if ($tokenField !== null) {
         try {
@@ -215,10 +228,15 @@ class Customer extends Model implements Authenticatable
       }
     }
 
-    $model = new static;
+    $model = new static();
 
     $emailOrUsername = $credentials['email'] ?? $credentials['mail'] ?? $credentials['username'] ?? null;
-    $field = (array_key_exists('email', $credentials) || array_key_exists('mail', $credentials)) ? 'mail' : (array_key_exists('username', $credentials) ? 'username' : null);
+    $field = (array_key_exists('email', $credentials) || array_key_exists(
+        'mail',
+        $credentials,
+      ))
+      ? 'mail'
+      : (array_key_exists('username', $credentials) ? 'username' : null);
     $group = $credentials['group'] ?? null;
 
     try {
@@ -226,7 +244,7 @@ class Customer extends Model implements Authenticatable
         'username' => $emailOrUsername,
         'password' => $credentials['password'] ?? null,
         'field' => $field,
-        'group' => $group
+        'group' => $group,
       ]);
 
       if ($response->authenticated) {
@@ -280,11 +298,17 @@ class Customer extends Model implements Authenticatable
    */
   public function getConsents($consent = null)
   {
-    return collect($this->getConnection()->get('relations/consents/customer/' . $this->id, true))
+    return collect(
+      $this->getConnection()->get(
+        'relations/consents/customer/' . $this->id,
+        true,
+      ),
+    )
       ->filter(function ($attributes) use ($consent) {
         if ($consent) {
           if (isset($attributes['consent']['id'])) {
-            return $attributes['consent']['id'] == (($consent instanceof Consent) ? $consent->id : $consent);
+            return $attributes['consent']['id'] == (($consent instanceof Consent)
+                ? $consent->id : $consent);
           }
         }
       })
@@ -330,25 +354,42 @@ class Customer extends Model implements Authenticatable
     $consents = $this->getConsents($consent);
     $activeConsent = null;
 
-    $consents = $consents->sort(function (ConsentAssignment $a, ConsentAssignment $b) {
-      if ($a->revoked_timestamp && $b->revoked_timestamp) {
-        return strcmp($a->revoked_timestamp->toDateTimeString(), $b->revoked_timestamp->toDateTimeString());
-      }
+    $consents = $consents->sort(
+      function (ConsentAssignment $a, ConsentAssignment $b) {
+        if ($a->revoked_timestamp && $b->revoked_timestamp) {
+          return strcmp(
+            $a->revoked_timestamp->toDateTimeString(),
+            $b->revoked_timestamp->toDateTimeString(),
+          );
+        }
 
-      if (!$a->revoked_timestamp && !$b->revoked_timestamp) {
-        return strcmp($a->timestamp->toDateTimeString(), $b->timestamp->toDateTimeString());
-      }
+        if (!$a->revoked_timestamp && !$b->revoked_timestamp) {
+          return strcmp(
+            $a->timestamp->toDateTimeString(),
+            $b->timestamp->toDateTimeString(),
+          );
+        }
 
-      if ($a->revoked_timestamp && !$b->revoked_timestamp) {
-        return strcmp($a->revoked_timestamp->toDateTimeString(), $b->timestamp->toDateTimeString());
-      }
+        if ($a->revoked_timestamp && !$b->revoked_timestamp) {
+          return strcmp(
+            $a->revoked_timestamp->toDateTimeString(),
+            $b->timestamp->toDateTimeString(),
+          );
+        }
 
-      if (!$a->revoked_timestamp && $b->revoked_timestamp) {
-        return strcmp($a->timestamp->toDateTimeString(), $b->revoked_timestamp->toDateTimeString());
-      }
+        if (!$a->revoked_timestamp && $b->revoked_timestamp) {
+          return strcmp(
+            $a->timestamp->toDateTimeString(),
+            $b->revoked_timestamp->toDateTimeString(),
+          );
+        }
 
-      return strcmp($a->timestamp->toDateTimeString(), $b->revoked_timestamp->toDateTimeString());
-    });
+        return strcmp(
+          $a->timestamp->toDateTimeString(),
+          $b->revoked_timestamp->toDateTimeString(),
+        );
+      },
+    );
 
     foreach ($consents as $consent) {
       /** @var ConsentAssignment $consent */
@@ -370,16 +411,19 @@ class Customer extends Model implements Authenticatable
    */
   public function addConsent($consent, $source, $options = [])
   {
-
     $options['source'] = $source;
     $assignment_id = ConsentAssignment::create($consent, $this, $options);
 
     /** @var Collection $consents */
-    $consents = $this->getConsents(($consent instanceof Consent) ? $consent->id : $consent);
+    $consents = $this->getConsents(
+      ($consent instanceof Consent) ? $consent->id : $consent,
+    );
 
-    return $consents->first(function (ConsentAssignment $consent) use ($assignment_id) {
-      return $consent->assignment_id == $assignment_id;
-    });
+    return $consents->first(
+      function (ConsentAssignment $consent) use ($assignment_id) {
+        return $consent->assignment_id == $assignment_id;
+      },
+    );
   }
 
   /**
@@ -399,7 +443,9 @@ class Customer extends Model implements Authenticatable
 
   public function addToGroup(int $id): bool
   {
-    $this->getConnection()->put("relations/customers/membership/{$this->id}/$id");
+    $this->getConnection()->put(
+      "relations/customers/membership/{$this->id}/$id",
+    );
     return true;
   }
 

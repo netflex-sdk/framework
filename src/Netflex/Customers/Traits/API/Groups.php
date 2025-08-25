@@ -2,16 +2,15 @@
 
 namespace Netflex\Customers\Traits\API;
 
-/* use Exception; */
-
+use GuzzleHttp\Exception\GuzzleException;
 use Netflex\API\Facades\API;
-use Netflex\Customers\Group;
-
-/* use Netflex\Commerce\Exceptions\CustomerNotFoundException; */
 
 trait Groups
 {
-  public function save()
+  /**
+   * @throws GuzzleException
+   */
+  public function save(): void
   {
     $payload = [];
 
@@ -27,7 +26,10 @@ trait Groups
     $this->refresh();
   }
 
-  public function refresh()
+  /**
+   * @throws GuzzleException
+   */
+  public function refresh(): static
   {
     $this->attributes = API::get(trim(static::$base_path, '/') . '/' . $this->id, true);
 
@@ -37,10 +39,11 @@ trait Groups
   /**
    * Creates empty order object based on orderData
    *
-   * @param array $order
+   * @param array $group
    * @return static
+   * @throws GuzzleException
    */
-  public static function create($group = [])
+  public static function create(array $group = []): static
   {
     return static::retrieve(
       API::post(trim(static::$base_path, '/'), $group)
