@@ -72,7 +72,7 @@ class ProxyCommand extends Command
      *
      * @return bool
      */
-    public function isHidden()
+    public function isHidden(): bool
     {
         return PHP_OS_FAMILY !== 'Darwin';
     }

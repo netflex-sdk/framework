@@ -2,7 +2,6 @@
 
 namespace Netflex\Console;
 
-use Netflex\Console\ArtisanServiceProvider;
 use Illuminate\Foundation\Providers\ComposerServiceProvider;
 use Laravel\Tinker\TinkerServiceProvider;
 use NunoMaduro\LaravelConsoleMenu\LaravelConsoleMenuServiceProvider;
