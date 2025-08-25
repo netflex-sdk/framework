@@ -2,14 +2,12 @@
 
 namespace Netflex\SDK;
 
-use Exception;
 use Netflex\Log\LogServiceProvider;
 use Netflex\API\Providers\APIServiceProvider;
 
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Foundation\Application as BaseApplication;
-use Illuminate\Foundation\Mix;
 use Netflex\Cache\Providers\CacheServiceProvider;
 
 class Application extends BaseApplication
