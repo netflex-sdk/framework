@@ -2,8 +2,6 @@
 
 namespace Netflex\Notifications;
 
-use Mustache_Engine;
-
 use Illuminate\Mail\Mailable;
 use Netflex\Foundation\Template;
 
