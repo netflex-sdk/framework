@@ -4,17 +4,18 @@ namespace Netflex\API;
 
 use Illuminate\Support\Facades\Config;
 
-use Netflex\API\Client;
 use Netflex\API\Contracts\APIClient;
 
 use InvalidArgumentException;
 use Netflex\API\Contracts\ClientResolver;
+use Netflex\API\Exceptions\MissingCredentialsException;
 
 class APIClientResolver implements ClientResolver
 {
     /**
      * @param string $connection
      * @return APIClient
+     * @throws MissingCredentialsException
      */
     public function resolve(string $connection): APIClient
     {

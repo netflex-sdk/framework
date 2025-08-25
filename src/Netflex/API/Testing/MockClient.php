@@ -5,7 +5,7 @@ namespace Netflex\API\Testing;
 use Netflex\API\Contracts\APIClient;
 use Netflex\Http\Concerns\ParsesResponse;
 
-use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException as Exception;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -20,39 +20,37 @@ class MockClient implements APIClient
   use ParsesResponse;
   use Macroable;
 
-  /** @var Client */
-  protected $client;
+  protected Client $client;
 
-  /** @var MockHandler */
-  protected $mock;
+  protected MockHandler $mock;
 
-  /** @var HandlerStack */
-  protected $stack;
+  protected HandlerStack $stack;
 
-  protected $connection = 'mock';
+  protected string $connectionName = 'mock';
 
   public function __construct()
   {
     $this->mock = new MockHandler();
     $this->stack = HandlerStack::create($this->mock);
-    $this->client = new GuzzleClient(['handler' => $this->stack]);
+    $this->client = new Client(['handler' => $this->stack]);
   }
 
   /**
    * @return string|null
    */
-  public function getConnectionName ()
+  public function getConnectionName(): ?string
   {
-    return $this->connection;
+    return $this->connectionName;
   }
 
   /**
-   * @param string|null $connection
+   * @param string|null $name
    * @return static
    */
-  public function setConnectionName ($connection)
+  public function setConnectionName(?string $name): static
   {
-    $this->connection = $connection;
+    $this->connectionName = $name;
+
     return $this;
   }
 
@@ -62,7 +60,7 @@ class MockClient implements APIClient
    * @param Response $response
    * @return void
    */
-  public function mockResponse(Response $response)
+  public function mockResponse(Response $response): void
   {
     $this->mock->append($response);
   }
@@ -73,7 +71,7 @@ class MockClient implements APIClient
    * @param RequestException $e
    * @return void
    */
-  public function mockRequestException(RequestException $e)
+  public function mockRequestException(RequestException $e): void
   {
     $this->mock->append($e);
   }
@@ -83,7 +81,7 @@ class MockClient implements APIClient
    *
    * @return void
    */
-  public function reset()
+  public function reset(): void
   {
     $this->mock->reset();
   }
@@ -94,26 +92,29 @@ class MockClient implements APIClient
    * @return mixed
    * @throws Exception
    */
-  public function get($url, $assoc = false)
+  public function get(string $url, bool $assoc = false): mixed
   {
     return $this->parseResponse(
       $this->client->get($url),
-      $assoc
+      $assoc,
     );
   }
 
   /**
    * @param string $url
-   * @param array $payload = []
+   * @param array|null $payload = []
    * @param boolean $assoc = false
    * @return mixed
    * @throws Exception
    */
-  public function put($url, $payload = [], $assoc = false)
-  {
+  public function put(
+    string $url,
+    array|null $payload = [],
+    bool $assoc = false,
+  ): mixed {
     return $this->parseResponse(
       $this->client->put($url, ['json' => $payload]),
-      $assoc
+      $assoc,
     );
   }
 
@@ -124,24 +125,29 @@ class MockClient implements APIClient
    * @return mixed
    * @throws Exception
    */
-  public function post($url, $payload = [], $assoc = false)
+  public function post(string $url, $payload = [], bool $assoc = false): mixed
   {
     return $this->parseResponse(
       $this->client->post($url, ['json' => $payload]),
-      $assoc
+      $assoc,
     );
   }
 
   /**
    * @param string $url
+   * @param array|null $payload
+   * @param bool $assoc
    * @return mixed
    * @throws Exception
    */
-  public function delete($url, $payload = null, $assoc = false)
-  {
+  public function delete(
+    string $url,
+    array|null $payload = null,
+    bool $assoc = false,
+  ): mixed {
     return $this->parseResponse(
       $this->client->delete($url),
-      $assoc
+      $assoc,
     );
   }
 
@@ -152,7 +158,7 @@ class MockClient implements APIClient
   ) {
     return $this->parseResponse(
       $this->client->send($request, $options),
-      $assoc
+      $assoc,
     );
   }
 }
