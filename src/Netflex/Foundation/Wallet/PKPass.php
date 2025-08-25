@@ -24,61 +24,62 @@ use Netflex\Foundation\Wallet\Contracts\PKPassRepresentable;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use TypeError;
 
-class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresentable
+class PKPass implements Responsable, JsonSerializable, Jsonable,
+    PKPassRepresentable
 {
-    const FORMAT_QR = 'PKBarcodeFormatQR';
-    const FORMAT_PDF417 = 'PKBarcodeFormatPDF417';
-    const FORMAT_AZTEC = 'PKBarcodeFormatAztec';
-    const FORMAT_CODE128 = 'PKBarcodeFormatCode128';
+    const string FORMAT_QR = 'PKBarcodeFormatQR';
+    const string FORMAT_PDF417 = 'PKBarcodeFormatPDF417';
+    const string FORMAT_AZTEC = 'PKBarcodeFormatAztec';
+    const string FORMAT_CODE128 = 'PKBarcodeFormatCode128';
 
-    const TYPE_GENERIC = 'generic';
-    const TYPE_BOARDING_PASS = 'boardingPass';
-    const TYPE_STORE_CARD = 'storeCard';
-    const TYPE_EVENT_TICKET = 'eventTicket';
-    const TYPE_COUPON = 'coupon';
+    const string TYPE_GENERIC = 'generic';
+    const string TYPE_BOARDING_PASS = 'boardingPass';
+    const string TYPE_STORE_CARD = 'storeCard';
+    const string TYPE_EVENT_TICKET = 'eventTicket';
+    const string TYPE_COUPON = 'coupon';
 
-    const FIELD_HEADER = 'headerFields';
-    const FIELD_PRIMARY = 'primaryFields';
-    const FIELD_SECONDARY = 'secondaryFields';
-    const FIELD_AUXILIARY = 'auxiliaryFields';
-    const FIELD_BACK = 'backFields';
+    const string FIELD_HEADER = 'headerFields';
+    const string FIELD_PRIMARY = 'primaryFields';
+    const string FIELD_SECONDARY = 'secondaryFields';
+    const string FIELD_AUXILIARY = 'auxiliaryFields';
+    const string FIELD_BACK = 'backFields';
 
-    const DATA_DETECTOR_PHONE_NUMBER = 'PKDataDetectorTypePhoneNumber';
-    const DATA_DETECTOR_LINK = 'PKDataDetectorTypeLink';
-    const DATA_DETECTOR_ADDRESS = 'PKDataDetectorTypeAddress';
-    const DATA_DETECTOR_CALENDAR_EVENT = 'PKDataDetectorTypeCalendarEvent';
+    const string DATA_DETECTOR_PHONE_NUMBER = 'PKDataDetectorTypePhoneNumber';
+    const string DATA_DETECTOR_LINK = 'PKDataDetectorTypeLink';
+    const string DATA_DETECTOR_ADDRESS = 'PKDataDetectorTypeAddress';
+    const string DATA_DETECTOR_CALENDAR_EVENT = 'PKDataDetectorTypeCalendarEvent';
 
-    const TEXT_ALIGNMENT_LEFT = 'PKTextAlignmentLeft';
-    const TEXT_ALIGNMENT_CENTER = 'PKTextAlignmentCenter';
-    const TEXT_ALIGNMENT_RIGHT = 'PKTextAlignmentRight';
+    const string TEXT_ALIGNMENT_LEFT = 'PKTextAlignmentLeft';
+    const string TEXT_ALIGNMENT_CENTER = 'PKTextAlignmentCenter';
+    const string TEXT_ALIGNMENT_RIGHT = 'PKTextAlignmentRight';
 
-    const NUMBER_STYLE_DECIMAL = 'PKNumberStyleDecimal';
-    const NUMBER_STYLE_PERCENT = 'PKNumberStylePercent';
-    const NUMBER_STYLE_SCIENTIFIC = 'PKNumberStyleScientific';
-    const NUMBER_STYLE_SPELLOUT = 'PKNumberStyleSpellOut';
+    const string NUMBER_STYLE_DECIMAL = 'PKNumberStyleDecimal';
+    const string NUMBER_STYLE_PERCENT = 'PKNumberStylePercent';
+    const string NUMBER_STYLE_SCIENTIFIC = 'PKNumberStyleScientific';
+    const string NUMBER_STYLE_SPELLOUT = 'PKNumberStyleSpellOut';
 
-    const TRANSIT_TYPE_AIR = 'PKTransitTypeAir';
-    const TRANSIT_TYPE_BOAT = 'PKTransitTypeBoat';
-    const TRANSIT_TYPE_BUS = 'PKTransitTypeBus';
-    const TRANSIT_TYPE_GENERIC = 'PKTransitTypeGeneric';
-    const TRANSIT_TYPE_TRAIN = 'PKTransitTypeTrain';
+    const string TRANSIT_TYPE_AIR = 'PKTransitTypeAir';
+    const string TRANSIT_TYPE_BOAT = 'PKTransitTypeBoat';
+    const string TRANSIT_TYPE_BUS = 'PKTransitTypeBus';
+    const string TRANSIT_TYPE_GENERIC = 'PKTransitTypeGeneric';
+    const string TRANSIT_TYPE_TRAIN = 'PKTransitTypeTrain';
 
-    const DATE_STYLE_NONE = 'PKDateStyleNone';
-    const DATE_STYLE_SHORT = 'PKDateStyleShort';
-    const DATE_STYLE_MEDIUM = 'PKDateStyleMedium';
-    const DATE_STYLE_LONG = 'PKDateStyleLong';
-    const DATE_STYLE_FULL = 'PKDateStyleFull';
+    const string DATE_STYLE_NONE = 'PKDateStyleNone';
+    const string DATE_STYLE_SHORT = 'PKDateStyleShort';
+    const string DATE_STYLE_MEDIUM = 'PKDateStyleMedium';
+    const string DATE_STYLE_LONG = 'PKDateStyleLong';
+    const string DATE_STYLE_FULL = 'PKDateStyleFull';
 
-    protected $type = self::TYPE_GENERIC;
+    protected string $type = self::TYPE_GENERIC;
 
-    protected $data = [
+    protected array $data = [
         'formatVersion' => 1,
     ];
 
-    protected $files = [];
-    protected $i18n = [];
+    protected array $files = [];
+    protected array $i18n = [];
 
-    protected $fields = [
+    protected array $fields = [
         'headerFields' => [],
         'primaryFields' => [],
         'secondaryFields' => [],
@@ -86,8 +87,11 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
         'backFields' => [],
     ];
 
-    protected function __construct(string $type = PKPass::TYPE_GENERIC, ?array $data = [], ?array $fields = [])
-    {
+    protected function __construct(
+        string $type = PKPass::TYPE_GENERIC,
+        ?array $data = [],
+        ?array $fields = [],
+    ) {
         $this->type = $type;
 
         $this->data = array_merge([
@@ -105,58 +109,64 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
 
     /**
      * Creates a boarding pass
-     * 
+     *
      * @param array|null $data
      * @param array|null $fields
      * @return static
      */
-    public static function boardingPass(?array $data = null, ?array $fields = null)
-    {
+    public static function boardingPass(
+        ?array $data = null,
+        ?array $fields = null,
+    ): static {
         return new static(self::TYPE_BOARDING_PASS, $data, $fields);
     }
 
     /**
      * Creates a store card
-     * 
+     *
      * @param array|null $data
      * @param array|null $fields
      * @return static
      * */
-    public static function storeCard(?array $data = null, ?array $fields = null)
-    {
+    public static function storeCard(
+        ?array $data = null,
+        ?array $fields = null,
+    ): static {
         return new static(self::TYPE_STORE_CARD, $data, $fields);
     }
 
     /**
      * Creates an event ticket
-     * 
+     *
      * @param array|null $data
      * @param array|null $fields
      * @return static
      * */
-    public static function eventTicket(?array $data = null, ?array $fields = null)
-    {
+    public static function eventTicket(
+        ?array $data = null,
+        ?array $fields = null,
+    ): static {
         return new static(self::TYPE_EVENT_TICKET, $data, $fields);
     }
 
     /**
      * Creates a coupon
-     * 
+     *
      * @return static
      * */
-    public static function coupon(?array $data = null, ?array $fields = null)
-    {
+    public static function coupon(
+        ?array $data = null,
+        ?array $fields = null,
+    ): static {
         return new static(self::TYPE_COUPON, $data, $fields);
     }
 
     /**
      * Creates a generic pass
-     * 
-     * @param array|null $data
-     * @param array|null $fields
+     *
      * @return static
      * */
-    public static function generic(?array $data = null, ?array $fields = null)
+    public static function generic(): static
     {
         return new static(self::TYPE_GENERIC);
     }
@@ -167,14 +177,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param integer $storeIdentifier
      * @return static
      */
-    public function associatedStoreIdentifier(int $storeIdentifier)
+    public function associatedStoreIdentifier(int $storeIdentifier): static
     {
         $this->data['associatedStoreIdentifiers'] = $this->data['associatedStoreIdentifiers'] ?? [];
         $this->data['associatedStoreIdentifiers'][] = $storeIdentifier;
         return $this;
     }
 
-    public function appLaunchURL(string $appLaunchURL)
+    public function appLaunchURL(string $appLaunchURL): static
     {
         $this->data['appLaunchURL'] = $appLaunchURL;
         return $this;
@@ -186,13 +196,13 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param mixed $userInfo
      * @return static
      */
-    public function userInfo($userInfo)
+    public function userInfo($userInfo): static
     {
         $this->data['userInfo'] = $userInfo;
         return $this;
     }
 
-    public function expirationDate($date)
+    public function expirationDate($date): static
     {
         if ($date instanceof DateTimeInterface) {
             $date = Carbon::parse($date)->toIso8601ZuluString();
@@ -203,7 +213,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
         return $this;
     }
 
-    public function relevantDate($date)
+    public function relevantDate($date): static
     {
         if ($date instanceof DateTimeInterface) {
             $date = Carbon::parse($date)->toIso8601ZuluString();
@@ -214,20 +224,31 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
         return $this;
     }
 
-    public function transitType(string $transitType)
+    public function transitType(string $transitType): static
     {
         if ($this->type === static::TYPE_BOARDING_PASS) {
-            if (in_array($transitType, [self::TRANSIT_TYPE_AIR, self::TRANSIT_TYPE_BOAT, self::TRANSIT_TYPE_BUS, self::TRANSIT_TYPE_GENERIC, self::TRANSIT_TYPE_TRAIN])) {
+            if (in_array(
+                $transitType,
+                [
+                    self::TRANSIT_TYPE_AIR,
+                    self::TRANSIT_TYPE_BOAT,
+                    self::TRANSIT_TYPE_BUS,
+                    self::TRANSIT_TYPE_GENERIC,
+                    self::TRANSIT_TYPE_TRAIN,
+                ],
+            )) {
                 $this->fields['transitType'] = $transitType;
             }
 
             return $this;
         }
 
-        throw new InvalidArgumentException('This pass type does not support transit type');
+        throw new InvalidArgumentException(
+            'This pass type does not support transit type',
+        );
     }
 
-    public function addLocale(string $locale, array $messages)
+    public function addLocale(string $locale, array $messages): static
     {
         $this->i18n[$locale] = $messages;
         return $this;
@@ -235,13 +256,17 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
 
     /**
      * @param string $key
-     * @param mixed $valu
+     * @param mixed $value
      * @param string $location Where is the field located on the pass
-     * @param string|array $options Label or options array
+     * @param array|string $options Label or options array
      * @return static
      */
-    protected function addField(string $key, $value, string $location = PKPass::FIELD_PRIMARY, $options = [])
-    {
+    protected function addField(
+        string $key,
+        mixed $value,
+        string $location = PKPass::FIELD_PRIMARY,
+        array|string $options = [],
+    ): static {
         if ($value instanceof DateTimeInterface) {
             $value = Carbon::parse($value)->toIso8601ZuluString();
         }
@@ -270,7 +295,10 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
                 $optionValue = $optionValue->toHtml();
             }
 
-            if (is_object($optionValue) && method_exists($optionValue, '__toString')) {
+            if (is_object($optionValue) && method_exists(
+                    $optionValue,
+                    '__toString',
+                )) {
                 $optionValue = (string) $optionValue;
             }
 
@@ -280,7 +308,16 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
                     break;
                 case 'dateStyle':
                 case 'timeStyle':
-                    if (in_array($optionValue, [self::DATE_STYLE_NONE, self::DATE_STYLE_SHORT, self::DATE_STYLE_MEDIUM, self::DATE_STYLE_LONG, self::DATE_STYLE_FULL])) {
+                    if (in_array(
+                        $optionValue,
+                        [
+                            self::DATE_STYLE_NONE,
+                            self::DATE_STYLE_SHORT,
+                            self::DATE_STYLE_MEDIUM,
+                            self::DATE_STYLE_LONG,
+                            self::DATE_STYLE_FULL,
+                        ],
+                    )) {
                         $field[$optionKey] = $optionValue;
                     }
                     break;
@@ -296,7 +333,15 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
                     }
 
                     foreach ($optionValue as $dataDetectorType) {
-                        if (in_array($optionValue, [static::DATA_DETECTOR_PHONE_NUMBER, static::DATA_DETECTOR_LINK, static::DATA_DETECTOR_ADDRESS, static::DATA_DETECTOR_CALENDAR_EVENT])) {
+                        if (in_array(
+                            $optionValue,
+                            [
+                                static::DATA_DETECTOR_PHONE_NUMBER,
+                                static::DATA_DETECTOR_LINK,
+                                static::DATA_DETECTOR_ADDRESS,
+                                static::DATA_DETECTOR_CALENDAR_EVENT,
+                            ],
+                        )) {
                             $dataDetectorTypes[] = $dataDetectorType;
                         }
                     }
@@ -304,7 +349,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
                     $field[$optionKey] = $dataDetectorTypes;
                     break;
                 case 'textAlignment':
-                    if (in_array($optionValue, [static::TEXT_ALIGNMENT_LEFT, static::TEXT_ALIGNMENT_CENTER, static::TEXT_ALIGNMENT_RIGHT])) {
+                    if (in_array(
+                        $optionValue,
+                        [
+                            static::TEXT_ALIGNMENT_LEFT,
+                            static::TEXT_ALIGNMENT_CENTER,
+                            static::TEXT_ALIGNMENT_RIGHT,
+                        ],
+                    )) {
                         $field[$optionKey] = $optionValue;
                     }
                     break;
@@ -314,7 +366,15 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
                     }
                     break;
                 case 'numberStyle':
-                    if ((is_int($value) || is_float($value)) && in_array($optionValue, [static::NUMBER_STYLE_DECIMAL, static::NUMBER_STYLE_PERCENT, static::NUMBER_STYLE_SCIENTIFIC, static::NUMBER_STYLE_SPELLOUT])) {
+                    if ((is_int($value) || is_float($value)) && in_array(
+                            $optionValue,
+                            [
+                                static::NUMBER_STYLE_DECIMAL,
+                                static::NUMBER_STYLE_PERCENT,
+                                static::NUMBER_STYLE_SCIENTIFIC,
+                                static::NUMBER_STYLE_SPELLOUT,
+                            ],
+                        )) {
                         $field[$optionKey] = $optionValue;
                     }
                     break;
@@ -337,59 +397,74 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     /**
      * @param string $key
      * @param mixed $value
-     * @param string|array $options Label or options array
+     * @param array|string $options Label or options array
      * @return static
      */
-    public function addHeaderField(string $key, $value, $options = [])
-    {
+    public function addHeaderField(
+        string $key,
+        mixed $value,
+        array|string $options = [],
+    ): static {
         return $this->addField($key, $value, static::FIELD_HEADER, $options);
     }
 
     /**
      * @param string $key
      * @param mixed $value
-     * @param string|array $options Label or options array
+     * @param array|string $options Label or options array
      * @return static
      */
-    public function addPrimaryField(string $key, $value, $options = [])
-    {
+    public function addPrimaryField(
+        string $key,
+        mixed $value,
+        array|string $options = [],
+    ): static {
         return $this->addField($key, $value, static::FIELD_PRIMARY, $options);
     }
 
     /**
      * @param string $key
      * @param mixed $value
-     * @param string|array $options Label or options array
+     * @param array|string $options Label or options array
      * @return static
      */
-    public function addSecondaryField(string $key, $value, $options = [])
-    {
+    public function addSecondaryField(
+        string $key,
+        mixed $value,
+        array|string $options = [],
+    ): static {
         return $this->addField($key, $value, static::FIELD_SECONDARY, $options);
     }
 
     /**
      * @param string $key
      * @param mixed $value
-     * @param string|array $options Label or options array
+     * @param array|string $options Label or options array
      * @return static
      */
-    public function addAuxiliaryField(string $key, $value, $options = [])
-    {
+    public function addAuxiliaryField(
+        string $key,
+        mixed $value,
+        array|string $options = [],
+    ): static {
         return $this->addField($key, $value, static::FIELD_AUXILIARY, $options);
     }
 
     /**
      * @param string $key
      * @param mixed $value
-     * @param string|array $options Label or options array
+     * @param array|string $options Label or options array
      * @return static
      */
-    public function addBackField(string $key, $value, $options = [])
-    {
+    public function addBackField(
+        string $key,
+        mixed $value,
+        array|string $options = [],
+    ): static {
         return $this->addField($key, $value, static::FIELD_BACK, $options);
     }
 
-    public function organizationName(string $organizationName)
+    public function organizationName(string $organizationName): static
     {
         $this->data['organizationName'] = $organizationName;
         return $this;
@@ -401,7 +476,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param boolean $voided
      * @return static
      */
-    public function voided(bool $voided = true)
+    public function voided(bool $voided = true): static
     {
         $this->data['voided'] = $voided;
         return $this;
@@ -413,7 +488,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param boolean $sharingProhibited
      * @return static
      */
-    public function sharingProhibited(bool $sharingProhibited = true)
+    public function sharingProhibited(bool $sharingProhibited = true): static
     {
         $this->data['sharingProhibited'] = $sharingProhibited;
         return $this;
@@ -425,7 +500,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string $serialNumber
      * @return static
      */
-    public function serialNumber(string $serialNumber)
+    public function serialNumber(string $serialNumber): static
     {
         $this->data['serialNumber'] = $serialNumber;
         return $this;
@@ -437,7 +512,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string $description
      * @return static
      */
-    public function description(string $description)
+    public function description(string $description): static
     {
         $this->data['description'] = $description;
         return $this;
@@ -451,8 +526,11 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string|null $relevantText
      * @return static
      */
-    public function addLocation(float $latitude, float $longitude, ?string $relevantText = null)
-    {
+    public function addLocation(
+        float $latitude,
+        float $longitude,
+        ?string $relevantText = null,
+    ): static {
         $this->data['locations'] = $this->data['locations'] ?? [];
 
         $location = [
@@ -478,8 +556,12 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string|null $relevantText
      * @return static
      */
-    public function addBeacon(string $proximityUUID, ?int $major = null, ?int $minor = null, ?string $relevantText = null)
-    {
+    public function addBeacon(
+        string $proximityUUID,
+        ?int $major = null,
+        ?int $minor = null,
+        ?string $relevantText = null,
+    ): static {
         $this->data['beacons'] = $this->data['beacons'] ?? [];
 
         $beacon = [
@@ -509,7 +591,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param integer $maxDistance
      * @return static
      */
-    public function maxDistance(int $maxDistance)
+    public function maxDistance(int $maxDistance): static
     {
         $this->data['maxDistance'] = $maxDistance;
         return $this;
@@ -519,7 +601,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string $color
      * @return static
      */
-    public function foregroundColor(string $color)
+    public function foregroundColor(string $color): static
     {
         $this->data['foregroundColor'] = $color;
         return $this;
@@ -529,7 +611,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string $color
      * @return static
      */
-    public function backgroundColor(string $color)
+    public function backgroundColor(string $color): static
     {
         $this->data['backgroundColor'] = $color;
         return $this;
@@ -539,7 +621,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string $color
      * @return static
      */
-    public function labelColor(string $color)
+    public function labelColor(string $color): static
     {
         $this->data['labelColor'] = $color;
         return $this;
@@ -549,17 +631,17 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string $color
      * @return static
      */
-    public function stripColor(string $color)
+    public function stripColor(string $color): static
     {
         $this->data['stripColor'] = $color;
         return $this;
     }
 
     /**
-     * @param string $color
+     * @param string $logoText
      * @return static
      */
-    public function logoText(string $logoText)
+    public function logoText(string $logoText): static
     {
         $this->data['logoText'] = $logoText;
         return $this;
@@ -571,8 +653,11 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string $format
      * @return static
      */
-    public function barcode(string $barcode, ?string $altText = null, string $format = PKPass::FORMAT_QR)
-    {
+    public function barcode(
+        string $barcode,
+        ?string $altText = null,
+        string $format = PKPass::FORMAT_QR,
+    ): static {
         $this->data['barcodes'] = $this->data['barcodes'] ?? [];
 
         $this->data['barcodes'][] = [
@@ -591,10 +676,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @return static
      * @throws InvalidArgumentException
      */
-    public function webService(string $webServiceURL, string $authenticationToken)
-    {
+    public function webService(
+        string $webServiceURL,
+        string $authenticationToken,
+    ): static {
         if (strlen($authenticationToken) < 16) {
-            throw new InvalidArgumentException('Authentication token must be 16 characters or longer');
+            throw new InvalidArgumentException(
+                'Authentication token must be 16 characters or longer',
+            );
         }
 
         $this->data['webServiceURL'] = $webServiceURL;
@@ -605,35 +694,44 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
 
     /**
      * Identifier used to group related passes.
-     * Optional for event tickets and boarding passes; otherwise not allowed. 
+     * Optional for event tickets and boarding passes; otherwise not allowed.
      *
      * @param string $groupingIdentifier
      * @return static
      * @throws InvalidArgumentException
      */
-    public function groupingIdentifier(string $groupingIdentifier)
+    public function groupingIdentifier(string $groupingIdentifier): static
     {
-        if (in_array($this->type, [static::TYPE_BOARDING_PASS, static::TYPE_EVENT_TICKET])) {
+        if (in_array(
+            $this->type,
+            [static::TYPE_BOARDING_PASS, static::TYPE_EVENT_TICKET],
+        )) {
             $this->data['groupingIdentifier'] = $groupingIdentifier;
             return $this;
         }
 
-        throw new InvalidArgumentException('Grouping identifier is only supported for boarding passes and event tickets');
+        throw new InvalidArgumentException(
+            'Grouping identifier is only supported for boarding passes and event tickets',
+        );
     }
 
     /**
-     * @param UploadedFile|File|MediaUrlResolvable|string $file A file or a path to a file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file A file or a path to a file
      * @param string|null $name
      * @return array
      */
-    protected function encodeFile($file, ?string $name = null)
-    {
+    protected function encodeFile(
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $name = null,
+    ): array {
         if (($file instanceof UploadedFile) || ($file instanceof File)) {
             if (!$name) {
                 $name = $file->getClientOriginalName();
             }
 
-            $path = 'data:text/plain;base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            $path = 'data:text/plain;base64,' . base64_encode(
+                    file_get_contents($file->getRealPath()),
+                );
         }
 
         if ($file instanceof MediaUrlResolvable) {
@@ -651,7 +749,9 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
             }
 
             if (!Str::startsWith($path, 'http')) {
-                $path = 'data:text/plain;base64,' . base64_encode(file_get_contents($file));
+                $path = 'data:text/plain;base64,' . base64_encode(
+                        file_get_contents($file),
+                    );
             }
         }
 
@@ -661,12 +761,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     /**
      * Add background image to the pass
      *
-     * @param UploadedFile|File|MediaUrlResolvable|string $file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file
      * @param string|null $locale
      * @return static
      */
-    public function addBackground($file, ?string $locale = null)
-    {
+    public function addBackground(
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $locale = null,
+    ): static {
         if ($locale) {
             return $this->addLocalizedFile($locale, $file, 'background.png');
         }
@@ -677,12 +779,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     /**
      * Add thumbnail image to the pass
      *
-     * @param UploadedFile|File|MediaUrlResolvable|string $file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file
      * @param string|null $locale
      * @return static
      */
-    public function addThumbnail($file, ?string $locale = null)
-    {
+    public function addThumbnail(
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $locale = null,
+    ): static {
         if ($locale) {
             return $this->addLocalizedFile($locale, $file, 'thumbnail.png');
         }
@@ -693,12 +797,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     /**
      * Add logo image to the pass
      *
-     * @param UploadedFile|File|MediaUrlResolvable|string $file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file
      * @param string|null $locale
      * @return static
      */
-    public function addLogo($file, ?string $locale = null)
-    {
+    public function addLogo(
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $locale = null,
+    ): static {
         if ($locale) {
             return $this->addLocalizedFile($locale, $file, 'logo.png');
         }
@@ -709,12 +815,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     /**
      * Add strip image to the pass
      *
-     * @param UploadedFile|File|MediaUrlResolvable|string $file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file
      * @param string|null $locale
      * @return static
      */
-    public function addStrip($file, ?string $locale = null)
-    {
+    public function addStrip(
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $locale = null,
+    ): static {
         if ($locale) {
             return $this->addLocalizedFile($locale, $file, 'strip.png');
         }
@@ -725,12 +833,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     /**
      * Add footer image to the pass
      *
-     * @param UploadedFile|File|MediaUrlResolvable|string $file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file
      * @param string|null $locale
      * @return static
      */
-    public function addFooter($file, ?string $locale = null)
-    {
+    public function addFooter(
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $locale = null,
+    ): static {
         if ($locale) {
             return $this->addLocalizedFile($locale, $file, 'footer.png');
         }
@@ -745,7 +855,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      * @param string|null $locale
      * @return static
      */
-    public function addIcon($file, ?string $locale = null)
+    public function addIcon($file, ?string $locale = null): static
     {
         if ($locale) {
             return $this->addLocalizedFile($locale, $file, 'icon.png');
@@ -756,12 +866,15 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
 
     /**
      * @param string $locale
-     * @param UploadedFile|File|MediaUrlResolvable|string $file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file
      * @param string|null $name
      * @return static
      */
-    public function addLocalizedFile(string $locale, $file, ?string $name = null)
-    {
+    public function addLocalizedFile(
+        string $locale,
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $name = null,
+    ): static {
         $payload = $this->encodeFile($file, $name);
         $payload['locale'] = $locale;
         $this->files[] = $payload;
@@ -770,13 +883,14 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     }
 
     /**
-     * @param UploadedFile|File|MediaUrlResolvable|string $file A file or a path to a file
+     * @param string|File|MediaUrlResolvable|UploadedFile $file A file or a path to a file
      * @param string|null $name
-     * @param string|null $locale
      * @return static
      */
-    public function addFile($file, ?string $name = null, $locale = null)
-    {
+    public function addFile(
+        File|string|MediaUrlResolvable|UploadedFile $file,
+        ?string $name = null,
+    ): static {
         $this->files[] = $this->encodeFile($file, $name);
 
         return $this;
@@ -785,18 +899,18 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     /**
      * Gets the signed pass as a binary blob
      *
-     * @return mixed
+     * @return string|false
      */
-    public function blob()
+    public function blob(): string|false
     {
         return $this->download()->content();
     }
 
     /**
-     * @param string $filename
+     * @param string|null $filename
      * @return Response
      */
-    public function download($filename = null): Response
+    public function download(string|null $filename = null): Response
     {
         $request = new Request();
         $request->headers->set('Content-Disposition', 'attachment' . $filename);
@@ -805,10 +919,10 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return Response
      */
-    public function toResponse($request)
+    public function toResponse($request): Response
     {
         $time = microtime(true); // time in Microseconds
 
@@ -818,16 +932,19 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
                     'data' => $this->jsonSerialize(),
                     'files' => $this->files,
                     'i18n' => $this->i18n,
-                ]
+                ],
             ]);
 
         $content = (string) $response->getBody();
         $headers = $request ? $request->headers : new HeaderBag([]);
 
         return with(new Response($content, 200, $headers->all()))
-            ->header('Content-Type', 'application/vnd.apple.pkpass', true)
-            ->header('X-SSR', 1, true)
-            ->header('X-SSR-Rendered-In', (microtime(true) - $time) . 's', true);
+            ->header('Content-Type', 'application/vnd.apple.pkpass')
+            ->header('X-SSR', 1)
+            ->header(
+                'X-SSR-Rendered-In',
+                (microtime(true) - $time) . 's',
+            );
     }
 
     protected function generateSerialNumber(): string
@@ -864,7 +981,7 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
      *
      * @return object
      */
-    public function schema()
+    public function schema(): object
     {
         return once(function () {
             $schema = file_get_contents(__DIR__ . '/PKPass.schema.json');
@@ -872,23 +989,29 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
         });
     }
 
-    public function validate()
+    public function validate(): true
     {
-        $validator = new Validator;
+        $validator = new Validator();
         $data = $this->payload();
         $data = json_decode(json_encode($data));
-        $validator->validate($data, $this->schema(), Constraint::CHECK_MODE_COERCE_TYPES);
+        $validator->validate(
+            $data,
+            $this->schema(),
+            Constraint::CHECK_MODE_COERCE_TYPES,
+        );
 
         if ($validator->numErrors() > 0) {
             foreach ($validator->getErrors() as $error) {
-                throw new TypeError('[' . $error['property'] . '] ' . $error['message']);
+                throw new TypeError(
+                    '[' . $error['property'] . '] ' . $error['message'],
+                );
             }
         }
 
         return true;
     }
 
-    public function toJson($options = 0)
+    public function toJson($options = 0): false|string
     {
         return json_encode($this, $options);
     }
@@ -898,5 +1021,3 @@ class PKPass implements Responsable, JsonSerializable, Jsonable, PKPassRepresent
         return $this;
     }
 }
-
-$pkpass = PKPass::boardingPass();
