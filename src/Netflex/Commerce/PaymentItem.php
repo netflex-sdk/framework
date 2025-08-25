@@ -72,6 +72,8 @@ class PaymentItem extends ReactiveObject implements Payment
         if ($this->data->card_expiry ?? null) {
             return Carbon::parse($this->data->card_expiry);
         }
+
+        return null;
     }
 
     public function getPaymentAmount(): float

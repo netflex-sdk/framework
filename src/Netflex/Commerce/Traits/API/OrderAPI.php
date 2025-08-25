@@ -5,8 +5,6 @@ namespace Netflex\Commerce\Traits\API;
 use Exception;
 
 use Netflex\API\Facades\API;
-use Netflex\Commerce\CartItem;
-use Netflex\Commerce\DiscountItem;
 use Netflex\Commerce\Exceptions\OrderNotFoundException;
 
 use Illuminate\Support\Facades\Session;

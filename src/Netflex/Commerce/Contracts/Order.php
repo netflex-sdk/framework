@@ -4,9 +4,6 @@ namespace Netflex\Commerce\Contracts;
 
 use DateTimeInterface;
 
-use Netflex\Commerce\Contracts\Payment;
-use Netflex\Commerce\Contracts\CartItem;
-
 interface Order extends Lockable
 {
     public function getOrderId(): ?int;

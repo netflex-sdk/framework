@@ -3,7 +3,6 @@
 namespace Netflex\Commerce\Traits\Reactivity;
 
 use Illuminate\Support\Collection;
-use Netflex\Commerce\AbstractOrder;
 use Netflex\Support\ItemCollection;
 use Netflex\Support\ReactiveObject;
 use ReflectionClass;

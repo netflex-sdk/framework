@@ -2,7 +2,6 @@
 
 namespace Netflex\Commerce;
 
-use Apility\Payment\Jobs\SendReceipt;
 use Carbon\Carbon;
 use DateTimeInterface;
 

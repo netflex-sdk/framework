@@ -41,7 +41,7 @@ use Netflex\Commerce\Contracts\Discount;
  * @property-read float $original_entries_total
  * @property-read float $original_entries_cost
  * @property-read float $original_tax_cost
- * @property-read id $order_id
+ * @property-read int $order_id
  */
 class CartItem extends ReactiveObject implements CartItemContract
 {
