@@ -8,15 +8,18 @@ trait ParsesResponse
 {
   /**
    * @param ResponseInterface $response
+   * @param bool $assoc
    * @return mixed
    */
-  protected function parseResponse(ResponseInterface $response, $assoc = false)
-  {
+  protected function parseResponse(
+    ResponseInterface $response,
+    bool $assoc = false,
+  ): mixed {
     $body = $response->getBody();
 
     $contentType = strtolower($response->getHeaderLine('Content-Type'));
 
-    if (strpos($contentType, 'json') !== false) {
+    if (str_contains($contentType, 'json')) {
       $jsonBody = json_decode(preg_replace_callback("/(&#[0-9]+;)/", function ($m) {
         return mb_convert_encoding($m[1], 'UTF-8', 'HTML-ENTITIES');
       }, (string) $body), $assoc);
@@ -26,7 +29,7 @@ trait ParsesResponse
       }
     }
 
-    if (strpos($contentType, 'text') !== false) {
+    if (str_contains($contentType, 'text')) {
       return $body->getContents();
     }
 
