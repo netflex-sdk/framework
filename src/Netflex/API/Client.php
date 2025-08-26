@@ -35,12 +35,14 @@ class Client extends HttpClient implements APIClient
     return $this;
   }
 
-  /** @var String */
-  const BASE_URI = 'https://api.netflexapp.com/v1/';
-
   public static function connection($connection = 'default')
   {
     return APIClientConnectionResolver::resolve($connection);
+  }
+
+  protected static function defaultBaseUri(): string
+  {
+    return config('api.baseUri', 'https://api.netflexapp.com/v1/');
   }
 
   public static function withCredentials($credentials)
@@ -56,8 +58,8 @@ class Client extends HttpClient implements APIClient
    */
   public function __construct(array $options = [])
   {
-    $options['base_uri'] = $options['base_uri'] ?? static::BASE_URI;
-    $options['auth'] = $options['auth'] ?? null;
+    $options['base_uri'] ??= static::defaultBaseUri();
+    $options['auth'] ??= null;
 
     if (!$options['auth']) {
       throw new MissingCredentialsException;
