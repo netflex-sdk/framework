@@ -93,10 +93,10 @@ class ConsentAssignment implements JsonSerializable, Jsonable
     }
 
     /**
-     * @param string $revoked_timestamp
+     * @param string|null $revoked_timestamp
      * @return Carbon|null
      */
-    public function getRevokedTimestampAttribute(string $revoked_timestamp): ?Carbon
+    public function getRevokedTimestampAttribute(?string $revoked_timestamp): ?Carbon
     {
         if ($revoked_timestamp) {
             return Carbon::parse($revoked_timestamp);
