@@ -28,7 +28,7 @@ class NewslettersServiceProvider extends ServiceProvider
 
     $this->mergeConfigFrom(
       __DIR__ . '/../config/newsletters.php',
-      'pages'
+      'newsletters'
     );
 
     if ($this->app->bound('events')) {
@@ -53,6 +53,6 @@ class NewslettersServiceProvider extends ServiceProvider
 
   protected function registerDirectives()
   {
-    
+
   }
 }
