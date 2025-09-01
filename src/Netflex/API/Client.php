@@ -2,14 +2,17 @@
 
 namespace Netflex\API;
 
-use Netflex\Http\Client as HttpClient;
-
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\HandlerStack;
+use Illuminate\Support\Traits\Macroable;
 use Netflex\API\Contracts\APIClient;
+use Netflex\API\Events\RequestFailed;
+use Netflex\API\Events\RequestStarted;
+use Netflex\API\Events\RequestSucceeded;
 use Netflex\API\Exceptions\MissingCredentialsException;
 use Netflex\API\Facades\APIClientConnectionResolver;
-
-use GuzzleHttp\Client as GuzzleClient;
-use Illuminate\Support\Traits\Macroable;
+use Netflex\Http\Client as HttpClient;
+use Psr\Http\Message\RequestInterface;
 
 class Client extends HttpClient implements APIClient
 {
@@ -67,6 +70,32 @@ class Client extends HttpClient implements APIClient
     if (!$options['auth']) {
       throw new MissingCredentialsException;
     }
+
+
+
+    if(!isset($options['handler'])) {
+      $options['handler'] = HandlerStack::create();
+    }
+
+    $exposeEvents = function (callable $handler) {
+      return function (RequestInterface $request, array $options) use ($handler) {
+        $requestId = $options['request-id'] ?? uuid();
+        $request = $request->withHeader('X-Request-Id', $requestId);
+
+        try {
+          event(new RequestStarted(clone $request));
+          $response = $handler($request, $options);
+          event(new RequestSucceeded(clone $request, $response));
+          return $response;
+        } catch (\Throwable $t) {
+          event(new RequestFailed(clone $request, $t));
+          return $response;
+        }
+      };
+    };
+
+    $options['handler']->push($exposeEvents);
+
 
     $this->client = new GuzzleClient($options);
 
