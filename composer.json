@@ -18,7 +18,7 @@
     },
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "apility/rule-builder": "^1.5.2",
         "apility/seotools": "^2.0",
         "brick/phonenumber": "^0.8.0",

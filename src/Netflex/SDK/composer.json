@@ -26,7 +26,7 @@
         "sort-packages": true
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.0",
         "netflex/api": "^6.0",

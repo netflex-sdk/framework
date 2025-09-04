@@ -22,7 +22,7 @@
         "sort-packages": true
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "brick/phonenumber": "^0.8.0",
         "illuminate/auth": "^12.0",
         "illuminate/contracts": "^12.0",
