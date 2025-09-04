@@ -37,6 +37,14 @@ class Client implements HttpClient
     $stack->push(Middleware::cookies(), 'cookies');
     $stack->push(Middleware::prepareBody(), 'prepare_body');
 
+    if (
+      class_exists(\Sentry\Tracing\GuzzleTracingMiddleware::class)
+      && app()->bound('sentry')
+      && \Sentry\SentrySdk::getCurrentHub()->getClient() !== null
+    ) {
+      $stack->push(\Sentry\Tracing\GuzzleTracingMiddleware::trace());
+    }
+
     $this->client = new \GuzzleHttp\Client(
       array_merge(
         ['handler' => $stack],
