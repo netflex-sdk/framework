@@ -35,17 +35,17 @@ trait HasReactiveChildrenProperties
       $this->{$protectedReactiveObjectKey} = $object;
       $this->attributes[$attributeKey] = $object->jsonSerialize();
     } else {
+      unset($this->{$protectedReactiveObjectKey});
+
       if (is_object($object) || is_array($object)) {
         $this->attributes[$attributeKey] = [];
 
         foreach ($object as $property => $value) {
-          $this->attributes[$attributeKey][$property] = $value;
+          $this->{$attributeKey}->offsetSet($property, $value);
         }
       } else {
         $this->attributes[$attributeKey] = $object;
       }
-
-      unset($this->{$protectedReactiveObjectKey});
     }
 
     $this->modified[] = $attributeKey;
