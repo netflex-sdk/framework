@@ -100,22 +100,22 @@ class PaymentItem extends ReactiveObject implements Payment
 
     protected ?Properties $propertiesInstance;
 
-    public function setPropertiesAttribute(object|array|null $properties): void
+    public function setDataAttribute(object|array|null $data): void
     {
         $this->setReactiveObject(
-            $properties,
-            'properties',
+            $data,
+            'data',
             'propertiesInstance',
         );
     }
 
-    public function getPropertiesAttribute(
-        object|array|null $properties = null
+    public function getDataAttribute(
+        object|array|null $data = null
     ): Properties {
         return $this->getReactiveObject(
-            $properties,
+            $data,
             static::PROPERTIES_CLASS,
-            'properties',
+            'data',
             'propertiesInstance',
         );
     }
