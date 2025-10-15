@@ -292,7 +292,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         );
     }
 
-    protected ?Payments $paymentsInstanc;
+    protected ?Payments $paymentsInstance;
 
     public function setPaymentsAttribute(object|array|null $payments): void
     {
