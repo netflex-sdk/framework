@@ -22,6 +22,9 @@ class Cart extends ReactiveObject
 {
   use HasReactiveChildrenProperties;
 
+  const string CART_ITEM_COLLECTION_CLASS = CartItemCollection::class;
+  const string RESERVATION_ITEM_COLLECTION_CLASS = ReservationItemCollection::class;
+
   protected $defaults = [
     'sub_total' => 0,
     'discount' => 0,
@@ -68,7 +71,7 @@ class Cart extends ReactiveObject
 
     return $this->getItemCollection(
       $items,
-      CartItemCollection::class,
+      static::CART_ITEM_COLLECTION_CLASS,
       'items',
       'itemsInstance',
     );
@@ -80,11 +83,12 @@ class Cart extends ReactiveObject
    * @param mixed $items
    * @return ReservationItemCollection
    */
-  public function getReservationsAttribute(array|null $items = null)
-  {
+  public function getReservationsAttribute(
+    array|null $items = null,
+  ): ReservationItemCollection {
     return $this->getItemCollection(
       $items,
-      ReservationItemCollection::class,
+      static::RESERVATION_ITEM_COLLECTION_CLASS,
       'reservations',
       'reservationsInstance',
     );

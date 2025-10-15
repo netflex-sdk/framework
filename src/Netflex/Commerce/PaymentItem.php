@@ -28,6 +28,8 @@ class PaymentItem extends ReactiveObject implements Payment
     use PaymentItemAPI;
     use HasReactiveChildrenProperties;
 
+    const PROPERTIES_CLASS = Properties::class;
+
     protected $readOnlyAttributes = [
         'id',
         'order_id'
@@ -112,7 +114,7 @@ class PaymentItem extends ReactiveObject implements Payment
     ): Properties {
         return $this->getReactiveObject(
             $properties,
-            Properties::class,
+            static::PROPERTIES_CLASS,
             'properties',
             'propertiesInstance',
         );
