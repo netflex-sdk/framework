@@ -419,6 +419,11 @@ if (!function_exists('map_content')) {
           })->values();
 
         return $entries;
+      case 'multiple_text_fields':
+        return Collection::make($content)
+          ->pluck('text')
+          ->filter()
+          ->values();
       case 'gallery':
         return $content->mapWithKeys(function ($item) {
           $hash = $item->text;
