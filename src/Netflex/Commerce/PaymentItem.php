@@ -2,11 +2,9 @@
 
 namespace Netflex\Commerce;
 
-
+use Closure;
 use DateTimeInterface;
-
 use Illuminate\Support\Carbon;
-
 use Netflex\Commerce\Contracts\Payment;
 use Netflex\Commerce\Traits\API\PaymentItemAPI;
 use Netflex\Commerce\Traits\Reactivity\HasReactiveChildrenProperties;
@@ -29,6 +27,9 @@ class PaymentItem extends ReactiveObject implements Payment
     use HasReactiveChildrenProperties;
 
     const PROPERTIES_CLASS = Properties::class;
+
+    /** @var (Closure(static): bool|null)|null */
+    protected static ?Closure $checkIsPendingCallback = null;
 
     protected $readOnlyAttributes = [
         'id',
@@ -139,6 +140,19 @@ class PaymentItem extends ReactiveObject implements Payment
      */
     public function getIsPending(): bool
     {
+        if (static::$checkIsPendingCallback !== null) {
+            $result = (static::$checkIsPendingCallback)($this);
+
+            if ($result !== null) {
+                return $result;
+            }
+        }
+
+        return $this->defaultGetIsPending();
+    }
+
+    protected function defaultGetIsPending(): bool
+    {
         return !in_array($this->getPaymentStatus(), ['paid', 'reserved']);
     }
 
@@ -150,5 +164,11 @@ class PaymentItem extends ReactiveObject implements Payment
     public function setLocked(bool $isLocked)
     {
         $this->data->isLocked = $isLocked;
+    }
+
+    /** @param (Closure(static): bool|null) */
+    public static function checkIsPendingUsing(Closure $callback): void
+    {
+       static::$checkIsPendingCallback = $callback;
     }
 }
