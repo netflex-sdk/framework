@@ -67,7 +67,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
     /**
      * Get the Chromium version of the renderer
-     * 
+     *
      * @return string
      */
     public static function version()
@@ -177,7 +177,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
     /**
      * Waits until the entire document, including resources are fully loaded.
-     * 
+     *
      * @return static
      * */
     public function waitUntilLoaded()
@@ -187,7 +187,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
     /**
      * Waits until the 'DOMContentLoaded' event is fired.
-     * 
+     *
      * @return static
      * */
     public function waitUntiDOMContentLoaded()
@@ -197,7 +197,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
     /**
      * Waits until there has not been any network requests for at least 500ms
-     * 
+     *
      * @return static
      * */
     public function waitUntiNetworkIdle()
@@ -207,12 +207,22 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
     /**
      * Waits until there has not been more than 2 network requests for at least 500ms
-     * 
+     *
      * @return static
      * */
     public function waitUntiNetworkSettled()
     {
         return $this->setOption('waitUntil', 'networkidle2');
+    }
+
+    /**
+     * Waits until a specified event has been emitted on window in the rendered application
+     * @param string $eventName
+     * @return static
+     */
+    public function waitForWindowEvent(string $eventName)
+    {
+        return $this->setOption('waitForWindowEvent', $eventName);
     }
 
     /**
@@ -228,7 +238,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
     /**
      * Get the rendered content as a file handle (resource)
-     * 
+     *
      * @return resource
      */
     public function stream()
@@ -241,7 +251,7 @@ abstract class Renderer implements Renderable, Jsonable, JsonSerializable
 
     /**
      * Get the rendered content as a blob
-     * 
+     *
      * @return string|null
      */
     public function blob()
