@@ -26,6 +26,7 @@ class PaymentItem extends ReactiveObject implements Payment
     use PaymentItemAPI;
     use HasReactiveChildrenProperties;
 
+    /** @var class-string<Properties> */
     const PROPERTIES_CLASS = Properties::class;
 
     /** @var (Closure(static): bool|null)|null */

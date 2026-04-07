@@ -49,6 +49,7 @@ class CartItem extends ReactiveObject implements CartItemContract
   use Localizable;
   use HasReactiveChildrenProperties;
 
+  /** @var class-string<Properties> */
   const string PROPERTIES_CLASS = Properties::class;
 
   protected $readOnlyAttributes = [

@@ -22,7 +22,9 @@ class Cart extends ReactiveObject
 {
   use HasReactiveChildrenProperties;
 
+  /** @var class-string<CartItemCollection> */
   const string CART_ITEM_COLLECTION_CLASS = CartItemCollection::class;
+  /** @var class-string<ReservationItemCollection> */
   const string RESERVATION_ITEM_COLLECTION_CLASS = ReservationItemCollection::class;
 
   protected $defaults = [

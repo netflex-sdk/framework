@@ -63,12 +63,19 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
     use HasEvents;
     use HasReactiveChildrenProperties;
 
+    /** @var class-string<Register> */
     const string REGISTER_CLASS = Register::class;
+    /** @var class-string<Cart> */
     const string CART_CLASS = Cart::class;
+    /** @var class-string<Data> */
     const string DATA_CLASS = Data::class;
+    /** @var class-string<Payments> */
     const string PAYMENTS_CLASS = Payments::class;
+    /** @var class-string<Checkout> */
     const string CHECKOUT_CLASS = Checkout::class;
+    /** @var class-string<DiscountItemCollection> */
     const string DISCOUNT_ITEM_COLLECTION_CLASS = DiscountItemCollection::class;
+    /** @var class-string<LogItemCollection> */
     const string LOG_ITEM_COLLECTION_CLASS = LogItemCollection::class;
 
     /**
@@ -261,8 +268,9 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         $this->setReactiveObject($register, 'register', 'registerInstance');
     }
 
-    public function getRegisterAttribute(object|array|null $register = null): Register
-    {
+    public function getRegisterAttribute(
+      object|array|null $register = null,
+    ): Register {
         return $this->getReactiveObject(
             $register,
             static::REGISTER_CLASS,

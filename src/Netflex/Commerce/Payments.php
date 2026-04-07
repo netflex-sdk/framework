@@ -14,6 +14,7 @@ class Payments extends ReactiveObject
 {
   use HasReactiveChildrenProperties;
 
+  /** @var class-string<PaymentItemCollection> */
   const string PAYMENT_ITEM_COLLECTION_CLASS = PaymentItemCollection::class;
 
   protected $defaults = [

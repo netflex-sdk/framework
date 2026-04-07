@@ -6,15 +6,20 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Illuminate\Support\Collection as BaseCollection;
 
+/**
+ * @template TKey of array-key
+ * @template TItem of ReactiveObject
+ *
+ * @extends BaseCollection<TKey, TItem>
+ */
 abstract class ItemCollection extends BaseCollection implements JsonSerializable
 {
   use Hooks;
 
-  /** @var ReactiveObject|ItemCollection|null */
-  public $parent = null;
+  public ReactiveObject|null $parent = null;
 
-  /** @var string */
-  protected static $type = ReactiveObject::class;
+  /** @var class-string<TItem> */
+  protected static string $type = ReactiveObject::class;
 
   /**
    * @param array|null $items = []
@@ -31,6 +36,7 @@ abstract class ItemCollection extends BaseCollection implements JsonSerializable
     }
   }
 
+  /** @return TItem */
   protected function wireItem(mixed $item): ReactiveObject
   {
     if (
