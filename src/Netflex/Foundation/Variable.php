@@ -59,7 +59,7 @@ class Variable extends ReactiveObject
       });
 
       return collect($templates)->map(function ($content) {
-        return new static($content);
+        return new static($content, null, false);
       });
     });
   }
@@ -82,6 +82,10 @@ class Variable extends ReactiveObject
       return static::$data[$alias] ?? null;
     }
 
-    return new static(['alias' => $alias, 'value' => '#' . $alias . '#']);
+    return new static(
+      ['alias' => $alias, 'value' => '#' . $alias . '#'],
+      null,
+      false,
+    );
   }
 }

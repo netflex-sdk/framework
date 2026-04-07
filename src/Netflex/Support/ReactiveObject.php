@@ -30,7 +30,7 @@ abstract class ReactiveObject implements ArrayAccess, JsonSerializable
   public function __construct(
     $attributes = [],
     $parent = null,
-    $markAttributesAsModified = false,
+    $markAttributesAsModified = true,
   ) {
     $this->parent = $parent;
 
@@ -121,9 +121,12 @@ abstract class ReactiveObject implements ArrayAccess, JsonSerializable
    * @param object|null $parent = null
    * @return static
    */
-  public static function factory($attributes = [], $parent = null)
-  {
-    return new static($attributes, $parent);
+  public static function factory(
+    $attributes = [],
+    $parent = null,
+    $markAttributesAsModified = true,
+  ) {
+    return new static($attributes, $parent, $markAttributesAsModified);
   }
 
   /**

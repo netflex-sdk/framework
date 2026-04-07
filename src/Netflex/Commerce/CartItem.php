@@ -179,7 +179,7 @@ class CartItem extends ReactiveObject implements CartItemContract
    */
   public function getDiscountDataAttribute($data)
   {
-    return DiscountData::factory($data, $this);
+    return new DiscountData($data, $this, false);
   }
 
   /**

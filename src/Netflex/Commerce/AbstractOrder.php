@@ -186,11 +186,11 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
         try {
             $data = $attributes['data'] ?? [];
             if ($class = $data['_class'] ?? null)
-                return new $class($attributes);
+                return new $class($attributes, null, false);
             else
-                return new static($attributes);
+                return new static($attributes, null, false);
         } catch (Throwable $t) {
-            return new static($attributes);
+            return new static($attributes, null, false);
         }
     }
 

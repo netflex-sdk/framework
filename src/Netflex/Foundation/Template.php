@@ -86,7 +86,7 @@ class Template extends ReactiveObject implements Responsable
         $data = API::get('foundation/templates');
 
         return collect($data)->map(function ($template) {
-          return new static($template);
+          return new static($template, null, false);
         })->keyBy('id');
       });
     }

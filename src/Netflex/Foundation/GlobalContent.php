@@ -42,7 +42,7 @@ class GlobalContent extends ReactiveObject
       });
 
       return collect($content)->map(function ($content) {
-        return new static($content);
+        return new static($content, null, false);
       });
     });
   }

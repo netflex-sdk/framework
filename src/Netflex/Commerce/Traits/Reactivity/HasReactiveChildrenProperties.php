@@ -68,7 +68,7 @@ trait HasReactiveChildrenProperties
     string $protectedReactiveObjectKey,
   ): ReactiveObject {
     return $this->{$protectedReactiveObjectKey}
-      ??= $reactiveObjectClassString::factory($attributes, $this)
+      ??= (new $reactiveObjectClassString($attributes, $this, false))
       ->addHook('modified', function () use ($attributeKey) {
         $this->modified[] = $attributeKey;
         $this->modified = array_unique($this->modified);
@@ -142,7 +142,7 @@ trait HasReactiveChildrenProperties
     string $protectedItemCollectionObjectKey,
   ): ItemCollection {
     return $this->{$protectedItemCollectionObjectKey}
-      ??= $itemCollectionClassString::factory($items, $this)
+      ??= (new $itemCollectionClassString($items, $this))
       ->addHook('modified', function () use ($attributeKey) {
         $this->modified[] = $attributeKey;
         $this->modified = array_unique($this->modified);

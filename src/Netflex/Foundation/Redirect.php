@@ -32,7 +32,7 @@ class Redirect extends ReactiveObject
     });
 
     return collect($redirects)->map(function ($redirect) {
-      return new static($redirect);
+      return new static($redirect, null, false);
     });
   }
 
