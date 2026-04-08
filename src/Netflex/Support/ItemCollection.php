@@ -198,6 +198,34 @@ abstract class ItemCollection extends BaseCollection implements JsonSerializable
     return $this;
   }
 
+  public function remove(ReactiveObject $item): static
+  {
+    $key = $this->search($item);
+
+    if ($key !== false) {
+      $item->parent = null;
+      $this->splice($key, 1);
+    }
+
+    return $this;
+  }
+
+  /** @return TItem */
+  public function create(
+    array $attributes = [],
+    bool $markAttributesAsModified = true,
+  ): ReactiveObject {
+    $item = new (static::$type)(
+      $attributes,
+      $this,
+      $markAttributesAsModified,
+    );
+
+    $this->add($item);
+
+    return $item;
+  }
+
   /**
    * Add an item to the collection.
    *
