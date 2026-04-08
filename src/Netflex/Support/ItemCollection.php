@@ -86,18 +86,35 @@ abstract class ItemCollection extends BaseCollection implements JsonSerializable
   }
 
   /**
+   * Get and remove the first N items from the collection.
+   *
+   * @param  int<0, max>  $count
+   * @return ($count is 1 ? TValue|null : static<int, TValue>)
+   *
+   * @throws \InvalidArgumentException
+   */
+  public function shift($count = 1)
+  {
+    $modifies = !$this->isEmpty();
+
+    $result = parent::shift($count);
+
+    if ($modifies) {
+      $this->performHook('modified');
+    }
+
+    return $result;
+  }
+
+  /**
    * Get and remove the last N items from the collection.
    *
-   * @param int $count
-   * @return mixed
+   * @param  int  $count
+   * @return ($count is 1 ? TValue|null : static<int, TValue>)
    */
   public function pop($count = 1)
   {
-    $modifies = true;
-
-    if ($this->isEmpty()) {
-      $modifies = false;
-    }
+    $modifies = !$this->isEmpty();
 
     $result = parent::pop($count);
 
