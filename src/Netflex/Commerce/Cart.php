@@ -27,7 +27,7 @@ class Cart extends ReactiveObject
   /** @var class-string<ReservationItemCollection> */
   const string RESERVATION_ITEM_COLLECTION_CLASS = ReservationItemCollection::class;
 
-  protected $defaults = [
+  protected array $defaults = [
     'sub_total' => 0,
     'discount' => 0,
     'tax' => 0,
@@ -39,7 +39,7 @@ class Cart extends ReactiveObject
     'reservations' => [],
   ];
 
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'sub_total',
     'discount',
     'tax',

@@ -14,7 +14,7 @@ use Netflex\Support\ReactiveObject;
  */
 class ReservationItem extends ReactiveObject
 {
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'cart_item',
     'entry_id',
     'variant_id',

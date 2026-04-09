@@ -52,7 +52,7 @@ class CartItem extends ReactiveObject implements CartItemContract
   /** @var class-string<Properties> */
   const string PROPERTIES_CLASS = Properties::class;
 
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'id',
     'tax_cost',
     'entries_cost',
@@ -68,7 +68,7 @@ class CartItem extends ReactiveObject implements CartItemContract
     'order_id',
   ];
 
-  protected $defaults = [
+  protected array $defaults = [
     'entry_id' => null,
     'entry_name' => null,
     'variant_cost' => null,
@@ -187,7 +187,7 @@ class CartItem extends ReactiveObject implements CartItemContract
    * @return array
    */
   #[\ReturnTypeWillChange]
-  public function jsonSerialize()
+  public function jsonSerialize(): array
   {
     $json = parent::jsonSerialize();
     $json['properties'] = $this->properties->jsonSerialize();

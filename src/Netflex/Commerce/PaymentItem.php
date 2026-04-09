@@ -32,7 +32,7 @@ class PaymentItem extends ReactiveObject implements Payment
     /** @var (Closure(static): bool|null)|null */
     protected static ?Closure $checkIsPendingCallback = null;
 
-    protected $readOnlyAttributes = [
+    protected array $readOnlyAttributes = [
         'id',
         'order_id'
     ];
@@ -126,7 +126,7 @@ class PaymentItem extends ReactiveObject implements Payment
      * @return array
      */
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $json = parent::jsonSerialize();
         $json['data'] = $this->data->jsonSerialize();

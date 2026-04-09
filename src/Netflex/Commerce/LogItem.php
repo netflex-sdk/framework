@@ -20,12 +20,12 @@ class LogItem extends ReactiveObject
 {
   use LogItemAPI;
 
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'id',
     'updated'
   ];
 
-  protected $defaults = [
+  protected array $defaults = [
     'type' => null,
     'msg' => null
   ];

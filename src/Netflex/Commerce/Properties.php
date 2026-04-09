@@ -8,7 +8,7 @@ use Netflex\Support\ReactiveObject;
 
 class Properties extends ReactiveObject implements Arrayable
 {
-  protected $readOnlyAttributes = [];
+  protected array $readOnlyAttributes = [];
 
   use Localizable;
 
@@ -16,7 +16,7 @@ class Properties extends ReactiveObject implements Arrayable
    * @return array
    */
   #[\ReturnTypeWillChange]
-  public function jsonSerialize()
+  public function jsonSerialize(): array
   {
     $attributes = empty($this->attributes) ? [] : $this->attributes;
 

@@ -34,7 +34,7 @@ class SegmentData extends ReactiveObject
 {
 
   /** @var array */
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'bornDay', 'bornMonth', 'bornYear'
   ];
 

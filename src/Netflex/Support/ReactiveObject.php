@@ -21,18 +21,18 @@ abstract class ReactiveObject implements ArrayAccess, JsonSerializable
   public ReactiveObject|ItemCollection|null $parent = null;
 
   /** @var array */
-  protected $defaults = [];
+  protected array $defaults = [];
 
   /** @var array */
-  protected $readOnlyAttributes = ['id'];
+  protected array $readOnlyAttributes = ['id'];
 
   /**
-   * @param object|array $attributes = []
-   * @param object|null $parent = null
+   * @param object|array|null $attributes = null
+   * @param ReactiveObject|ItemCollection|null $parent = null
    */
   public function __construct(
-    $attributes = [],
-    $parent = null,
+    object|array|null $attributes = null,
+    ReactiveObject|ItemCollection|null $parent = null,
     $markAttributesAsModified = true,
   ) {
     $this->parent = $parent;
@@ -59,7 +59,7 @@ abstract class ReactiveObject implements ArrayAccess, JsonSerializable
     }
 
     if ($markAttributesAsModified) {
-      array_push($this->modified, ...array_keys($attributes));
+      array_push($this->modified, ...array_keys((array) $attributes));
       $this->modified = array_unique($this->modified);
     }
   }
@@ -130,12 +130,12 @@ abstract class ReactiveObject implements ArrayAccess, JsonSerializable
 
   /**
    * @param object|array $attributes = []
-   * @param object|null $parent = null
+   * @param ItemCollection|ReactiveObject|null $parent = null
    * @return static
    */
   public static function factory(
-    $attributes = [],
-    $parent = null,
+    object|array $attributes = [],
+    ItemCollection|ReactiveObject|null $parent = null,
     $markAttributesAsModified = true,
   ) {
     return new static($attributes, $parent, $markAttributesAsModified);
@@ -145,7 +145,7 @@ abstract class ReactiveObject implements ArrayAccess, JsonSerializable
    * @return array
    */
   #[\ReturnTypeWillChange]
-  public function jsonSerialize()
+  public function jsonSerialize(): array
   {
     $json = [];
 
@@ -160,7 +160,11 @@ abstract class ReactiveObject implements ArrayAccess, JsonSerializable
         $value = $value->jsonSerialize();
       }
 
-      if (($value instanceof Carbon) && property_exists($this, 'timestamps') && in_array($property, $this->timestamps)) {
+      if (
+        ($value instanceof Carbon)
+        && property_exists($this, 'timestamps')
+        && in_array($property, $this->timestamps)
+      ) {
         $value = $this->serializeTimestamp($value);
       }
 

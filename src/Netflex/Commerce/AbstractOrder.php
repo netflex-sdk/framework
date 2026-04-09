@@ -99,7 +99,7 @@ class AbstractOrder extends ReactiveObject implements OrderContract, UrlRoutable
 
     protected $relation = 'order';
 
-    protected $defaults = [
+    protected array $defaults = [
         'id' => null,
         'created' => null,
         'updated' => null,

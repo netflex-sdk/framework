@@ -17,12 +17,12 @@ class Payments extends ReactiveObject
   /** @var class-string<PaymentItemCollection> */
   const string PAYMENT_ITEM_COLLECTION_CLASS = PaymentItemCollection::class;
 
-  protected $defaults = [
+  protected array $defaults = [
     'total' => 0,
     'items' => []
   ];
 
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'total',
     'items'
   ];

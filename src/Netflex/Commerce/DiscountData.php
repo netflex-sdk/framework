@@ -16,7 +16,7 @@ use Netflex\Support\ReactiveObject;
  */
 class DiscountData extends ReactiveObject
 {
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'id',
     'order_id',
     'discount_id',

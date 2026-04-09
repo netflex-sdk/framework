@@ -19,7 +19,7 @@ class DiscountItem extends ReactiveObject
 {
   use DiscountItemAPI;
 
-  protected $readOnlyAttributes = [
+  protected array $readOnlyAttributes = [
     'id',
     'order_id'
   ];
