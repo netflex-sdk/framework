@@ -37,7 +37,7 @@ trait OrderAPI
         $this->data['_class'] ??= get_class($this);
 
         foreach ($attributes as $attributeKey => $attribute) {
-          $this->{$attributeKey} = $attribute;
+            $this->{$attributeKey} = $attribute;
         }
 
         $payload = $this->toModifiedArray();
@@ -48,8 +48,9 @@ trait OrderAPI
                 return $this;
             }
 
-            $this->attributes['id'] = API::post(trim(static::$base_path, '/'), $payload)->order_id;
-
+            $this->attributes['id'] = API
+                ::post(trim(static::$base_path, '/'), $payload)
+                ->order_id;
 
             $this->refresh();
 
@@ -75,7 +76,7 @@ trait OrderAPI
                             'Prefer' => [
                                 'update-behavior=full',
                             ],
-                        ]
+                        ],
                     ],
                     true,
                 );
@@ -105,7 +106,12 @@ trait OrderAPI
     public function refresh()
     {
         if ($this->id) {
-            $this->attributes = API::get(static::basePath() . $this->id, true);
+            $response = API::get(static::basePath() . $this->id, true);
+
+            foreach ($response as $key => $value) {
+                $this->offsetUnset($key);
+                $this->attributes[$key] = $value;
+            }
 
             $this->addToCache();
             $this->fireModelEvent('retrieved', false);
@@ -235,7 +241,7 @@ trait OrderAPI
      */
     public static function create($attributes = [])
     {
-        $order = (new static)->newFromBuilder($attributes);
+        $order = (new static())->newFromBuilder($attributes);
         foreach ($attributes as $key => $value) {
             $order->modified[] = $key;
         }
@@ -306,7 +312,9 @@ trait OrderAPI
         $order = (new static)->newFromBuilder($data);
 
         if (!$order->id) {
-            throw new OrderNotFoundException('Order not found with secret ' . $secret);
+            throw new OrderNotFoundException(
+                'Order not found with secret ' . $secret,
+            );
         }
 
         $order = $order->addToCache();
@@ -325,10 +333,12 @@ trait OrderAPI
     {
         $data = API::get(static::basePath() . 'register/' . $id);
 
-        $order = (new static)->newFromBuilder($data);
+        $order = (new static())->newFromBuilder($data);
 
         if (!$order->id) {
-            throw new OrderNotFoundException('Order not found with register id ' . $id);
+            throw new OrderNotFoundException(
+                'Order not found with register id ' . $id,
+            );
         }
 
         $order = $order->addToCache();
@@ -348,7 +358,7 @@ trait OrderAPI
             $data = API::get(static::basePath() . $id);
         }
 
-        $order = (new static)->newFromBuilder($data);
+        $order = (new static())->newFromBuilder($data);
 
         if (!$order->id) {
             throw new OrderNotFoundException('Order not found with id ' . $id);
@@ -371,7 +381,7 @@ trait OrderAPI
             && class_exists('Illuminate\Support\Facades\Cache')
         ) {
             return \Illuminate\Support\Facades\Cache::get(
-                static::$cacheBaseKey . '/' . $key
+                static::$cacheBaseKey . '/' . $key,
             );
         }
 
@@ -391,12 +401,12 @@ trait OrderAPI
             \Illuminate\Support\Facades\Cache::put(
                 static::$cacheBaseKey . '/' . $this->id,
                 $this->attributes,
-                static::$cacheTTL
+                static::$cacheTTL,
             );
             \Illuminate\Support\Facades\Cache::put(
                 static::$cacheBaseKey . '/' . $this->secret,
                 $this->attributes,
-                static::$cacheTTL
+                static::$cacheTTL,
             );
         }
 
@@ -414,10 +424,10 @@ trait OrderAPI
             && class_exists('Illuminate\Support\Facades\Cache')
         ) {
             \Illuminate\Support\Facades\Cache::forget(
-                static::$cacheBaseKey . '/' . $this->id
+                static::$cacheBaseKey . '/' . $this->id,
             );
             \Illuminate\Support\Facades\Cache::forget(
-                static::$cacheBaseKey . '/' . $this->secret
+                static::$cacheBaseKey . '/' . $this->secret,
             );
         }
 
