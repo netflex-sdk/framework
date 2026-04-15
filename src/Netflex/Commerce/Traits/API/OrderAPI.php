@@ -67,6 +67,7 @@ trait OrderAPI
             // Put updates
             if (!empty($payload)) {
                 $uri = static::basePath() . $this->id;
+
                 $response = API::request(
                     'put',
                     $uri,
@@ -114,6 +115,9 @@ trait OrderAPI
             }
 
             $this->addToCache();
+
+            $this->modified = [];
+
             $this->fireModelEvent('retrieved', false);
         } else {
             $this->save();
