@@ -7,15 +7,15 @@
         "sort-packages": true
     },
     "require": {
-        "illuminate/bus": "^12.0",
-        "illuminate/mail": "^12.0",
-        "illuminate/notifications": "^12.0",
-        "illuminate/support": "^12.0",
+        "illuminate/bus": "^13.0",
+        "illuminate/mail": "^13.0",
+        "illuminate/notifications": "^13.0",
+        "illuminate/support": "^13.0",
         "mustache/mustache": "^2.14.1",
-        "netflex/api": "^6.0",
-        "netflex/foundation": "^6.0",
-        "netflex/renderer": "^6.0",
-        "php": "^8.2"
+        "netflex/api": "^7.0",
+        "netflex/foundation": "^7.0",
+        "netflex/renderer": "^7.0",
+        "php": "^8.4"
     },
     "autoload": {
         "psr-4": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.0.x-dev"
+            "dev-master": "7.0.x-dev"
         },
         "laravel": {
             "providers": [

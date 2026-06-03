@@ -19,8 +19,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "apility/rule-builder": "^1.5.2",
-        "apility/seotools": "^2.0",
+        "apriil/rule-builder": "^1.0",
+        "apriil/seotools": "^1.0",
         "brick/phonenumber": "^0.8.0",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^7.0",
@@ -29,17 +29,17 @@
         "html2text/html2text": "^4.3",
         "jetbrains/phpstorm-attributes": "^1.0",
         "justinrainbow/json-schema": "^6.4",
-        "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.0",
+        "laravel/framework": "^13.0",
+        "laravel/tinker": "^3.0",
         "mustache/mustache": "^2.14.1",
-        "nunomaduro/laravel-console-menu": "^3.0",
-        "symfony/cache": "^7.3",
-        "symfony/psr-http-message-bridge": "^7.3",
+        "nunomaduro/laravel-console-menu": "^3.7",
+        "symfony/cache": "^7.4",
+        "symfony/psr-http-message-bridge": "^7.4",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
-        "ultrono/laravel-sitemap": "^9.5"
+        "ultrono/laravel-sitemap": "^10.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0|^10.0",
+        "phpunit/phpunit": "^12.0",
         "vlucas/phpdotenv": "^5.2",
         "tacman/composer-json-manipulator": "^11.4",
         "symplify/monorepo-builder": "^11.2"
@@ -87,7 +87,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.x-dev"
+            "dev-master": "7.0.x-dev"
         },
         "laravel": {
             "providers": [
@@ -111,10 +111,10 @@
                 "Netflex\\Newsletters\\Providers\\NewslettersServiceProvider"
             ],
             "aliases": {
-                "SEOMeta": "Apility\\SEOTools\\Facades\\SEOMeta",
-                "OpenGraph": "Apility\\SEOTools\\Facades\\OpenGraph",
-                "Twitter": "Apility\\SEOTools\\Facades\\TwitterCard",
-                "SEO": "Apility\\SEOTools\\Facades\\SEOTools",
+                "SEOMeta": "Apriil\\SEOTools\\Facades\\SEOMeta",
+                "OpenGraph": "Apriil\\SEOTools\\Facades\\OpenGraph",
+                "Twitter": "Apriil\\SEOTools\\Facades\\TwitterCard",
+                "SEO": "Apriil\\SEOTools\\Facades\\SEOTools",
                 "Search": "Netflex\\Query\\Facades\\Search",
                 "Query": "Netflex\\Query\\Facades\\QueryBuilderFacade",
                 "QueryAssoc": "Netflex\\Query\\Facades\\QueryBuilderFacade",
@@ -130,28 +130,28 @@
         }
     },
     "replace": {
-        "netflex/actions": "6.0.0",
-        "netflex/api": "6.0.0",
-        "netflex/breadcrumbs": "6.0.0",
-        "netflex/commerce": "6.0.0",
-        "netflex/console": "6.0.0",
-        "netflex/customers": "6.0.0",
-        "netflex/encryption": "6.0.0",
-        "netflex/files": "6.0.0",
-        "netflex/foundation": "6.0.0",
-        "netflex/http": "6.0.0",
-        "netflex/log": "6.0.0",
-        "netflex/message-channel": "6.0.0",
-        "netflex/newsletters": "6.0.0",
-        "netflex/notifications": "6.0.0",
-        "netflex/pages": "6.0.0",
-        "netflex/query-builder": "6.0.0",
-        "netflex/renderer": "6.0.0",
-        "netflex/scheduler": "6.0.0",
-        "netflex/sdk": "6.0.0",
-        "netflex/structure": "6.0.0",
-        "netflex/structures": "6.0.0",
-        "netflex/support": "6.0.0"
+        "netflex/actions": "7.0.0",
+        "netflex/api": "7.0.0",
+        "netflex/breadcrumbs": "7.0.0",
+        "netflex/commerce": "7.0.0",
+        "netflex/console": "7.0.0",
+        "netflex/customers": "7.0.0",
+        "netflex/encryption": "7.0.0",
+        "netflex/files": "7.0.0",
+        "netflex/foundation": "7.0.0",
+        "netflex/http": "7.0.0",
+        "netflex/log": "7.0.0",
+        "netflex/message-channel": "7.0.0",
+        "netflex/newsletters": "7.0.0",
+        "netflex/notifications": "7.0.0",
+        "netflex/pages": "7.0.0",
+        "netflex/query-builder": "7.0.0",
+        "netflex/renderer": "7.0.0",
+        "netflex/scheduler": "7.0.0",
+        "netflex/sdk": "7.0.0",
+        "netflex/structure": "7.0.0",
+        "netflex/structures": "7.0.0",
+        "netflex/support": "7.0.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true

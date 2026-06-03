@@ -22,12 +22,12 @@
     },
     "require": {
         "facade/ignition-contracts": "^1.0",
-        "illuminate/contracts": "^12.0",
-        "illuminate/http": "^12.0",
-        "illuminate/support": "^12.0",
-        "illuminate/view": "^12.0",
-        "netflex/api": "^6.0",
-        "php": "^8.2"
+        "illuminate/contracts": "^13.0",
+        "illuminate/http": "^13.0",
+        "illuminate/support": "^13.0",
+        "illuminate/view": "^13.0",
+        "netflex/api": "^7.0",
+        "php": "^8.4"
     },
     "autoload": {
         "psr-4": {
@@ -39,7 +39,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.0.x-dev"
+            "dev-master": "7.0.x-dev"
         },
         "laravel": {
             "providers": [

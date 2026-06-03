@@ -16,16 +16,16 @@
     },
     "require": {
         "html2text/html2text": "^4.3",
-        "netflex/api": "^6.0",
-        "netflex/pages": "^6.0",
-        "netflex/query-builder": "^6.0",
-        "netflex/support": "^6.0",
+        "netflex/api": "^7.0",
+        "netflex/pages": "^7.0",
+        "netflex/query-builder": "^7.0",
+        "netflex/support": "^7.0",
         "php": "^8.4",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.0.x-dev"
+            "dev-master": "7.0.x-dev"
         },
         "laravel": {
             "providers": [
