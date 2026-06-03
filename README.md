@@ -9,7 +9,11 @@
 
 This repository contains the full Netflex Framework. All packages are built from this repository, and split into separate read only subtrees.
 
-The 6.x version is meant to be used with Laravel 12. It has *not* been tested extensively, and there is no guarantee that all the Netflex framwork's features will work. 
+The 7.x version targets Laravel 13. The 6.x branch remains on Laravel 12.
+
+Both lines have *not* been tested extensively, and there is no guarantee that all Netflex framework features will work.
+
+See [UPGRADE-LARAVEL-13.md](UPGRADE-LARAVEL-13.md) when upgrading consumer SDK apps from 6.x to 7.x.
 
 ## Documentation
 
